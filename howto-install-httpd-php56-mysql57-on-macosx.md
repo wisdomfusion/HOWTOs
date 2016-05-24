@@ -1,4 +1,4 @@
-# HowTo Install httpd+PHP5.6+MySQL5.7 on Mac OS X
+# How to Install httpd+PHP5.6+MySQL5.7 on Mac OS X
 
 ## 1. Introduction
 

@@ -1,4 +1,4 @@
-# HowTo Install Postfix on CentOS 6
+# How to Install Postfix on CentOS 6
 
 ## 1. Introduction
 
