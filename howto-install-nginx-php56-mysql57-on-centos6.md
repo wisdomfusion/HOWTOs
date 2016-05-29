@@ -49,26 +49,26 @@ echo "nameserver 202.106.196.115" >> /etc/resolv.conf
 echo "nameserver 114.114.114.114" >> /etc/resolv.conf
 ```
 
-禁用 SELinux：
+### 2.2. 禁用 SELinux
 
 ```sh
 sed -i 's/^SELINUX=*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
-禁用 IPv6：
+### 2.3. 禁用 IPv6
 ```sh
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 ```
 
-进程打开文件数：
+### 2.4. 进程打开文件数
 ```sh
 echo >> /etc/security/limits.conf
 echo "* soft nofile 65535" >> /etc/security/limits.conf
 echo "* hard nofile 65535" >> /etc/security/limits.conf
 ```
 
-禁止更新 kernel 相关的包：
+### 2.5. 禁止更新 kernel 相关的包：
 
 ```sh
 echo "exclude=kernel*" >> /etc/yum.conf
