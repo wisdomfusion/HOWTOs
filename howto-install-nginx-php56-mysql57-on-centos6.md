@@ -232,9 +232,6 @@ chkconfig mysqld on
 必要的配置：
 
 ```sh
-mkdir -p /u01/mysql
-chown mysql:mysql /u01/mysql/
-
 cat > /etc/my.cnf <<\EOF
 [client]
 port = 3306
@@ -319,17 +316,22 @@ sort_buffer_size = 8M
 read_buffer = 4M
 write_buffer = 4M
 EOF
+```
 
+初始化数据库，请保持 `/u01/mysql/` 目录为空：
+```sh
+mkdir -p /u01/mysql
+chown mysql:mysql /u01/mysql/
 /usr/local/webserver/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/usr/local/webserver/mysql --datadir=/u01/mysql
 ```
 
-启动：
+启动 MySQL：
 
 ```sh
 /etc/init.d/mysqld start
 ```
 
-更改 MySQL 默认密码：
+给 MySQL root 用户添加密码：
 
 ```sh
 dbrootpwd=123456
@@ -337,7 +339,7 @@ dbrootpwd=123456
 /usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$dbrootpwd\" with grant option;"
 ```
 
-关闭：
+关闭 MySQL：
 
 ```sh
 /etc/init.d/mysqld stop
