@@ -687,7 +687,9 @@ http
 EOF
 ```
 
-## 5. iptables
+## 5. 系统安全加固
+
+### 5.1. iptables 防火墙
 
 ```sh
 mkdir -p /usr/local/firewall
@@ -838,9 +840,22 @@ cat > /usr/local/firewall/iptables.rule <<\EOF
 # iptables -t nat -A PREROUTING -p tcp -i $EXTIF --dport 80  \
 #          -j DNAT --to 192.168.1.210:80
 EOF
+```
 
+随机启动 iptables：
+
+```sh
 echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 ```
+
+### 5.2. PHP 安全配置
+
+
+### 5.3. MySQL 安全配置
+
+
+### 5.4. CentOS 系统安全配置
+
 
 ## 6. 其他服务安装
 
