@@ -162,22 +162,22 @@ echo '/usr/local/lib' >> /etc/ld.so.conf
 
 MySQL 5.7 GA版本的发布，也就是说从现在开始5.7已经可以在生产环境中使用，有任何问题官方都将立刻修复。
 
-MySQL 5.7主要特性：
-- 更好的性能：对于多核CPU、固态硬盘、锁有着更好的优化，每秒100W QPS已不再是MySQL的追求，下个版本能否上200W QPS才是吾等用户更关心的
-- 更好的InnoDB存储引擎
-- 更为健壮的复制功能：复制带来了数据完全不丢失的方案，传统金融客户也可以选择使用MySQL数据库。此外，GTID在线平滑升级也变得可能
-- 更好的优化器：优化器代码重构的意义将在这个版本及以后的版本中带来巨大的改进，Oracle官方正在解决MySQL之前最大的难题
-- 原生JSON类型的支持
-- 更好的地理信息服务支持：InnoDB原生支持地理位置类型，支持GeoJSON，GeoHash特性
-- 新增sys库：以后这会是DBA访问最频繁的库
+MySQL 5.7 主要特性：
+- 更好的性能：对于多核 CPU、固态硬盘、锁有着更好的优化，每秒 100W QPS 已不再是 MySQL 的追求，下个版本能否上 200W QPS才 是吾等用户更关心的
+- 更好的 InnoDB 存储引擎
+- 更为健壮的复制功能：复制带来了数据完全不丢失的方案，传统金融客户也可以选择使用 MySQL 数据库。此外，GTID 在线平滑升级也变得可能
+- 更好的优化器：优化器代码重构的意义将在这个版本及以后的版本中带来巨大的改进，Oracle 官方正在解决 MySQL 之前最大的难题
+- 原生 JSON 类型的支持
+- 更好的地理信息服务支持：InnoDB 原生支持地理位置类型，支持 GeoJSON，GeoHash 特性
+- 新增 sys 库：以后这会是 DBA 访问最频繁的库
 
-需要用于 boost C++ 库：
+MySQL 编译安装时需要用到 boost C++ 库：
 ```sh
 cd /usr/src/
 tar zxvf boost_1_59_0.tar.gz -C /usr/local/
 ```
 
-正式安装前先建立 mysql:mysql 用户：
+正式安装前先建立 `mysql:mysql` 用户：
 
 ```sh
 /usr/sbin/groupadd mysql
