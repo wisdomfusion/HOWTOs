@@ -154,7 +154,7 @@ cd mcrypt-2.6.8/
 ./configure && make && make install
 cd ../
 
-echo '/usr/local/lib' >> /etc/ld.so.conf
+echo "/usr/local/lib" >> /etc/ld.so.conf
 /sbin/ldconfig
 ```
 
