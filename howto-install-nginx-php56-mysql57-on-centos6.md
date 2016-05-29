@@ -2,7 +2,7 @@
 
 ## 0. 约定
 
-- 系统用户暂用 root 密码：rootroot
+- 暂用系统用户 root 方便安装调试，密码：rootroot
 - 主机IP地址：192.168.1.11
 - 软件包下载到 `/usr/src/` 目录下
 - 所有软件包安装在 `/usr/local/webserver/` 目录下
