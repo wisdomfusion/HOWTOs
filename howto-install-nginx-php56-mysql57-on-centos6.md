@@ -2,7 +2,7 @@
 
 ## 0. 约定
 
-- 暂用系统用户 root 方便安装调试，密码：rootroot
+- 暂用系统用户 root 方便安装调试
 - 主机IP地址：192.168.1.11
 - 软件包下载到 `/usr/src/` 目录下
 - 所有软件包安装在 `/usr/local/webserver/` 目录下
@@ -10,11 +10,20 @@
 - `/u01/www/` 存放网站数据
 - `/u01/logfiles/` 存放网站日志
 
-## 1. 所需软件包
+## 1. 系统要求
+
+系统环境：
+
+- CentOS 6.8
+
+所需软件包：
 
     nginx-1.10.0.tar.gz
     php-5.6.22.tar.gz
     mysql-5.7.12.tar.gz
+
+相关库：
+
     boost_1_59_0.tar.gz
     libiconv-1.14.tar.gz
     libmcrypt-2.5.8.tar.gz
