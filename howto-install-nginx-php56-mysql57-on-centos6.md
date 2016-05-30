@@ -77,12 +77,6 @@ echo "* soft nofile 65535" >> /etc/security/limits.conf
 echo "* hard nofile 65535" >> /etc/security/limits.conf
 ```
 
-### 2.5. 禁止更新 kernel 相关的包：
-
-```sh
-echo "exclude=kernel*" >> /etc/yum.conf
-```
-
 ## 3. 安装前的准备
 
 ### 3.1. 编译工具及相关库
@@ -866,6 +860,12 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 
 
 ### 5.4. CentOS 系统安全配置
+
+**禁止更新 kernel 相关的包**
+
+```sh
+echo "exclude=kernel*" >> /etc/yum.conf
+```
 
 
 ## 6. 其他服务安装
