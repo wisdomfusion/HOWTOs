@@ -90,7 +90,7 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 ### 3.2. 安装常用工具
 
 ```sh
-yum -y install man wget vim-enhanced
+yum -y install man wget vim-enhanced lrzsz
 alias vi='vim'
 echo "alias vi='vim'" >> ~/.bashrc
 echo "set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936" >> ~/.vimrc
