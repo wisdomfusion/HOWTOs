@@ -99,6 +99,8 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 yum -y install man wget vim-enhanced
 alias vi='vim'
 echo "alias vi='vim'" >> ~/.bashrc
+echo "set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936" >> ~/.vimrc
+echo "set fileformats=unix,dos" >> ~/.vimrc
 ```
 
 ### 3.3. 下载所需软件包
