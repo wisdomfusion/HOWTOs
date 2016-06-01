@@ -33,6 +33,11 @@
     pcre-8.38.tar.gz
     ImageMagick.tar.gz
     imagick-3.4.1.tgz
+    
+其他服务软件包：
+
+    memcached-1.4.25.tar.gz
+    redis-3.2.0.tar.gz
 
 ## 2. 系统基本设定
 
@@ -77,12 +82,6 @@ echo "* soft nofile 65535" >> /etc/security/limits.conf
 echo "* hard nofile 65535" >> /etc/security/limits.conf
 ```
 
-### 2.5. 禁止更新 kernel 相关的包：
-
-```sh
-echo "exclude=kernel*" >> /etc/yum.conf
-```
-
 ## 3. 安装前的准备
 
 ### 3.1. 编译工具及相关库
@@ -96,7 +95,7 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 ### 3.2. 安装常用工具
 
 ```sh
-yum -y install man wget vim-enhanced
+yum -y install man wget iptraf iotop vim-enhanced
 alias vi='vim'
 echo "alias vi='vim'" >> ~/.bashrc
 ```
@@ -433,6 +432,17 @@ chkconfig --add php-fpm
 chkconfig php-fpm on
 ```
 
+PHP 模块安装：
+
+
+
+
+
+
+
+
+
+
 ### 4.4. 安装 nginx 1.10.0
 
 先要安装 PCRE 支持：
@@ -696,9 +706,20 @@ http
 EOF
 ```
 
-## 5. 系统安全加固
+## 5. 其他服务安装
 
-### 5.1. iptables 防火墙
+### 5.1. rsync
+
+yum -y rsync xinetd
+
+### 5.2. ProFTPd
+
+FTP 服务器
+
+
+## 6. 系统安全加固
+
+### 6.1. iptables 防火墙
 
 ```sh
 mkdir -p /usr/local/firewall
@@ -857,22 +878,16 @@ EOF
 echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 ```
 
-### 5.2. PHP 安全配置
+### 6.2. PHP 安全配置
+
+### 6.3. MySQL 安全配置
 
 
-### 5.3. MySQL 安全配置
+### 6.4. CentOS 系统安全配置
 
+**禁止更新 kernel 相关的包**
 
-### 5.4. CentOS 系统安全配置
-
-
-## 6. 其他服务安装
-
-### 6.1. rsync
-
-yum -y rsync xinetd
-
-### 6.2. ProFTPd
-
-FTP 服务器
+```sh
+echo "exclude=kernel*" >> /etc/yum.conf
+```
 
