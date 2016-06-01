@@ -4,7 +4,7 @@
 
 ``好记性不如烂笔头'' 这话什么时候也不过时。几年前，因网站发送验证邮件的需要，折腾了两三天仓促地搭建了 postfix 邮件系统，没头没脑，也没写文档。但回想起来也的确搞笑，本身搭建工作没有什么难度，只不过涉事组件比较多，组件之间还有权限和库文件的依赖，如果能一步步把文档整理出来，事后再遇此事，便再不会慌里慌张。
 
-好了，不再寒暄了。这个文档是真实案例的产物，我在安装过程中也参考了包括 extmail 官方提供的 wiki 文档在内的多篇记笔文档，也就是说，这个文档主要是站在他人肩上做的一套实践活动，随便写了个活动感想。:grin:
+好了，不再寒暄了。本文是真实案例的产物，我在安装过程中也参考了包括 extmail 官方提供的 wiki 文档在内的多篇记笔文档，也就是说，这个文档主要是站在他人肩上做的一套实践活动，随便写了个活动感想，可能这个感想有些流水帐了些。:grin:
 
 ## 1. 系统要求
 
@@ -14,13 +14,13 @@
 
 1.2. 所需软件包
 
-- httpd
-- MySQL 5.7.12
 - postfix 3.1.1
+- MySQL 5.7.12
 - courier-authlib-0.66.4
 - dovecot
 - cyrus-sasl
 - maildrop
+- httpd
 - extmail-1.2
 - extman-1.1
 
@@ -28,10 +28,14 @@
 
 ### 2.1. 编译工具及相关库
 
+像软体包安装，我更倾向编译安装一下，我不太喜欢直接 groupinstall 一堆诸如 `Development Libraries`, `Development Tools`, `X Software Development`, `Legacy Software Development` 的“组”，应该是只安装自己需要的工具就可以了，这里借用了 LNMP 里的编译工具安装一用：
+
 ```sh
-sudo -s
-LANG=C
 yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel unzip zip nmap ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+```
+同时安装如下库和工具：
+
+```sh
 yum -y install tcl tcl-devel libart_lgpl libart_lgpl-devel libtool-ltdl libtool-ltdl-devel expect db4-devel
 ```
 
@@ -45,10 +49,11 @@ wget http://downloads.sourceforge.net/project/courier/authlib/0.66.4/courier-aut
 wget http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-3.1.1.tar.gz
 ```
 
-### 2.3. 其他软件包
+### 2.3. 这些软件包需要单独获取：
 
 - extmail-1.2
 - extman-1.1
+- maildrop
 
 ## 3. 安装
 
@@ -109,89 +114,87 @@ chkconfig mysqld on
 
 必要的配置：
 
-```sh
-cat > /etc/my.cnf <<\EOF
-[client]
-port = 3306
-socket = /tmp/mysql.sock
+    cat > /etc/my.cnf <<\EOF
+    [client]
+    port = 3306
+    socket = /tmp/mysql.sock
 
-[mysqld]
-port = 3306
-socket = /tmp/mysql.sock
-basedir = /usr/local/webserver/mysql
-datadir = /u01/mysql
-pid-file = /u01/mysql/mysql.pid
-user = mysql
-bind-address = 0.0.0.0
-server-id = 1
-#skip-name-resolve
-#skip-networking
+    [mysqld]
+    port = 3306
+    socket = /tmp/mysql.sock
+    basedir = /usr/local/webserver/mysql
+    datadir = /u01/mysql
+    pid-file = /u01/mysql/mysql.pid
+    user = mysql
+    bind-address = 0.0.0.0
+    server-id = 1
+    #skip-name-resolve
+    #skip-networking
 
-back_log = 300
-max_connections = 1000
-max_connect_errors = 6000
-open_files_limit = 65535
-table_open_cache = 128
-max_allowed_packet = 4M
-binlog_cache_size = 1M
-max_heap_table_size = 8M
-tmp_table_size = 16M
-read_buffer_size = 2M
-read_rnd_buffer_size = 8M
-sort_buffer_size = 8M
-join_buffer_size = 8M
-key_buffer_size = 4M
-thread_cache_size = 8
-query_cache_type = 1
-query_cache_size = 8M
-query_cache_limit = 2M
-ft_min_word_len = 4
-log_bin = mysql-bin
-binlog_format = mixed
-expire_logs_days = 30
-log_error = /u01/mysql/mysql-error.log
-slow_query_log = 1
-long_query_time = 1
-slow_query_log_file = /u01/mysql/mysql-slow.log
-performance_schema = 0
-explicit_defaults_for_timestamp
-#lower_case_table_names = 1
-skip-external-locking
+    back_log = 300
+    max_connections = 1000
+    max_connect_errors = 6000
+    open_files_limit = 65535
+    table_open_cache = 128
+    max_allowed_packet = 4M
+    binlog_cache_size = 1M
+    max_heap_table_size = 8M
+    tmp_table_size = 16M
+    read_buffer_size = 2M
+    read_rnd_buffer_size = 8M
+    sort_buffer_size = 8M
+    join_buffer_size = 8M
+    key_buffer_size = 4M
+    thread_cache_size = 8
+    query_cache_type = 1
+    query_cache_size = 8M
+    query_cache_limit = 2M
+    ft_min_word_len = 4
+    log_bin = mysql-bin
+    binlog_format = mixed
+    expire_logs_days = 30
+    log_error = /u01/mysql/mysql-error.log
+    slow_query_log = 1
+    long_query_time = 1
+    slow_query_log_file = /u01/mysql/mysql-slow.log
+    performance_schema = 0
+    explicit_defaults_for_timestamp
+    #lower_case_table_names = 1
+    skip-external-locking
 
-default_storage_engine = InnoDB
-#default-storage-engine = MyISAM
-innodb_file_per_table = 1
-innodb_open_files = 500
-innodb_buffer_pool_size = 64M
-innodb_write_io_threads = 4
-innodb_read_io_threads = 4
-innodb_thread_concurrency = 0
-innodb_purge_threads = 1
-innodb_flush_log_at_trx_commit = 2
-innodb_log_buffer_size = 2M
-innodb_log_file_size = 32M
-innodb_log_files_in_group = 3
-innodb_max_dirty_pages_pct = 90
-innodb_lock_wait_timeout = 120
+    default_storage_engine = InnoDB
+    #default-storage-engine = MyISAM
+    innodb_file_per_table = 1
+    innodb_open_files = 500
+    innodb_buffer_pool_size = 64M
+    innodb_write_io_threads = 4
+    innodb_read_io_threads = 4
+    innodb_thread_concurrency = 0
+    innodb_purge_threads = 1
+    innodb_flush_log_at_trx_commit = 2
+    innodb_log_buffer_size = 2M
+    innodb_log_file_size = 32M
+    innodb_log_files_in_group = 3
+    innodb_max_dirty_pages_pct = 90
+    innodb_lock_wait_timeout = 120
 
-bulk_insert_buffer_size = 8M
-myisam_sort_buffer_size = 8M
-myisam_max_sort_file_size = 10G
-myisam_repair_threads = 1
-interactive_timeout = 28800
-wait_timeout = 28800
+    bulk_insert_buffer_size = 8M
+    myisam_sort_buffer_size = 8M
+    myisam_max_sort_file_size = 10G
+    myisam_repair_threads = 1
+    interactive_timeout = 28800
+    wait_timeout = 28800
 
-[mysqldump]
-quick
-max_allowed_packet = 16M
+    [mysqldump]
+    quick
+    max_allowed_packet = 16M
 
-[myisamchk]
-key_buffer_size = 8M
-sort_buffer_size = 8M
-read_buffer = 4M
-write_buffer = 4M
-EOF
-```
+    [myisamchk]
+    key_buffer_size = 8M
+    sort_buffer_size = 8M
+    read_buffer = 4M
+    write_buffer = 4M
+    EOF
 
 初始化数据库，请保持 `/u01/mysql/` 目录为空：
 
@@ -310,121 +313,125 @@ make install
     shlib_directory: [no]
     meta_directory: [/etc/postfix]
 
+postfix 启动脚本：
 
+    cat > /etc/init.d/postfix <<\EOF
+            #!/bin/bash
+            # postfix script for the postfix server
+            # chkconfig: 2345 80 30
+            # description: postfix is the smtp server
+            . /etc/rc.d/init.d/functions
+            . /etc/sysconfig/network
+            [ $NETWORKING = "no" ] && exit 3
+            [ -x /usr/sbin/postfix ] || exit 4
+            [ -d /etc/postfix ] || exit 5
+            [ -d /var/spool/postfix ] || exit 6
+    
+    RETVAL=0
+        prog="postfix"
+    
+        start() {
+    echo -n "Starting postfix: "
+      /usr/bin/newaliased > /dev/null 2>&1
+      /usr/sbin/postfix start 2>/dev/null 1>&2 && success || failure "$prog start"
+      #RETVAL=$?
+      #[ $RETVAl -eq 0 ] && touch /var/lock/subsys/postfix
+      RETVAL=$?
+      [ $RETVAL -eq 0 ] && touch /var/lock/subsys/postfix
+      echo
+      return $RETVAL
+    }
+    stop() {
+      echo -n "Shutting down postfix: "
+      /usr/sbin/postfix stop 2>/dev/null 1>&2 && success || failure "$prog stop"
+      RETVAL=$?
+      [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/postfix
+      echo
+      return $RETVAL
+    }
+    reload() {
+      echo -n "Reloading postfix: "
+      /usr/sbin/postfix reload 2>/dev/null 1>&2 && success || failure "$prog reload"
+      RETVAL=$?
+      echo
+      return $RETVAL
+    }
+    abort() {
+      /usr/sbin/postfix abort 2>/dev/null 1>&2 && success || failure "$prog abort"
+      RETVAL=$?
+      echo
+      return $RETVAL
+    }
+    flush() {
+      /usr/sbin/postfix flush 2>/dev/null 1>&2 && success || failure "$prog flush"
+      return $RETVAL
+    }
+    check() {
+      echo -n "Checking postfix"
+      /usr/sbin/postfix check 2>/dev/null 1>&2 && success || failure
+      RETVAL=$?
+      echo
+      return $RETVAL
+    }
+    status() {
+      /usr/sbin/postfix status
+      return $RETVAL
+    
+    }
+    
+    restart() {
+      stop
+      start
+    }
+    
+    case "$1" in
+      start)
+      start
+      ;;
+      stop)
+      stop
+      ;;
+      restart)
+      restart
+      ;;
+      reload)
+      reload
+      ;;
+      abort)
+      abort
+      ;;
+      flush)
+      flush
+      ;;
+      check)
+      check
+      ;;
+      status)
+      status
+      ;;
+      condrestart)
+      [ -f /var/lock/subsys/postfix ] && restart || :
+      ;;
+      *)
+      echo "Usag: $0 {start|stop|restart|reload|abort|flush|check|status|condrestart}"
+      exit 2
+    esac
+    exit $?
+    EOF
+
+    
 ```sh
-cat > /etc/init.d/postfix <<\EOF
-#!/bin/bash
-# postfix script for the postfix server
-# chkconfig: 2345 80 30
-# description: postfix is the smtp server
-. /etc/rc.d/init.d/functions
-. /etc/sysconfig/network
-[ $NETWORKING = "no" ] && exit 3
-[ -x /usr/sbin/postfix ] || exit 4
-[ -d /etc/postfix ] || exit 5
-[ -d /var/spool/postfix ] || exit 6
-
-RETVAL=0
-prog="postfix"
-
-start() {
-  echo -n "Starting postfix: "
-  /usr/bin/newaliased > /dev/null 2>&1
-  /usr/sbin/postfix start 2>/dev/null 1>&2 && success || failure "$prog start"
-  #RETVAL=$?
-  #[ $RETVAl -eq 0 ] && touch /var/lock/subsys/postfix
-  RETVAL=$?
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/postfix
-  echo
-  return $RETVAL
-}
-stop() {
-  echo -n "Shutting down postfix: "
-  /usr/sbin/postfix stop 2>/dev/null 1>&2 && success || failure "$prog stop"
-  RETVAL=$?
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/postfix
-  echo
-  return $RETVAL
-}
-reload() {
-  echo -n "Reloading postfix: "
-  /usr/sbin/postfix reload 2>/dev/null 1>&2 && success || failure "$prog reload"
-  RETVAL=$?
-  echo
-  return $RETVAL
-}
-abort() {
-  /usr/sbin/postfix abort 2>/dev/null 1>&2 && success || failure "$prog abort"
-  RETVAL=$?
-  echo
-  return $RETVAL
-}
-flush() {
-  /usr/sbin/postfix flush 2>/dev/null 1>&2 && success || failure "$prog flush"
-  return $RETVAL
-}
-check() {
-  echo -n "Checking postfix"
-  /usr/sbin/postfix check 2>/dev/null 1>&2 && success || failure
-  RETVAL=$?
-  echo
-  return $RETVAL
-}
-status() {
-  /usr/sbin/postfix status
-  return $RETVAL
-
-}
-
-restart() {
-  stop
-  start
-}
-
-case "$1" in
-  start)
-  start
-  ;;
-  stop)
-  stop
-  ;;
-  restart)
-  restart
-  ;;
-  reload)
-  reload
-  ;;
-  abort)
-  abort
-  ;;
-  flush)
-  flush
-  ;;
-  check)
-  check
-  ;;
-  status)
-  status
-  ;;
-  condrestart)
-  [ -f /var/lock/subsys/postfix ] && restart || :
-  ;;
-  *)
-  echo "Usag: $0 {start|stop|restart|reload|abort|flush|check|status|condrestart}"
-  exit 2
-esac
-exit $?
-EOF
-
 chmod +x /etc/init.d/postfix
 chkconfig --add postfix
 chkconfig postfix on
 ```
 
-### 3.4. 认证
+### 3.4. CA 认证
 
 
 ### 3.5. courier-authlib
+
+
 
 ### 3.6. postfix 支持虚拟域和虚拟用户
 
@@ -440,7 +447,7 @@ chkconfig postfix on
 ### 3.9. maildrop
 
 
-## 4. 
+## 4. TODO
 
 
 
