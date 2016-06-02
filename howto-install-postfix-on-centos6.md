@@ -416,6 +416,13 @@ chkconfig --add postfix
 chkconfig postfix on
 ```
 
+另外，postfix 的邮件队列都存放在 `/var/spool/postfix`，不要试图去把权限弄明白，有点多有点乱，直接用 postfix 提供的命令即可完成权限修正，如下命令，修正权限并检查 postfix 配置文件：
+
+```sh
+postfix set-permissions
+postfix check
+```
+
 ### 3.4. 认证
 
 查看认证方式：
