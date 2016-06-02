@@ -2,7 +2,7 @@
 
 Version 0.1
 
-**postfix + extmail/extman + dovecot + maildrop**
+**postfix 3.1.1 + MySQL 5.7 + extmail-1.2/extman-1.1 + dovecot + maildrop-2.8.3**
 
 ## 0. 说明
 
