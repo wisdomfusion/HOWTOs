@@ -30,20 +30,25 @@ Version 0.1
 
 ## 2. 安装前的准备
 
-### 2.2. 下载一些软件包
+### 2.1. 下载一些软件包
 
 下面这些是可以直接 wget 或 curl 到的：
 
 ```sh
 cd /usr/src
-wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.12.tar.gz
+wget http://cdn.mysql.com/Downloads/MySQL-5.7/mysql-5.7.12.tar.gz
 wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget http://downloads.sourceforge.net/project/courier/authlib/0.66.4/courier-authlib-0.66.4.tar.bz2
 wget http://downloads.sourceforge.net/project/courier/maildrop/2.8.3/maildrop-2.8.3.tar.bz2
 wget http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-3.1.1.tar.gz
 ```
 
-### 2.1. 编译工具及相关库
+### 2.2. 这些软件包需要单独获取：
+
+- extmail-1.2
+- extman-1.1
+
+### 2.3. 编译工具及相关库
 
 安装开发工具组：
 
@@ -55,11 +60,6 @@ yum groupinstall "Development Tools"
 ```sh
 yum -y install tcl tcl-devel libart_lgpl libart_lgpl-devel libtool-ltdl libtool-ltdl-devel expect db4-devel
 ```
-
-### 2.3. 这些软件包需要单独获取：
-
-- extmail-1.2
-- extman-1.1
 
 ## 3. 安装
 
@@ -105,7 +105,7 @@ cmake \
 编译安装：
 
 ```sh
-make -j `grep processor /proc/cpuinfo | wc -l`
+make -j $(nproc)
 make install
 ```
 
@@ -431,7 +431,7 @@ postfix check
     cyrus
     dovecot
 
-#### 3.4.1. sasl
+#### 3.4.1. cyrus-sasl
 
 安装 cyrus-sasl
 
@@ -492,10 +492,6 @@ SMTP 认证配置 `/usr/lib64/sasl2/smtpd.conf`：
     #smtpd_sasl_application_name = smtpd
     smtpd_banner = Welcome to our $myhostname ESMTP,Warning: Version not Available!
 
-/var/spool/postfix
-
-
-
 ### 3.4.3. 安装 dovecot 服务
 
 dovecot 提供系统的 POP3 和 IMAP 服务，同时给 postfix 提供 SMTP 的 SASL 认证服务。
@@ -520,8 +516,9 @@ chkconfig dovecot on
 
 ### 3.4.4. 创建 CA
 
-vi /etc/pki/tls/openssl.cnf
-dir = /etc/pki/CA
+确认 CA 配置 `vi /etc/pki/tls/openssl.cnf`：
+
+    dir = /etc/pki/CA
 
 ```sh
 cd /etc/pki/CA
@@ -592,7 +589,7 @@ dovecot 相关配置：
 
     !include conf.d/*.conf
 
-它的意思是把 /etc/dovecot/conf.d/ 中的 *.conf 分类配置文件包含进来。
+它的意思是把 `/etc/dovecot/conf.d/` 中的 `*.conf` 分类配置文件包含进来。
 
 修改其中的 ssl 配置 `vi /etc/dovecot/conf.d/10-ssl.conf`：
 
@@ -625,9 +622,9 @@ dovecot 相关配置：
     unionmap
     unix
 
-### 3.4.3. courier-authlib
+### 3.4.3. 安装 courier-authlib
 
-courier-authlib 是用于 couier 的其他组件提供认证服务，其认证功能通常包括正登陆时的账号和密码，获取一个账号相关的家目录或邮件目录等信息，改变账号的密码等。而其认证的实现方式也包括基于 pam 通过 /etc/passwd 和 /etc/shadow 进行认证，基于 GDBM 或 DB 进行认证，基于 LDAP/mysql 进行认证等。因此 courier-authlib 通常用来与 courier 之外的其他邮件组件（如 postfix）整合为其提供认证服务。
+courier-authlib 是用于 couier 的其他组件提供认证服务，其认证功能通常包括正登陆时的账号和密码，获取一个账号相关的家目录或邮件目录等信息，改变账号的密码等。而其认证的实现方式也包括基于 pam 通过 `/etc/passwd` 和 `/etc/shadow` 进行认证，基于 GDBM 或 DB 进行认证，基于 LDAP/mysql 进行认证等。因此 courier-authlib 通常用来与 courier 之外的其他邮件组件（如 postfix）整合为其提供认证服务。
 
 这块安装的时候很是头疼，首先配置时一直提示如下错误：
 
@@ -748,7 +745,7 @@ chkconfig --add courier-authlib
 chkconfig courier-authlib on
 ```
 
-整合 postfix 和 courier-authlib
+整合 postfix 和 courier-authlib：
 
 ```sh
 mkdir -p /var/mailbox
@@ -778,6 +775,7 @@ virtual_gid_maps = static:2525
 virtual_transport = virtual
 maildrop_destination_recipient_limit = 1
 maildrop_destination_concurrency_limit = 1
+
 ##############QUOTA Setting##################
 message_size_limit = 14336000
 virtual_mailbox_limit = 20971520
@@ -804,9 +802,9 @@ mysql> grant select on extmail.* to 'extmail'@127.0.0.1 identified by 'extmail';
 mysql> flush privileges;
 ```
 
-启动虚拟域以后，需要注释掉myhostname，mydestination，mydomain，myorigin几个指令；当然，你也可以把mydestination的值改成自己需要的。
+启动虚拟域以后，需要注释掉 myhostname，mydestination，mydomain，myorigin 几个指令；当然，你也可以把 mydestination 的值改成自己需要的。
 
-需要注意的是 MySQL 5.7 改动比较大，而 extmail/extman 又太老，最新一版好像是 2009 年更新的吧，如果用 MySQL 5.7 的话需要调整一下：
+**需要注意的是 MySQL 5.7 改动比较大，**而 extmail/extman 又太老，最新一版好像是 2009 年更新的吧，如果用 MySQL 5.7 的话需要调整一下：
 
 ```sql
 cat > extmail.sql <<\EOF
@@ -940,18 +938,17 @@ vi /etc/dovecot/conf.d/10-auth.conf
 vi /etc/dovecot/conf.d/auth-system.conf.ext
 
     ...
-    
     auth default {
       mechanisms = plain
       passdb sql {
-      args = /etc/dovecot-mysql.conf
+      args = /etc/dovecot/dovecot-mysql.conf
       }
       userdb sql {
-      args = /etc/dovecot-mysql.conf
+      args = /etc/dovecot/dovecot-mysql.conf
       }
     }
 
-vi /etc/dovecot-mysql.conf
+vi /etc/dovecot/dovecot-mysql.conf
 
     driver = mysql
     connect = host=/var/tmp/mysql/mysqld.sock dbname=extmail user=extmail password=extmail
@@ -1126,7 +1123,7 @@ chown-R vmail:vmail /var/tmp/extman/
 
 | 命令                                | 说明                     |
 |-------------------------------------|--------------------------|
-| postconf -d \vert grep mail_version | 查看 postfix 版本号      |
+| postconf -d \| grep mail_version    | 查看 postfix 版本号      |
 | postfix set-permission              | 设置目录权限             |
 | postfix check                       | 检查配置及目录权限       |
 | postconf -n                         | 查看 postfix 配置        |
@@ -1151,5 +1148,5 @@ chown-R vmail:vmail /var/tmp/extman/
 tail -f /var/log/maillog
 ```
 
-末了，再次提配各位，立即删除 `/var/www/extsuite/extmail/cgi/env.cgi` 文件！
+末了，再次提醒各位，立即删除 `/var/www/extsuite/extmail/cgi/env.cgi` 文件！
  
