@@ -1043,6 +1043,17 @@ cpanm Time::HiRes Time::HiRes::Value File::Tail
 yum -y install rrdtool rrdtool-perl 
 ```
 
+**注意！！！**
+
+立即删除这个系统环境探针 CGI 脚本，[官方](http://extmail.org/)称 [WooYun] 上有爆该文件存在可执行任意脚本的漏洞：
+
+```sh
+rm /var/www/extsuite/extmail/cgi/env.cgi
+```
+
+
+[WooYun: http://www.wooyun.org/]
+
 ### 3.7. maildrop
 
 maildrop 是一个替代邮件代理并且包含邮件过滤的语言，系统管理员用这个 maildrop 即可以取代已经存在的邮件投递代理。maildrop 是一个使用 C++ 编写的用来代替本地 MDA 的带有过滤功能的邮件投递代理，是 courier 邮件系统的组件之一，它从标准输入接受信息并投递到用户邮箱。maildrop 可以将邮件投递到 mailboxes 格式的邮箱，亦可以将其投递到 maildirs 格式的邮箱里；同时呢，maildrop 可以从文件中读取入站邮件的过滤指示规则，并由此决定是将邮件送入用户邮箱或者转发直其它的地址。
@@ -1133,3 +1144,5 @@ chown-R vmail:vmail /var/tmp/extman/
 tail -f /var/log/maillog
 ```
 
+末了，再次提配各位，立即删除 `/var/www/extsuite/extmail/cgi/env.cgi` 文件！
+ 
