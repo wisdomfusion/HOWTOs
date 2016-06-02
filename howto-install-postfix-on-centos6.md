@@ -799,7 +799,7 @@ mysql> flush privileges;
 
 启动虚拟域以后，需要注释掉myhostname，mydestination，mydomain，myorigin几个指令；当然，你也可以把mydestination的值改成自己需要的。
 
-需要注意的是 MySQL 5.7
+需要注意的是 MySQL 5.7 改动比较大，而 extmail/extman 又太老，最新一版好像是 2009 年更新的吧，如果用 MySQL 5.7 的话需要调整一下：
 
 ```sql
 cat > extmail.sql <<\EOF
@@ -917,15 +917,20 @@ CREATE TABLE mailbox (
 ) Engine=MyISAM COMMENT='ExtMail - Virtual Mailboxes';
 ```
 
-vi /etc/my.cnf
+MySQL 配置去掉严格模式 `vi /etc/my.cnf`：
 
     sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 
-!include auth-system.conf.ext
-
-vi /etc/dovecot/conf.d/auth-system.conf.ext
+vi /etc/dovecot/conf.d/10-mail.conf
 
     mail_location = maildir:/var/mailbox/%d/%n/Maildir
+
+vi /etc/dovecot/conf.d/10-auth.conf
+
+    auth_mechanisms = plain
+    !include auth-system.conf.ext
+
+vi /etc/dovecot/conf.d/auth-system.conf.ext
 
     ...
     
