@@ -1,5 +1,7 @@
 # How to Install Postfix on CentOS 6
 
+Version 0.1
+
 ## 0. 说明
 
 ``好记性不如烂笔头'' 这话什么时候也不过时。几年前，因网站发送验证邮件的需要，折腾了两三天仓促地搭建了 postfix 邮件系统，没头没脑，也没写文档。但回想起来也的确搞笑，本身搭建工作没有什么难度，只不过涉事组件比较多，组件之间还有权限和库文件的依赖，如果能一步步把文档整理出来，事后再遇此事，便再不会慌里慌张。
@@ -19,41 +21,43 @@
 - courier-authlib-0.66.4
 - dovecot
 - cyrus-sasl
-- maildrop
+- maildrop-2.8.3
 - httpd
 - extmail-1.2
 - extman-1.1
 
 ## 2. 安装前的准备
 
-### 2.1. 编译工具及相关库
-
-像软体包安装，我更倾向编译安装一样，我不太喜欢直接 groupinstall 一堆诸如 `Development Libraries`, `Development Tools`, `X Software Development`, `Legacy Software Development` 的“组”，应该是只安装自己需要的工具就可以了，这里借用了 LNMP 里的编译工具安装一用：
-
-```sh
-yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel unzip zip nmap ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
-```
-同时安装如下库和工具：
-
-```sh
-yum -y install tcl tcl-devel libart_lgpl libart_lgpl-devel libtool-ltdl libtool-ltdl-devel expect db4-devel
-```
-
 ### 2.2. 下载一些软件包
+
+下面这些是可以直接 wget 或 curl 到的：
 
 ```sh
 cd /usr/src
 wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.12.tar.gz
 wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget http://downloads.sourceforge.net/project/courier/authlib/0.66.4/courier-authlib-0.66.4.tar.bz2
+wget http://downloads.sourceforge.net/project/courier/maildrop/2.8.3/maildrop-2.8.3.tar.bz2
 wget http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-3.1.1.tar.gz
+```
+
+### 2.1. 编译工具及相关库
+
+安装开发工具组：
+
+```sh
+yum groupinstall "Development Tools"
+```
+同时安装如下库和工具，这是 postfix 安装必须的：
+
+```sh
+yum -y install tcl tcl-devel libart_lgpl libart_lgpl-devel libtool-ltdl libtool-ltdl-devel expect db4-devel
 ```
 
 ### 2.3. 这些软件包需要单独获取：
 
 - extmail-1.2
 - extman-1.1
-- maildrop
 
 ## 3. 安装
 
@@ -218,27 +222,18 @@ dbrootpwd=123456
 /usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$dbrootpwd\" with grant option;"
 ```
 
-关闭 MySQL：
-
-```sh
-/etc/init.d/mysqld stop
-```
-
 ### 3.2. 卸载 sendmail 或 postfix
 
-CentOS 系统自带 sendmail 或 postfix，需要事件卸载，本文采用编译安装方式，软件包安装位置和软件包之间的库依赖都可以自己把控。
+CentOS 系统自带 sendmail 或 postfix，需要事件卸载，本文采用编译安装方式，软件包安装位置和软件包之间的库依赖都可以自己把控。自带的 postfix 不是必须卸载，但因为软件包之间的依赖关系，在编译安装时配置相关路径会免去好多麻烦。
 
 ```sh
 yum remove sendmail
-```
-
-或
-
-```sh
 yum remove postfix
 ```
 
 ### 3.3. 安装 postfix
+
+#### 3.3.1. 新建用户
 
 事先添加两个用户和用户组 postfix:postfix 和 postdrop:postdrop，由于 CentOS 6.8 中默认安装过 postfix，所以直接把 postfix 用户和用户组的 id 改成 2525，改成这个数是为了后面配置方便，有些配置直接用的是 uid 和 gid：
 
@@ -260,35 +255,34 @@ groupadd -g 2526 postdrop
 useradd -g postdrop -M -s /sbin/nologin -u 2526 postdrop
 ```
 
-启动 saslauthd服务，并加入自动启动
+添加 `vmail:vmail` 用户：
 ```sh
-chkconfig saslauthd on
-/etc/init.d/saslauthd start
+groupadd -g 1001 vmail
+useradd -g vmail -u 1001 -s /sbin/nologin vmail
 ```
 
-安装 cyrus-sasl
+#### 3.3.2. 动态链接库
 
-```sh
-yum -y install cyrus-sasl
-```
+安装之前把 `mysql/lib/` 目录添加到动态链接库中，因为 postfix 安装中有一步是要需要 `libmysqlclient.so`，不添加的话，会出现如下错误提示：
 
-```sh
-rpm -qa | grep cyrus-sasl
-cyrus-sasl-lib-2.1.23-15.el6_6.2.x86_64
-cyrus-sasl-2.1.23-15.el6_6.2.x86_64
-cyrus-sasl-devel-2.1.23-15.el6_6.2.x86_64
-```
+    bin/postconf: error while loading shared libraries: libmysqlclient.so.20: cannot open shared object file: No such file or directory
+
+运行如下命令：
 
 ```sh
 echo "/usr/local/webserver/mysql/lib" >> /etc/ld.so.conf
 /sbin/ldconfig
 ```
 
+#### 3.3.3. 编译安装 postfix
+
+编译 postfix，注意 MySQL 的 `include` 和 `lib` 等路径：
+
 ```sh
 make makefiles 'CCARGS=-DHAS_MYSQL -I/usr/local/webserver/mysql/include -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl -DUSE_TLS -I/usr/include/openssl' 'AUXLIBS=-L/usr/local/webserver/mysql/lib -lmysqlclient -lz -lm -L/usr/lib64/sasl2 -lsasl2 -lssl -lcrypto'
 ```
 
-make install
+我然后执行 `make install` 安装 postfix，安装时，里面有一堆选项，除了 tempdir 指定为 `/var/tmp/postfix` 外，其他均使用默认值：
 
     install_root: [/]
     tempdir: [/usr/src/postfix-3.1.1] /var/tmp/postfix
@@ -420,28 +414,701 @@ chkconfig --add postfix
 chkconfig postfix on
 ```
 
-### 3.4. CA 认证
+### 3.4. 认证
+
+查看认证方式：
+
+    postconf -a
+    cyrus
+    dovecot
+
+#### 3.4.1. sasl
+
+安装 cyrus-sasl
+
+```sh
+yum -y install cyrus-sasl cyrus-sasl-devel cyrus-imapd cyrus-sasl-plain
+```
+
+查看安装结果：
+
+```sh
+rpm -qa | grep cyrus-sasl
+cyrus-sasl-devel-2.1.23-15.el6_6.2.x86_64
+cyrus-sasl-lib-2.1.23-15.el6_6.2.x86_64
+cyrus-sasl-plain-2.1.23-15.el6_6.2.x86_64
+cyrus-sasl-2.1.23-15.el6_6.2.x86_64
+cyrus-sasl-md5-2.1.23-15.el6_6.2.x86_64
+```
+
+修改 sasl 配置 `vi /etc/sysconfig/saslauthd`：
+
+    # Directory in which to place saslauthd's listening socket, pid file, and so
+    # on.  This directory must already exist.
+    SOCKETDIR=/var/run/saslauthd
+
+    # Mechanism to use when checking passwords.  Run "saslauthd -v" to get a list
+    # of which mechanism your installation was compiled with the ablity to use.
+    #MECH=pam
+    MECH=shadow
+
+    # Options sent to the saslauthd. If the MECH is other than "pam" uncomment the next line.
+    # DAEMONOPTS=--user saslauth
+
+    # Additional flags to pass to saslauthd on the command line.  See saslauthd(8)
+    # for the list of accepted flags.
+    FLAGS=
+
+启动 saslauthd服务，并加入自动启动
+
+```sh
+chkconfig saslauthd on
+/etc/init.d/saslauthd start
+```
+
+SMTP 认证配置 `/usr/lib64/sasl2/smtpd.conf`：
+    
+    pwcheck_method: authdaemond
+    mech_list: PLAIN LOGIN
+
+### 3.4.2. 修改 postfix 主配置文件
+
+修改 postfix 主配置文件 `vi /etc/postfix/main.cf`：
+
+    broken_sasl_auth_clients = yes
+    smtpd_recipient_restrictions = permit_mynetworks,permit_sasl_authenticated,reject_invalid_hostname,reject_non_fqdn_hostname,reject_unknown_sender_domain,reject_non_fqdn_sender,reject_non_fqdn_recipient,reject_unknown_recipient_domain,reject_unauth_pipelining,reject_unauth_destination
+    smtpd_sasl_auth_enable = yes
+    smtpd_sasl_local_domain = $myhostname
+    smtpd_sasl_security_options = noanonymous
+    #smtpd_sasl_application_name = smtpd
+    smtpd_banner = Welcome to our $myhostname ESMTP,Warning: Version not Available!
+
+/var/spool/postfix
 
 
-### 3.5. courier-authlib
+
+### 3.4.3. 安装 dovecot 服务
+
+dovecot 提供系统的 POP3 和 IMAP 服务，同时给 postfix 提供 SMTP 的 SASL 认证服务。
+
+安装 dovecot:
+
+```sh
+yum -y install dovecot
+```
+
+编辑 dovecot 配置 `vi /etc/dovecot/dovecot.conf`：
+
+    protocols = imap pop3
+
+启动 dovecot：
+
+```sh
+chkconfig --add dovecot
+chkconfig dovecot on
+/etc/init.d/dovecot start
+```
+
+### 3.4.4. 创建 CA
+
+vi /etc/pki/tls/openssl.cnf
+dir = /etc/pki/CA
+
+```sh
+cd /etc/pki/CA
+(umask 077;openssl genrsa 1024 > private/cakey.pem)
+openssl req -new -x509 -key private/cakey.pem -out cacert.pem -days 36500
+```
+
+示例输出：
+
+    You are about to be asked to enter information that will be incorporated
+    into your certificate request.
+    What you are about to enter is what is called a Distinguished Name or a DN.
+    There are quite a few fields but you can leave some blank
+    For some fields there will be a default value,
+    If you enter '.', the field will be left blank.
+    -----
+    Country Name (2 letter code) [GB]:CN
+    State or Province Name (full name) [Berkshire]:Beijing
+    Locality Name (eg, city) [Newbury]:Beijing
+    Organization Name (eg, company) [My Company Ltd]:Example
+    Organizational Unit Name (eg, section) []:Tech
+    Common Name (eg, your name or your server's hostname) []:ca.example.com
+    Email Address []:caadmin@example.com
 
 
+```sh
+mkdir crl certs newcerts
+touch index.txt
+mkdir -p /etc/dovecot/ssl
+cd /etc/dovecot/ssl/
+(umask 077;openssl genrsa 1024 > dovecot.key)
+openssl req -new -key dovecot.key -out dovecot.csr -days 36500
+```
 
-### 3.6. postfix 支持虚拟域和虚拟用户
+示例输出：
+
+    You are about to be asked to enter information that will be incorporated
+    into your certificate request.
+    What you are about to enter is what is called a Distinguished Name or a DN.
+    There are quite a few fields but you can leave some blank
+    For some fields there will be a default value,
+    If you enter '.', the field will be left blank.
+    -----
+    Country Name (2 letter code) [GB]:CN
+    State or Province Name (full name) [Berkshire]:Beijing
+    Locality Name (eg, city) [Newbury]:Beijing
+    Organization Name (eg, company) [My Company Ltd]:Example
+    Organizational Unit Name (eg, section) []:Tech
+    Common Name (eg, your name or your server's hostname) []:pop3.example.com
+    Email Address []:popadmin@example.com
+    Please enter the following 'extra' attributes
+    to be sent with your certificate request
+    A challenge password []:
+    An optional company name []:
+
+```sh
+echo "1000" > /etc/pki/CA/serial 
+openssl ca -in dovecot.csr -out dovecot.crt
+```
+
+dovecot 相关配置：
+
+相改 dovecot.conf 配置文件 `vi /etc/dovecot/dovecot.conf`：
+
+    protocols = imap pop3 pop3s imaps
+
+需要注意的是 dovecot 主配置文件的结尾处有这么一句配置
+
+    !include conf.d/*.conf
+
+它的意思是把 /etc/dovecot/conf.d/ 中的 *.conf 分类配置文件包含进来。
+
+修改其中的 ssl 配置 `vi /etc/dovecot/conf.d/10-ssl.conf`：
+
+    ssl_disable = no
+    ssl_cert_file = /etc/dovecot/ssl/dovecot.crt
+    ssl_key_file = /etc/dovecot/ssl/dovecot.key
+
+查看表检索方式 `postconf -m`：
+
+    btree
+    cidr
+    environ
+    fail
+    hash
+    inline
+    internal
+    memcache
+    mysql
+    nis
+    pcre
+    pipemap
+    prox
+    y
+    randmap
+    regexp
+    socketmap
+    static
+    tcp
+    texthash
+    unionmap
+    unix
+
+### 3.4.3. courier-authlib
+
+courier-authlib 是用于 couier 的其他组件提供认证服务，其认证功能通常包括正登陆时的账号和密码，获取一个账号相关的家目录或邮件目录等信息，改变账号的密码等。而其认证的实现方式也包括基于 pam 通过 /etc/passwd 和 /etc/shadow 进行认证，基于 GDBM 或 DB 进行认证，基于 LDAP/mysql 进行认证等。因此 courier-authlib 通常用来与 courier 之外的其他邮件组件（如 postfix）整合为其提供认证服务。
+
+这块安装的时候很是头疼，首先配置时一直提示如下错误：
+
+    configure: error: invalid ltdl library directory: '/usr/lib64'
+
+怎么 yum 安装、cp、ln -s 都不行的，最后直接下载 libtool 源码安装：
+
+```sh
+cd /usr/src/
+wget http://ftpmirror.gnu.org/libtool/libtool-2.4.6.tar.gz
+tar zxvf libtool-2.4.6.tar.gz
+cd libtool-2.4.6
+./configure --prefix=/usr/local/libtool-2.4.6 --enable-ltdl-install
+make && make install
+```
+
+然后指定 `/usr/local/libtool-2.4.6` 目录中的 `lib` 和 `include` 才不再出现此错误提示，尝试再次安装：
+
+```sh
+tar zxvf libtool-2.4.6.tar.gz
+cd courier-authlib-0.66.4/
+./configure --prefix=/usr/local/courier-authlib \
+--sysconfdir=/etc \
+--without-authpam \
+--without-authshadow \
+--without-authvchkpw \
+--without-authpgsql \
+--with-authmysql \
+--with-mysql-libs=/usr/local/webserver/mysql/lib \
+--with-mysql-includes=/usr/local/webserver/mysql/include \
+--with-authmysqlrc=/etc/authmysqlrc \
+--with-authdaemonrc=/etc/authdaemonrc \
+--with-mailuser=vmail \
+--with-mailgroup=vmail \
+--with-ltdl-lib=/usr/local/libtool-2.4.6/lib \
+--with-ltdl-include=/usr/local/libtool-2.4.6/include
+```
+
+又出现找不到 gdbm 和 db 库的提示：
+
+    configure: error: Cannot find either the gdbm or the db library.
+
+这个好办，直接 yum 安装即可：
+
+```sh
+yum -y install gdbm db
+```
+
+然后，再次尝试配置 courier-authlib 并编译安装：
+
+```sh
+./configure --prefix=/usr/local/courier-authlib \
+--sysconfdir=/etc \
+--without-authpam \
+--without-authshadow \
+--without-authvchkpw \
+--without-authpgsql \
+--with-authmysql \
+--with-mysql-libs=/usr/local/webserver/mysql/lib \
+--with-mysql-includes=/usr/local/webserver/mysql/include \
+--with-authmysqlrc=/etc/authmysqlrc \
+--with-authdaemonrc=/etc/authdaemonrc \
+--with-mailuser=vmail \
+--with-mailgroup=vmail \
+--with-ltdl-lib=/usr/local/libtool-2.4.6/lib \
+--with-ltdl-include=/usr/local/libtool-2.4.6/include
+make && make install
+```
+
+**终于成功了！！！**
+
+添加动态链接库：
+
+```sh
+echo "/usr/local/courier-authlib/lib/courier-authlib" >> /etc/ld.so.conf
+/sbin/ldconfig
+ldconfig -v
+```
+
+拷贝配置文件：
+
+```sh
+chmod 755 /usr/local/courier-authlib/var/spool/authdaemon/
+cp /etc/authdaemonrc.dist /etc/authdaemonrc
+cp /etc/authmysqlrc.dist /etc/authmysqlrc
+```
+
+修改 authdaemonrc 文件 `vi /etc/authdaemonrc`：
+
+    authmodulelist="authmysql"
+    authmodulelistorig="authmysql"
+    daemons=10
+
+修改 authmysqlrc 文件 `vi /etc/authmysqlrc`：
+
+    MYSQL_SERVER localhost
+    MYSQL_USERNAME extmail
+    MYSQL_PASSWORD extmail
+    MYSQL_SOCKET /tmp/mysqld.sock
+    MYSQL_PORT 3306
+    MYSQL_OPT 0
+    MYSQL_DATABASE extmail
+    MYSQL_USER_TABLE mailbox
+    MYSQL_CRYPT_PWFIELD password
+    MYSQL_UID_FIELD 2525
+    MYSQL_GID_FIELD 2525
+    MYSQL_LOGIN_FIELD username
+    MYSQL_HOME_FIELD concat('/var/mailbox/',homedir)
+    MYSQL_NAME_FIELD name
+    MYSQL_MAILDIR_FIELD concat('/var/mailbox/',maildir)
+
+courier-authlib 启动脚本：
+
+```sh
+cp courier-authlib.sysvinit /etc/init.d/courier-authlib
+chmod +x /etc/init.d/courier-authlib
+chkconfig --add courier-authlib
+chkconfig courier-authlib on
+```
+
+整合 postfix 和 courier-authlib
+
+```sh
+mkdir -p /var/mailbox
+chown -R postfix:postfix /var/mailbox/
+```
+
+修改 SMTP 配置 `vi /usr/lib64/sasl2/smtpd.conf`：
+
+    pwcheck_method: authdaemond
+    log_level: 3
+    mech_list: PLAIN LOGIN
+    authdaemond_path:/usr/local/courier-authlib/var/spool/authdaemon/socket
+
+### 3.5. postfix 支持虚拟域和虚拟用户
 
 
-### 3.7. dovecot服务
+修改 postfix 主配置文件 `vi /etc/postfix/main.cf` 在结尾追加：
+
+```
+########################Virtual Mailbox Settings########################
+virtual_mailbox_base = /var/mailbox
+virtual_mailbox_maps = mysql:/etc/postfix/mysql_virtual_mailbox_maps.cf
+virtual_mailbox_domains = mysql:/etc/postfix/mysql_virtual_domains_maps.cf
+virtual_alias_domains =
+virtual_uid_maps = static:2525
+virtual_gid_maps = static:2525
+virtual_transport = virtual
+maildrop_destination_recipient_limit = 1
+maildrop_destination_concurrency_limit = 1
+##############QUOTA Setting##################
+message_size_limit = 14336000
+virtual_mailbox_limit = 20971520
+virtual_mailbox_extended = yes
+virtual_create_maildirsize = yes
+virtual_mailbox_limit_maps = mysql:/etc/postfix/mysql_virtual_mailbox_limit_maps.cf
+virtual_mailbox_limit_override = yes
+virtual_maildir_limit_message = Sorry,the user's maildir has overdrawn his diskspace quota,please Tidy your mailbox and try again later.
+virtual_overquota_bounce = yes
+```
+
+配置虚拟域及虚拟用户：
+
+```sh
+tar zxvf extman-1.1.tar.gz 
+cd extman-1.1/docs/
+cp mysql_virtual_* /etc/postfix/
+sed -i 's/TYPE=MyISAM/Engine=MyISAM/g' init.sql
+sed -i 's/TYPE=MyISAM/Engine=MyISAM/g' extmail.sql
+mysql -uroot -p < extmail.sql
+mysql -uroot -p < init.sql
+mysql> grant select on extmail.* to 'extmail'@'localhost' identified by 'extmail';
+mysql> grant select on extmail.* to 'extmail'@127.0.0.1 identified by 'extmail';
+mysql> flush privileges;
+```
+
+启动虚拟域以后，需要注释掉myhostname，mydestination，mydomain，myorigin几个指令；当然，你也可以把mydestination的值改成自己需要的。
+
+需要注意的是 MySQL 5.7
+
+```sql
+cat > extmail.sql <<\EOF
+
+CREATE DATABASE extmail;
+
+/* readonly user */
+GRANT USAGE ON extmail.* TO extmail@localhost IDENTIFIED BY 'extmail';
+GRANT SELECT, UPDATE ON extmail.* TO extmail@localhost;
+
+/* read/write user */
+GRANT USAGE ON extmail.* TO webman@localhost IDENTIFIED BY 'webman';
+GRANT SELECT, INSERT, DELETE, UPDATE ON extmail.* TO webman@localhost;
+
+FLUSH PRIVILEGES;
+
+USE extmail;
+
+/* Table structure for table manager */
+CREATE TABLE manager (
+  username varchar(255) NOT NULL default '',
+  password varchar(255) NOT NULL default '',
+  type varchar(64) NOT NULL default 'postmaster',
+  uid varchar(255) NOT NULL default '',
+  name varchar(255) NOT NULL default '',
+  question text NOT NULL,
+  answer text NOT NULL,
+  disablepwdchange smallint(1),
+  createdate datetime NOT NULL default '1000-01-01 00:00:00',
+  expiredate DATE NOT NULL default '1000-01-01',
+  active tinyint(1) NOT NULL default '1',
+  PRIMARY KEY  (username),
+  KEY username (username)
+) Engine=MyISAM COMMENT='Ext/Webman - Admin Accounts';
+
+/* Table structure for table alias */
+CREATE TABLE alias (
+  address varchar(255) NOT NULL default '',
+  goto text NOT NULL,
+  domain varchar(255) NOT NULL default '',
+  createdate datetime NOT NULL default '1000-01-01 00:00:00',
+  active tinyint(1) NOT NULL default '1',
+  PRIMARY KEY  (address),
+  KEY address (address)
+) Engine=MyISAM COMMENT='ExtMail - Virtual Aliases';
+
+/* Table structure for table domain */
+CREATE TABLE domain (
+  domain varchar(255) NOT NULL default '',
+  description varchar(255) NOT NULL default '',
+  hashdirpath varchar(255) NOT NULL default '',
+  maxalias int(10) NOT NULL default '0',
+  maxusers int(10) NOT NULL default '0',
+  maxquota varchar(16) NOT NULL default '0',
+  maxnetdiskquota varchar(16) NOT NULL default '0',
+  transport varchar(255) default NULL,
+  can_signup tinyint(1) NOT NULL default '0',
+  default_quota varchar(255) default NULL,
+  default_netdiskquota varchar(255) default NULL,
+  default_expire varchar(12) default NULL,
+  disablesmtpd smallint(1),
+  disablesmtp smallint(1),
+  disablewebmail smallint(1),
+  disablenetdisk smallint(1),
+  disableimap smallint(1),
+  disablepop3 smallint(1),
+  createdate datetime NOT NULL default '1000-01-01 00:00:00',
+  expiredate DATE NOT NULL default '1000-01-01',
+  active tinyint(1) NOT NULL default '1',
+  PRIMARY KEY  (domain),
+  KEY domain (domain)
+) Engine=MyISAM COMMENT='ExtMail - Virtual Domains';
+
+/* Table structure for table domain_manager */
+CREATE TABLE domain_manager (
+  username varchar(255) NOT NULL default '',
+  domain varchar(255) NOT NULL default '',
+  createdate datetime NOT NULL default '1000-01-01 00:00:00',
+  active tinyint(1) NOT NULL default '1',
+  KEY username (username)
+) Engine=MyISAM COMMENT='Ext/Webman - Domain Admins';
+
+/*
+ Table structure for table mailbox
+ mapping: name <-> cn, username <-> mail
+*/
+CREATE TABLE mailbox (
+  username varchar(255) NOT NULL default '',
+  uid varchar(255) NOT NULL default '',
+  password varchar(255) NOT NULL default '',
+  clearpwd varchar(128) NOT NULL default '',
+  name varchar(255) NOT NULL default '',
+  mailhost varchar(255) NOT NULL default '',
+  maildir varchar(255) NOT NULL default '',
+  homedir varchar(255) NOT NULL default '',
+  quota varchar(16) NOT NULL default '0',
+  netdiskquota varchar(16) NOT NULL default '0',
+  domain varchar(255) NOT NULL default '',
+  uidnumber int(6) NOT NULL default '1000',
+  gidnumber int(6) NOT NULL default '1000',
+  createdate datetime NOT NULL default '1000-01-01 00:00:00',
+  expiredate DATE NOT NULL default '1000-01-01',
+  active smallint(1) NOT NULL default '1',
+  disablepwdchange smallint(1),
+  disablesmtpd smallint(1),
+  disablesmtp smallint(1),
+  disablewebmail smallint(1),
+  disablenetdisk smallint(1),
+  disableimap smallint(1),
+  disablepop3 smallint(1),
+  question text NOT NULL,
+  answer text NOT NULL,
+  PRIMARY KEY  (username),
+  KEY username (username)
+) Engine=MyISAM COMMENT='ExtMail - Virtual Mailboxes';
+```
+
+vi /etc/my.cnf
+
+    sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+
+!include auth-system.conf.ext
+
+vi /etc/dovecot/conf.d/auth-system.conf.ext
+
+    mail_location = maildir:/var/mailbox/%d/%n/Maildir
+
+    ...
+    
+    auth default {
+      mechanisms = plain
+      passdb sql {
+      args = /etc/dovecot-mysql.conf
+      }
+      userdb sql {
+      args = /etc/dovecot-mysql.conf
+      }
+    }
+
+vi /etc/dovecot-mysql.conf
+
+    driver = mysql
+    connect = host=/var/tmp/mysql/mysqld.sock dbname=extmail user=extmail password=extmail
+    default_pass_scheme = CRYPT
+    password_query = SELECT username AS user,password AS password FROM mailbox WHERE username = '%u'
+    user_query = SELECT maildir,uidnumber AS uid,gidnumber AS gid FROM mailbox WHERE username = '%u'
+
+启动dovecot服务：
+
+```sh
+/etc/init.d/dovecot start
+```
+
+### 3.6. extmail & extman
+
+```sh
+tar zxvf extmail-1.2.tar.gz
+mkdir -p /var/www/extsuite
+mv extman-1.1 /var/www/extsuite/extman
+mv extmail-1.2 /var/www/extsuite/extmail
+cp /var/www/extsuite/extmail/webmail.cf.default /var/www/extsuite/extmail/webmail.cf
+```
+
+vi var/www/extsuite/extmail/webmail.cf
+
+    SYS_MAILDIR_BASE = /var/mailbox
+    SYS_USER_LANG = zh_CN
+    SYS_MYSQL_USER = extmail
+    SYS_MYSQL_PASS = extmail
+    SYS_MYSQL_DB = extmail
+    SYS_MYSQL_HOST = localhost
+    SYS_MYSQL_SOCKET = /var/tmp/mysql/mysqld.sock
+    SYS_AUTHLIB_SOCKET = /usr/local/courier-authlib/var/spool/authdaemon/socket
+
+yum -y install httpd
+vi /etc/httpd/conf/httpd.conf
+
+    User postfix
+    Group postfix
+    
+    NameVirtualHost *:8081
+    
+    <VirtualHost *:8081>
+      DocumentRoot /var/www/extsuite/extmail/html
+      ServerName mail.example.com
+    
+      ScriptAlias /extmail/cgi /var/www/extsuite/extmail/cgi
+      Alias /extmail /var/www/extsuite/extmail/html
+    
+      ScriptAlias /extman/cgi /var/www/extsuite/extman/cgi
+      Alias /extman /var/www/extsuite/extman/html
+    
+      ErrorLog logs/mail.example.com-error_log
+      CustomLog logs/mail.example.com-access_log common
+    </VirtualHost>
 
 
+```sh
+chown -R postfix.postfix /var/www/extsuite/extmail/cgi/
+chown -R postfix.postfix /var/www/extsuite/extman/cgi/
+```
 
-### 3.8. extmail & extman
+extman 出现的一些错误提示：
+
+> Can't locate CGI.pm in @INC (@INC contains: /var/www/extsuite/extmail/libs /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5) at /var/www/extsuite/extmail/libs/Ext/CGI.pm line 20. BEGIN failed--compilation aborted at /var/www/extsuite/extmail/libs/Ext/CGI.pm line 20. Compilation failed in require at /var/www/extsuite/extmail/libs/Ext/App.pm line 23. BEGIN failed--compilation aborted at /var/www/extsuite/extmail/libs/Ext/App.pm line 23. Compilation failed in require at /var/www/extsuite/extmail/libs/Ext/App/Login.pm line 16. BEGIN failed--compilation aborted at /var/www/extsuite/extmail/libs/Ext/App/Login.pm line 16. Compilation failed in require at /var/www/extsuite/extmail/cgi/index.cgi line 20.
+
+```sh
+yum -y install cpan
+cpan App::cpanminus
+cpanm Unix::Syslog CGI
+yum -y install perl-DBD-MySQL
+```
+
+extman 后台超级管理账号 `root@extmail.org` 初始密码 `extmail*123*`
+
+    Can't open /var/tmp/extman/sid_d013a10359cece77d472a0cc474f27be, Permission denied
+
+```sh
+mkdir -p /var/tmp/extman/
+chown-R postfix:postfix /var/tmp/extman/
+```
+
+extman 后台提示 `No such file or directory`
+```sh
+/var/www/extsuite/extman/daemon/cmdserver -d
+```
+
+Graph Log
+
+> Can't locate RRDs.pm in @INC (@INC contains: /var/www/extsuite/extman/libs /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at /var/www/extsuite/extman/libs/Ext/GraphLog.pm line 23. BEGIN failed--compilation aborted at /var/www/extsuite/extman/libs/Ext/GraphLog.pm line 23. Compilation failed in require at /var/www/extsuite/extman/libs/Ext/MgrApp/ViewLog.pm line 22. BEGIN failed--compilation aborted at /var/www/extsuite/extman/libs/Ext/MgrApp/ViewLog.pm line 22. Compilation failed in require at /var/www/extsuite/extman/cgi/viewlog.cgi line 18.
+
+cpanm Time::HiRes Time::HiRes::Value File::Tail
+yum -y install rrdtool rrdtool-perl 
 
 
+### 3.7. maildrop
 
-### 3.9. maildrop
+maildrop 是一个替代邮件代理并且包含邮件过滤的语言，系统管理员用这个 maildrop 即可以取代已经存在的邮件投递代理。maildrop 是一个使用 C++ 编写的用来代替本地 MDA 的带有过滤功能的邮件投递代理，是 courier 邮件系统的组件之一，它从标准输入接受信息并投递到用户邮箱。maildrop 可以将邮件投递到 mailboxes 格式的邮箱，亦可以将其投递到 maildirs 格式的邮箱里；同时呢，maildrop 可以从文件中读取入站邮件的过滤指示规则，并由此决定是将邮件送入用户邮箱或者转发直其它的地址。
+> 由于 maildrop 自 courier-authlib 发行后，就不再使用内建的数据库连接模块，而是通过 authlib 来获得用户的各种信息，因此在安装 maildrop 前必须正确安装 courier-authlib 并配置好。
+
+当然，上面咱们早已把 courier-authlib 安装并配置好啦，下面我们直接安装 maildrop。提醒大家，从这一步开始要注意了，之前使用 postfix:postfix 用户建的目录还有配置，这里要改成 1001 为 uid 的 vmail 用户的了。
+
+```sh
+cd /usr/src/
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/local/courier-authlib/include/
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/courier-authlib/include/
+tar jxvf maildrop-2.8.3.tar.bz2
+cd maildrop-2.8.3
+
+ln -s /usr/local/courier-authlib/bin/courierauthconfig /usr/bin/courierauthconfig
+```
+
+上文中我们建立了 vmail 账号，这里就用到了 uid 和 gid：
+
+```sh
+./configure --prefix=/usr/local/maildrop --enable-sendmail=/usr/sbin/sendmail --enable-trusted-user='root postdrop vmail' --enable-syslog=1 --enable-maildirquota --enable-maildrop-uid=1001 --enable-maildrop-gid=1001 --with-trashquota --with-dirsync
+```
+
+-w 90是做quota用的，也就是达到quota的90%，进入的邮件会被defer(延期处理)
+
+vi /etc/postfix/master.cf
+
+    maildrop  unix  -       n       n       -       -       pipe
+      flags=DRhu user=vmail argv=/usr/local/maildrop/bin/maildrop -w 90 -d ${user}@${nexthop} {recipient} {user} {extension} {nexthop}
 
 
-## 4. TODO
+vi /etc/postfix/main.cf
 
+    virtual_uid_maps = static:1001
+    virtual_gid_maps = static:1001
+    virtual_transport = maildrop
+    
+    chown vmail:vmail mailbox
+    chown vmail:vmail cgi
 
+vi extman/webman.cf
 
+    # sys_default_uid, if not set, webman will ignore it
+    SYS_DEFAULT_UID = 1001
+    
+    # sys_default_gid, if not set, webman will ignore it
+    SYS_DEFAULT_GID = 1001
+    
+vi /etc/authmysqlrc
+
+    MYSQL_UID_FIELD 1001
+    MYSQL_GID_FIELD 1001
+
+vi /etc/httpd/conf/httpd.conf
+
+    User vmail
+    Group vmail
+
+chown-R vmail:vmail /var/tmp/extman/
+
+## 4. postfix 常用命令
+
+| 命令                                | 说明                     |
+|-------------------------------------|--------------------------|
+| postconf -d \vert grep mail_version | 查看 postfix 版本号      |
+| postfix set-permission              | 设置目录权限             |
+| postfix check                       | 检查配置及目录权限       |
+| postconf -n                         | 查看 postfix 配置        |
+| postqueue -p                        | 查看邮件队列             |
+| postqueue -f                        | 重新尝试发送队列中的邮件 |
+| postsuper -r <messages-id>          | 重发某封邮件             |
+| postsuper -r ALL                    | 全部重发                 |
+| postsuper -d <messages-id>          | 删除某封邮件             |
+| postsuper -d ALL                    | 合部删除                 |
+
+## 5. TODO
+
+- 反垃圾邮件
+- nginx + fastcgi
