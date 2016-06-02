@@ -1123,3 +1123,13 @@ chown-R vmail:vmail /var/tmp/extman/
 
 - 反垃圾邮件
 - nginx + fastcgi
+- 每走一步的 telnet 测试还没写进去
+
+## 6. 坐享其成
+
+没事看看日志，发发呆~ :relaxed:
+
+```sh
+tail -f /var/log/maillog
+```
+
