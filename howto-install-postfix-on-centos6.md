@@ -581,7 +581,7 @@ dovecot 相关配置：
 
     protocols = imap pop3 pop3s imaps
 
-需要注意的是 dovecot 主配置文件的结尾处有这么一句配置
+需要注意的是 dovecot 主配置文件的结尾处有这么一句配置：
 
     !include conf.d/*.conf
 
@@ -1045,14 +1045,14 @@ yum -y install rrdtool rrdtool-perl
 
 **注意！！！**
 
-立即删除这个系统环境探针 CGI 脚本，[官方](http://extmail.org/)称 [WooYun] 上有爆该文件存在可执行任意脚本的漏洞：
+立即删除这个系统环境探针 CGI 脚本，[官方][extmail]称 [WooYun] 上有爆该文件存在可执行任意脚本的漏洞：
 
 ```sh
 rm /var/www/extsuite/extmail/cgi/env.cgi
 ```
 
-
-[WooYun: http://www.wooyun.org/]
+[extmail]: http://www.extmail.org/
+[WooYun]: http://www.wooyun.org/
 
 ### 3.7. maildrop
 
