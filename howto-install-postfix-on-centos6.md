@@ -28,7 +28,7 @@
 
 ### 2.1. 编译工具及相关库
 
-像软体包安装，我更倾向编译安装一下，我不太喜欢直接 groupinstall 一堆诸如 `Development Libraries`, `Development Tools`, `X Software Development`, `Legacy Software Development` 的“组”，应该是只安装自己需要的工具就可以了，这里借用了 LNMP 里的编译工具安装一用：
+像软体包安装，我更倾向编译安装一样，我不太喜欢直接 groupinstall 一堆诸如 `Development Libraries`, `Development Tools`, `X Software Development`, `Legacy Software Development` 的“组”，应该是只安装自己需要的工具就可以了，这里借用了 LNMP 里的编译工具安装一用：
 
 ```sh
 yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel unzip zip nmap ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
@@ -316,16 +316,16 @@ make install
 postfix 启动脚本：
 
     cat > /etc/init.d/postfix <<\EOF
-            #!/bin/bash
-            # postfix script for the postfix server
-            # chkconfig: 2345 80 30
-            # description: postfix is the smtp server
-            . /etc/rc.d/init.d/functions
-            . /etc/sysconfig/network
-            [ $NETWORKING = "no" ] && exit 3
-            [ -x /usr/sbin/postfix ] || exit 4
-            [ -d /etc/postfix ] || exit 5
-            [ -d /var/spool/postfix ] || exit 6
+    #!/bin/bash
+    # postfix script for the postfix server
+    # chkconfig: 2345 80 30
+    # description: postfix is the smtp server
+    . /etc/rc.d/init.d/functions
+    . /etc/sysconfig/network
+    [ $NETWORKING = "no" ] && exit 3
+    [ -x /usr/sbin/postfix ] || exit 4
+    [ -d /etc/postfix ] || exit 5
+    [ -d /var/spool/postfix ] || exit 6
     
     RETVAL=0
         prog="postfix"
