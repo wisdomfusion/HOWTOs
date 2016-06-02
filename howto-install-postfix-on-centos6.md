@@ -328,10 +328,10 @@ postfix 启动脚本：
     [ -d /var/spool/postfix ] || exit 6
     
     RETVAL=0
-        prog="postfix"
+    prog="postfix"
     
-        start() {
-    echo -n "Starting postfix: "
+    start() {
+      echo -n "Starting postfix: "
       /usr/bin/newaliased > /dev/null 2>&1
       /usr/sbin/postfix start 2>/dev/null 1>&2 && success || failure "$prog start"
       #RETVAL=$?
@@ -376,7 +376,6 @@ postfix 启动脚本：
     status() {
       /usr/sbin/postfix status
       return $RETVAL
-    
     }
     
     restart() {
