@@ -979,6 +979,8 @@ vi var/www/extsuite/extmail/webmail.cf
     SYS_MYSQL_SOCKET = /var/tmp/mysql/mysqld.sock
     SYS_AUTHLIB_SOCKET = /usr/local/courier-authlib/var/spool/authdaemon/socket
 
+安装配置 httpd：
+
 yum -y install httpd
 vi /etc/httpd/conf/httpd.conf
 
@@ -1036,14 +1038,16 @@ Graph Log
 
 > Can't locate RRDs.pm in @INC (@INC contains: /var/www/extsuite/extman/libs /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at /var/www/extsuite/extman/libs/Ext/GraphLog.pm line 23. BEGIN failed--compilation aborted at /var/www/extsuite/extman/libs/Ext/GraphLog.pm line 23. Compilation failed in require at /var/www/extsuite/extman/libs/Ext/MgrApp/ViewLog.pm line 22. BEGIN failed--compilation aborted at /var/www/extsuite/extman/libs/Ext/MgrApp/ViewLog.pm line 22. Compilation failed in require at /var/www/extsuite/extman/cgi/viewlog.cgi line 18.
 
+```sh
 cpanm Time::HiRes Time::HiRes::Value File::Tail
 yum -y install rrdtool rrdtool-perl 
-
+```
 
 ### 3.7. maildrop
 
 maildrop 是一个替代邮件代理并且包含邮件过滤的语言，系统管理员用这个 maildrop 即可以取代已经存在的邮件投递代理。maildrop 是一个使用 C++ 编写的用来代替本地 MDA 的带有过滤功能的邮件投递代理，是 courier 邮件系统的组件之一，它从标准输入接受信息并投递到用户邮箱。maildrop 可以将邮件投递到 mailboxes 格式的邮箱，亦可以将其投递到 maildirs 格式的邮箱里；同时呢，maildrop 可以从文件中读取入站邮件的过滤指示规则，并由此决定是将邮件送入用户邮箱或者转发直其它的地址。
-> 由于 maildrop 自 courier-authlib 发行后，就不再使用内建的数据库连接模块，而是通过 authlib 来获得用户的各种信息，因此在安装 maildrop 前必须正确安装 courier-authlib 并配置好。
+
+由于 maildrop 自 courier-authlib 发行后，就不再使用内建的数据库连接模块，而是通过 authlib 来获得用户的各种信息，因此在安装 maildrop 前必须正确安装 courier-authlib 并配置好。
 
 当然，上面咱们早已把 courier-authlib 安装并配置好啦，下面我们直接安装 maildrop。提醒大家，从这一步开始要注意了，之前使用 postfix:postfix 用户建的目录还有配置，这里要改成 1001 为 uid 的 vmail 用户的了。
 
