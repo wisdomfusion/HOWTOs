@@ -8,11 +8,11 @@
 
 ## 1. 系统要求
 
-1.1. 系统环境
+### 1.1. 系统环境
 
 - CentOS 6.8
 
-1.2. 所需软件包
+### 1.2. 所需软件包
 
 - postfix 3.1.1
 - MySQL 5.7.12
@@ -24,7 +24,7 @@
 - extmail-1.2
 - extman-1.1
 
-## 2. 安装前的准备 ##
+## 2. 安装前的准备
 
 ### 2.1. 编译工具及相关库
 
@@ -238,37 +238,32 @@ yum remove sendmail
 yum remove postfix
 ```
 
-启动 saslauthd服务，并加入自动启动
-
-```sh
-chkconfig saslauthd on
-/etc/init.d/saslauthd start
-```
-
-
 ### 3.3. 安装 postfix
-
 
 事先添加两个用户和用户组 postfix:postfix 和 postdrop:postdrop，由于 CentOS 6.8 中默认安装过 postfix，所以直接把 postfix 用户和用户组的 id 改成 2525，改成这个数是为了后面配置方便，有些配置直接用的是 uid 和 gid：
 
-添加 `postfix:postfix`
+添加 `postfix:postfix` 用户：
 ```sh
 groupadd -g 2525 postfix
 useradd -g postfix -M -s /sbin/nologin -u 2525 postfix
 ```
 
-或修改 `postfix:postfix`
-
+或修改 `postfix:postfix` 用户：
 ```sh
 usermod -u 2525 postfix
 groupmod -g 2525 postfix
 ```
 
-添加 `postdrop:postdrop`
-
+添加 `postdrop:postdrop` 用户：
 ```sh
 groupadd -g 2526 postdrop
 useradd -g postdrop -M -s /sbin/nologin -u 2526 postdrop
+```
+
+启动 saslauthd服务，并加入自动启动
+```sh
+chkconfig saslauthd on
+/etc/init.d/saslauthd start
 ```
 
 安装 cyrus-sasl
