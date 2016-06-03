@@ -1222,6 +1222,33 @@ grep "SASL LOGIN authentication failed" /var/log/maillog | sed 's/^.*unknown\[\(
        2232 112.236.61.93
        2663 119.29.92.101
 
+### 6.2. 查看服务状况
+
+使用 `netstat` 命令查看：
+
+```sh
+netstat -nultp
+```
+
+示例输出：
+
+    Active Internet connections (only servers)
+    Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
+    tcp        0      0 0.0.0.0:8958                0.0.0.0:*                   LISTEN      24649/sshd          
+    tcp        0      0 0.0.0.0:993                 0.0.0.0:*                   LISTEN      19600/dovecot       
+    tcp        0      0 0.0.0.0:995                 0.0.0.0:*                   LISTEN      19600/dovecot       
+    tcp        0      0 0.0.0.0:3306                0.0.0.0:*                   LISTEN      8256/mysqld         
+    tcp        0      0 0.0.0.0:110                 0.0.0.0:*                   LISTEN      19600/dovecot       
+    tcp        0      0 0.0.0.0:143                 0.0.0.0:*                   LISTEN      19600/dovecot       
+    tcp        0      0 0.0.0.0:21                  0.0.0.0:*                   LISTEN      32345/proftpd       
+    tcp        0      0 0.0.0.0:25                  0.0.0.0:*                   LISTEN      10559/master        
+    tcp        0      0 :::8958                     :::*                        LISTEN      24649/sshd          
+    tcp        0      0 :::993                      :::*                        LISTEN      19600/dovecot       
+    tcp        0      0 :::995                      :::*                        LISTEN      19600/dovecot       
+    tcp        0      0 :::110                      :::*                        LISTEN      19600/dovecot       
+    tcp        0      0 :::143                      :::*                        LISTEN      19600/dovecot
+
+
 
 ## 7. 坐享其成
 
