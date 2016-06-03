@@ -784,6 +784,28 @@ chown -R postfix:postfix /var/mailbox/
 修改 postfix 主配置文件 `vi /etc/postfix/main.cf` 在结尾追加：
 
 ```
+# SMTP sender login matching config
+smtpd_sender_restrictions =
+        permit_mynetworks,
+        reject_sender_login_mismatch,
+        reject_authenticated_sender_login_mismatch,
+        reject_unauthenticated_sender_login_mismatch
+
+smtpd_sender_login_maps =
+        mysql:/etc/postfix/mysql_virtual_sender_maps.cf,
+        mysql:/etc/postfix/mysql_virtual_alias_maps.cf
+
+# SMTP AUTH config here
+broken_sasl_auth_clients = yes
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_local_domain = $myhostname
+smtpd_sasl_security_options = noanonymous
+
+# limit incoming or receiving email rate
+smtpd_error_sleep_time = 1s
+smtpd_soft_error_limit = 10
+smtpd_hard_error_limit = 20
+
 ########################Virtual Mailbox Settings########################
 virtual_mailbox_base = /var/mailbox
 virtual_mailbox_maps = mysql:/etc/postfix/mysql_virtual_mailbox_maps.cf
