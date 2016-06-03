@@ -1175,6 +1175,8 @@ chown-R vmail:vmail /var/tmp/extman/
 
 ## 4. postfix 常用命令
 
+### 4.1. 原生命令
+
 | 命令                                | 说明                     |
 |-------------------------------------|--------------------------|
 | postconf -d \| grep mail_version    | 查看 postfix 版本号      |
@@ -1183,10 +1185,32 @@ chown-R vmail:vmail /var/tmp/extman/
 | postconf -n                         | 查看 postfix 配置        |
 | postqueue -p                        | 查看邮件队列             |
 | postqueue -f                        | 重新尝试发送队列中的邮件 |
-| postsuper -r <messages-id>          | 重发某封邮件             |
+| postsuper -r \<messages-id\>        | 重发某封邮件             |
 | postsuper -r ALL                    | 全部重发                 |
-| postsuper -d <messages-id>          | 删除某封邮件             |
+| postsuper -d \<messages-id\>        | 删除某封邮件             |
 | postsuper -d ALL                    | 合部删除                 |
+
+### 4.2. 其他管理命令
+
+刪除所有正在 deferred 行列中的邮件 ( 查看那些信被删除 ): 
+```sh
+find /var/spool/postfix/deferred -type f -print | xargs rm -f 
+```
+
+刪掉3天以前无法发出的邮件: 
+```sh
+find /var/spool/postfix/deferred -type f -mtime +3 -print | xargs rm -f 
+```
+
+列出目前所有无法发出的郵件: 
+```sh
+find /var/spool/postfix/deferred -type f -exec ls -l –time-style=+%Y-%m-%d_%H:%M:%S {} ; 
+```
+
+刪除超过 5 天的 "defer" 行列中的退信记录: 
+```sh
+find /var/spool/postfix/defer -type f -mtime +5 -print | xargs rm -f 
+```
 
 ## 6. postfix 管理日志
 
@@ -1269,8 +1293,6 @@ netstat -nultp
     tcp        0      0 :::995                      :::*                        LISTEN      19600/dovecot       
     tcp        0      0 :::110                      :::*                        LISTEN      19600/dovecot       
     tcp        0      0 :::143                      :::*                        LISTEN      19600/dovecot
-
-
 
 ## 7. 坐享其成
 
