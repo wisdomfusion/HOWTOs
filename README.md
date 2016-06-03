@@ -20,5 +20,5 @@
 **OS X**
 
 - [ ] [How to Use Macports and Homebrew on Mac OS X](howto-use-macports-and-homebrew-on-macosx.md)
-- [ ] [How to Install httpd2.2 with PHP5.6 and MySQL5.7 on Mac OS X](howto-install-httpd22-php56-mysql57-on-macosx.md)
+- [x] [How to Install httpd2.2 with PHP5.6 and MySQL5.7 on Mac OS X](howto-install-httpd22-php56-mysql57-on-macosx.md)
 
