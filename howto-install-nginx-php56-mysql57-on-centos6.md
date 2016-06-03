@@ -375,6 +375,7 @@ cd /usr/src/
 tar zxvf php-5.6.22.tar.gz
 cd php-5.6.22/
 ./configure --prefix=/usr/local/webserver/php \
+--with-config-file-path=/usr/local/webserver/php/etc \
 --with-libdir=lib64 \
 --enable-fpm \
 --with-fpm-user=www \
@@ -412,6 +413,8 @@ cd php-5.6.22/
 --disable-ipv6
 ```
 
+**注意：**PHP 默认配置文件存放在 `php/lib/` 下，为什么不放在 `php/etc/` 下？为什么不放在 `php/etc/` 下？为什么？好，我把它改到 `php/etc/` 下，所以上面编译选项中我添加了这一项 `--with-config-file-path=/usr/local/webserver/php/etc`。如果你觉得默认就很爽，那你大可以把这项去掉，能很欢快地找到 php.ini 并使之生效即可，如果发现配置不生效，请用 `php --ini` 命令 check 一下。
+
 编译安装：
 
 ```sh
@@ -437,14 +440,68 @@ chkconfig php-fpm on
 
 PHP 模块安装：
 
+```sh
+cd /usr/src/
+tar zxvf memcache-2.2.7.tgz
+cd memcache-2.2.7/
+/usr/local/webserver/php/bin/phpize
+./configure --with-php-config=/usr/local/webserver/php/bin/php-config
+make && make install
+cd ../
 
+tar zxvf ImageMagick.tar.gz
+cd ImageMagick-7.0.1-6/
+./configure && make && make install
+/sbin/ldconfig
+cd ../
 
+tar zxvf imagick-3.4.1.tgz
+cd imagick-3.4.1/
+/sbin/ldconfig
+/usr/local/webserver/php/bin/phpize
+./configure --with-php-config=/usr/local/webserver/php/bin/php-config
+make && make install
+cd ../
 
+wget https://pecl.php.net/get/redis-2.2.7.tgz
+tar zxvf redis-2.2.7.tgz
+cd redis-2.2.7
+/usr/local/webserver/php/bin/phpize
+./configure --with-php-config=/usr/local/webserver/php/bin/php-config
+make && make install
+cd ../
+```
 
+编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
 
+```sh
+vi /usr/local/webserver/php/etc/php.ini
+```
 
+配置项：
 
+    ; extension_dir = "ext"
+    ; 在该行下添加如下配置：
+    extension_dir = "/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20131226/"
+    extension=imagick.so
+    extension=memcache.so
+    extension=redis.so
 
+再次注意 `php.ini` 的位置，这个真的很重要！
+
+还是在 `php.ini` 文件中，启用内置的 opcache 模块，并调整相关配置：
+
+    ; 添加
+    zend_extension=opcache.so
+    ; 修改
+    opcache.enable=1
+    opcache.memory_consumption=256
+    opcache.interned_strings_buffer=8
+    opcache.max_accelerated_files=4000
+    opcache.revalidate_freq=60
+    opcache.fast_shutdown=1
+
+重新启动 php-fpm 即可生效。
 
 ### 4.4. 安装 nginx 1.10.0
 
