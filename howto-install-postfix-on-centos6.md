@@ -1136,13 +1136,12 @@ ln -s /usr/local/courier-authlib/bin/courierauthconfig /usr/bin/courierauthconfi
 ./configure --prefix=/usr/local/maildrop --enable-sendmail=/usr/sbin/sendmail --enable-trusted-user='root postdrop vmail' --enable-syslog=1 --enable-maildirquota --enable-maildrop-uid=1001 --enable-maildrop-gid=1001 --with-trashquota --with-dirsync
 ```
 
--w 90是做quota用的，也就是达到quota的90%，进入的邮件会被defer(延期处理)
-
 vi /etc/postfix/master.cf
 
     maildrop  unix  -       n       n       -       -       pipe
       flags=DRhu user=vmail argv=/usr/local/maildrop/bin/maildrop -w 90 -d ${user}@${nexthop} {recipient} {user} {extension} {nexthop}
 
+其中，`-w 90` 是做 quota 用的，也就是达到 quota 的 90%，进入的邮件会被 defer （延期处理）
 
 vi /etc/postfix/main.cf
 
@@ -1171,7 +1170,11 @@ vi /etc/httpd/conf/httpd.conf
     User vmail
     Group vmail
 
+更改 `/var/tmp/extman/` 宿主为 `vmail`：
+
+```sh
 chown-R vmail:vmail /var/tmp/extman/
+```
 
 ## 4. postfix 常用命令
 
