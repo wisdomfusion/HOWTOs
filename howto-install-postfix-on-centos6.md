@@ -1204,7 +1204,7 @@ find /var/spool/postfix/deferred -type f -mtime +3 -print | xargs rm -f
 
 列出目前所有无法发出的郵件: 
 ```sh
-find /var/spool/postfix/deferred -type f -exec ls -l –time-style=+%Y-%m-%d_%H:%M:%S {} ; 
+find /var/spool/postfix/deferred -type f -exec ls -l –time-style=+%Y-%m-%d_%H:%M:%S {} \\; 
 ```
 
 刪除超过 5 天的 "defer" 行列中的退信记录: 
