@@ -18,15 +18,17 @@ Version 0.1
 
 ### 1.2. 所需软件包
 
-- postfix 3.1.1
-- MySQL 5.7.12
-- courier-authlib-0.66.4
-- dovecot
-- cyrus-sasl
-- maildrop-2.8.3
-- httpd
-- extmail-1.2
-- extman-1.1
+| 软件包                 | 说明                                 |
+|------------------------|--------------------------------------|
+| postfix-3.1.1          | 邮件传输代理（MTA）                  |
+| mysql-5.7.12           | 数据库，虚拟域及虚拟用户必备         |
+| courier-authlib-0.66.4 | 负责 courier-imap 和 maildrop 的认证 |
+| dovecot                | IMAP 和 POP3 邮件服务器              |
+| cyrus-sasl             | SMTP认证库                           |
+| maildrop-2.8.3         | 邮件投递代理（MDA）                  |
+| httpd-2.2.15           | Web 服务器                           |
+| extmail-1.2            | WebMail 系统                         |
+| extman-1.1             | Web帐户管理后台                      |
 
 ## 2. 安装前的准备
 
@@ -421,6 +423,23 @@ chkconfig postfix on
 ```sh
 postfix set-permissions
 postfix check
+```
+
+#### 3.3.4. 配置并开启 postfix
+
+修改 postfix 主配置文件 `vi /etc/postfix/main.cf`：
+
+    myhostname = mail.example.com
+    mydomain = example.com
+    myorigin = $mydomain
+    inet_interfaces = all
+    inet_protocols = ipv4
+    mydestination = $myhostname, localhost.$mydomain, localhost
+    mynetworks = 127.0.0.0/8, 192.168.1.0/24, 192.168.0.0/24
+    smtpd_banner = $myhostname ESMTP "Mail Server"
+
+```sh
+/etc/init.d/postfix start
 ```
 
 ### 3.4. 认证
@@ -1047,6 +1066,19 @@ cpanm Time::HiRes Time::HiRes::Value File::Tail
 yum -y install rrdtool rrdtool-perl 
 ```
 
+新建虚拟域及虚拟用户：
+
+启动虚拟域后，我们已经把开始在 postfix 主配置中修改的域配置注释掉了，现在登录 extmain，进行 Domains，新增一个域，如下图：
+
+![postfix domains](./fig/postfix-domains.png "postfix domains")
+
+然后在该域中新增 noreplys@example.com 和 postmaster@example.com 两个虚拟账号，如下图：
+
+![postfix domains user](./fig/postfix-domains-user.png "postfix domains user")
+
+最后，不要忘了把超级管理员 `root@extmail.org` 的初始密码 `extmail*123*` 改掉！
+
+
 **注意！！！**
 
 立即删除这个系统环境探针 CGI 脚本，[官方][extmail]称 [WooYun] 上有爆该文件存在可执行任意脚本的漏洞：
@@ -1134,13 +1166,64 @@ chown-R vmail:vmail /var/tmp/extman/
 | postsuper -d <messages-id>          | 删除某封邮件             |
 | postsuper -d ALL                    | 合部删除                 |
 
-## 5. TODO
+## 6. postfix 管理日志
 
-- 反垃圾邮件
-- nginx + fastcgi
-- 每走一步的 telnet 测试还没写进去
+### 6.1. 查看异常 IP
 
-## 6. 坐享其成
+```sh
+grep "SASL LOGIN authentication failed" /var/log/maillog | sed 's/^.*unknown\[\(.*\)\].*$/\1/' | awk '{a[$0]++}END{for(i in a){print a[i]":"i}}' | sort -n
+```
+
+或
+
+```sh
+grep "SASL LOGIN authentication failed" /var/log/maillog | sed 's/^.*unknown\[\(.*\)\].*$/\1/' | sort -n | uniq -c | sort -n
+```
+示例输出：
+
+          1 183.31.232.154
+          1 219.82.112.8
+          1 58.100.2.131
+          2 219.82.112.7
+          2 58.100.201.88
+          4 58.100.201.89
+          4 58.100.201.90
+          6 58.100.201.93
+         13 111.79.240.231
+         20 121.22.253.203
+         20 202.106.156.143
+         27 1.27.211.29
+         28 36.33.217.254
+         28 36.33.217.72
+         28 36.33.218.225
+         28 36.33.219.178
+         30 182.38.32.252
+         44 101.30.73.1
+         46 192.116.221.251
+         47 14.116.107.167
+         48 101.87.215.114
+         60 112.250.103.160
+         60 223.146.142.209
+         60 60.167.20.214
+         69 219.131.227.105
+         72 223.243.48.241
+         84 223.243.48.84
+         84 60.166.213.212
+        104 122.246.222.219
+        115 14.125.55.141
+        125 177.23.177.146
+        125 202.106.156.142
+        132 117.89.187.244
+        218 153.99.48.123
+        256 183.130.27.186
+        353 202.108.253.122
+        383 118.193.178.250
+        936 221.225.89.188
+       2232 112.236.61.93
+       2663 119.29.92.101
+
+
+## 7. 坐享其成
 
 没事看看日志，发发呆~ :relaxed:
 
