@@ -1074,7 +1074,7 @@ mkdir -p /var/tmp/extman/
 chown-R postfix:postfix /var/tmp/extman/
 ```
 
-extman 后台提示 `No such file or directory`
+extman 后台提示 `No such file or directory`，需要启动 extman 的 cmdserver：
 ```sh
 /var/www/extsuite/extman/daemon/cmdserver -d
 ```
@@ -1148,9 +1148,12 @@ vi /etc/postfix/main.cf
     virtual_uid_maps = static:1001
     virtual_gid_maps = static:1001
     virtual_transport = maildrop
-    
-    chown vmail:vmail mailbox
-    chown vmail:vmail cgi
+
+```sh
+chown vmail:vmail /var/mailbox
+chown -R vmail:vmail /var/www/extsuite/extmail/cgi/
+chown -R vmail:vmail /var/www/extsuite/extman/cgi/
+```
 
 vi extman/webman.cf
 
@@ -1176,6 +1179,25 @@ vi /etc/httpd/conf/httpd.conf
 chown-R vmail:vmail /var/tmp/extman/
 ```
 
+测试 maildrop 对 authlib 支持：
+
+```sh
+/usr/local/maildrop/bin/maildrop -v
+```
+
+    maildrop 2.8.3 Copyright 1998-2015 Double Precision, Inc.
+    GDBM/DB extensions enabled.
+    Courier Authentication Library extension enabled.
+    Maildir quota extension are now always enabled.
+    This program is distributed under the terms of the GNU General Public
+    License. See COPYING for additional information.
+
+重新加载 postfix 配置：
+
+```sh
+/etc/init.d/postfix reload
+```
+
 ## 4. postfix 常用命令
 
 ### 4.1. 原生命令
@@ -1197,12 +1219,12 @@ chown-R vmail:vmail /var/tmp/extman/
 
 刪除所有正在 deferred 行列中的邮件 ( 查看那些信被删除 ): 
 ```sh
-find /var/spool/postfix/deferred -type f -print | xargs rm -f 
+find /var/spool/postfix/deferred -type f -exec rm -f {} \;
 ```
 
 刪掉3天以前无法发出的邮件: 
 ```sh
-find /var/spool/postfix/deferred -type f -mtime +3 -print | xargs rm -f 
+find /var/spool/postfix/deferred -type f -mtime +3 -exec rm -f {} \;
 ```
 
 列出目前所有无法发出的郵件: 
@@ -1212,7 +1234,7 @@ find /var/spool/postfix/deferred -type f -exec ls -l –time-style=+%Y-%m-%d_%H:
 
 刪除超过 5 天的 "defer" 行列中的退信记录: 
 ```sh
-find /var/spool/postfix/defer -type f -mtime +5 -print | xargs rm -f 
+find /var/spool/postfix/defer -type f -mtime +5 -exec rm -f {} \;
 ```
 
 ## 6. postfix 管理日志
@@ -1307,3 +1329,7 @@ tail -f /var/log/maillog
 
 末了，再次提醒各位，立即删除 `/var/www/extsuite/extmail/cgi/env.cgi` 文件！
  
+## 8. 参考文档
+
+- [Extmail Solution for CentOS 5](http://wiki.extmail.org/extmail_solution_for_centos-5)
+
