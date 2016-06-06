@@ -429,6 +429,10 @@ cp php.ini-production /usr/local/webserver/php/etc/php.ini
 cp /usr/local/webserver/php/etc/php-fpm.conf.default /usr/local/webserver/php/etc/php-fpm.conf
 ```
 
+php-fpm 配置 vi /usr/local/webserver/php/etc/php-fpm.conf
+
+
+
 php-fpm 启动脚本：
 
 ```sh
@@ -940,7 +944,17 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 
 ### 6.2. PHP 安全配置
 
+修改 php.ini 配置文件：
+
+    disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+
+php.ini 官方手册参考 [Description of core php.ini directives][phpini]
+
+[phpini]: http://php.net/manual/en/ini.core.php
+
 ### 6.3. MySQL 安全配置
+
+
 
 ### 6.4. CentOS 系统安全配置
 
