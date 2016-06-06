@@ -239,7 +239,7 @@ yum remove postfix
 
 #### 3.3.1. 新建用户
 
-事先添加两个用户和用户组 postfix:postfix 和 postdrop:postdrop，由于 CentOS 6.8 中默认安装过 postfix，所以直接把 postfix 用户和用户组的 id 改成 2525，改成这个数是为了后面配置方便，有些配置直接用的是 uid 和 gid：
+事先添加两个用户和用户组 postfix:postfix 和 postdrop:postdrop，由于 CentOS 6.8 中默认安装过 postfix，所以直接把 postfix 用户和用户组的 id 改成 2525，改成这个数是为了后面配置方便，有些配置直接用的是 uid 和 gid。后续配置 maildrop 时会用到 vmail:vmail 用户，这里也一并添加了吧：
 
 添加 `postfix:postfix` 用户：
 ```sh

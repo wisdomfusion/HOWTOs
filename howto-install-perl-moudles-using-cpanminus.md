@@ -73,7 +73,7 @@ Linux 平台下安装比较直接，一条命令搞惦：
 
     cpan-outdated
 
-直接把过期的模块使用管道传给 cpanm 命令，更新安们：
+直接把过期的模块使用管道传给 cpanm 命令，更新它们：
 
     cpan-outdated | cpanm
 
