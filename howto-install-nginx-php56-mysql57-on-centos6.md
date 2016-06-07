@@ -791,6 +791,36 @@ http
 EOF
 ```
 
+nginx 日志轮询：
+
+- nginx 日志存放位置：`/u01/logfiles/nginx`
+- 日志轮询脚本：`/usr/local/webserver/nginx/cut_nginx_log.sh`
+- nginx pid 文件位置：`/usr/local/webserver/nginx/logs/nginx.pid`
+
+```sh
+cat > /usr/local/webserver/nginx/cut_nginx_log.sh <<\EOF
+#!/bin/bash
+# cut_nginx_log.sh
+# This script run at 00:00
+
+# The Nginx logs path
+logs_path="/u01/logfiles/nginx"
+newlogs_path=${logs_path}/$(date -d 'yesterday' '+%Y%m%d')
+
+mkdir -p ${newlogs_path}
+mv ${logs_path}/*.log ${newlogs_path}
+
+kill -USR1 `cat /usr/local/webserver/nginx/logs/nginx.pid`
+EOF
+```
+
+crontab 中添加定时任务，00:00 执行日志轮询：
+
+```sh
+crontab -e
+0 0 * * * /bin/bash /usr/local/webserver/nginx/cut_nginx_log.sh
+```
+
 ## 5. 其他服务安装
 
 ### 5.1. rsync
