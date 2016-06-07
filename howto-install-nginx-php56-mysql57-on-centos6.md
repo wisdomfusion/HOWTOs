@@ -454,6 +454,26 @@ php-fpm.conf 配置 `vi /usr/local/webserver/php/etc/php-fpm.conf`：
     pm.max_requests = 51200
     request_terminate_timeout = 0
 
+可以直接使用如下系列命令达到如上修改效果：
+
+```sh
+sed -i '/^;pid/s/^;//' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;error_log/s/^;//' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;emergency_restart_threshold/c\emergency_restart_threshold = 60' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;emergency_restart_interval/c\emergency_restart_interval = 60' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;process/c\process_control_timeout = 5s' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;daemonize/s/^;//' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;rlimit_files/c\rlimit_files = 65535' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^pm =/c\pm = static' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^pm.max_children/s/[0-9]\+$/256/' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^pm.start_servers/s/[0-9]\+$/20/' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^pm.min_spare_servers/s/[0-9]\+$/5/' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^pm.max_spare_servers/s/[0-9]\+$/35/' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;pm.process_idle_timeout/s/^;//' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;pm.max_requests/c\pm.max_requests = 51200' /usr/local/webserver/php/etc/php-fpm.conf
+sed -i '/^;request_terminate_timeout/s/^;//' /usr/local/webserver/php/etc/php-fpm.conf
+```
+
 php-fpm 启动脚本：
 
 ```sh
