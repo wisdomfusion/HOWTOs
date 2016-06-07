@@ -429,6 +429,31 @@ cp php.ini-production /usr/local/webserver/php/etc/php.ini
 cp /usr/local/webserver/php/etc/php-fpm.conf.default /usr/local/webserver/php/etc/php-fpm.conf
 ```
 
+php-fpm.conf 配置 `vi /usr/local/webserver/php/etc/php-fpm.conf`：
+
+    [global]
+    pid = run/php-fpm.pid
+    error_log = log/php-fpm.log
+    emergency_restart_threshold = 60
+    emergency_restart_interval = 60
+    process_control_timeout = 5s
+    daemonize = yes
+    rlimit_files = 65535
+
+    [www]
+    user = www
+    group = www
+    listen = 0.0.0.0:9000
+    listen.allowed_clients = 127.0.0.1
+    pm = static
+    pm.max_children = 384
+    pm.start_servers = 20
+    pm.min_spare_servers = 5
+    pm.max_spare_servers = 35
+    pm.process_idle_timeout = 10s
+    pm.max_requests = 51200
+    request_terminate_timeout = 0
+
 php-fpm 启动脚本：
 
 ```sh
@@ -949,4 +974,19 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 ```sh
 echo "exclude=kernel*" >> /etc/yum.conf
 ```
+
+### 7. 运维笔记
+
+
+把 PHP 和 MySQL 相关命令添加到 PATH 中：
+
+```sh
+export PATH=$PATH:/usr/local/webserver/php/bin:/usr/local/webserver/mysql/bin
+echo "export PATH=$PATH:/usr/local/webserver/php/bin:/usr/local/webserver/mysql/bin" >> ~/.bashrc
+```
+
+
+
+
+
 
