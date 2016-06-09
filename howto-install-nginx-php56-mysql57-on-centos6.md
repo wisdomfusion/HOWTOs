@@ -66,6 +66,7 @@ echo "nameserver 114.114.114.114" >> /etc/resolv.conf
 ### 2.2. 禁用 SELinux
 
 ```sh
+setenforce 0
 sed -i 's/^SELINUX=*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
@@ -443,8 +444,6 @@ php-fpm.conf 配置 `vi /usr/local/webserver/php/etc/php-fpm.conf`：
     [www]
     user = www
     group = www
-    listen = 0.0.0.0:9000
-    listen.allowed_clients = 127.0.0.1
     pm = static
     pm.max_children = 384
     pm.start_servers = 20
@@ -495,7 +494,7 @@ make && make install
 cd ../
 
 tar zxvf ImageMagick.tar.gz
-cd ImageMagick-7.0.1-6/
+cd ImageMagick-*/
 ./configure && make && make install
 /sbin/ldconfig
 cd ../
@@ -843,11 +842,91 @@ crontab -e
 
 ## 5. 其他服务安装
 
-### 5.1. rsync
+### 5.1. sshd
+
+添加管理用户
+
+```sh
+useradd -G wheel username
+```
+
+启用 wheel 用户组的 su 权限
+
+vi /etc/pam.d/su	uncomment the following line:
+
+    #auth required pam_wheel.so use_uid
+    echo "SU_WHEEL_ONLY yes" >> /etc/login.defs
+
+SSH2 的公钥与私钥的建立
+
+```sh
+su - username
+ssh-keygen -t rsa
+cd ~/.ssh
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+rm -f ~/.ssh/id_rsa.pub
+chmod 400 ~/.ssh/authorized_keys
+```
+
+vi /etc/ssh/sshd_config
+
+    ServerKeyBits 1024
+    PermitRootLogin no
+    PasswordAuthentication no
+    PermitEmptyPasswords no
+
+### 5.2. rsync
 
 yum -y rsync xinetd
 
-### 5.2. ProFTPd
+启用 rsync 服务：
+
+vi /etc/xinetd.d/rsync
+
+修改 disable = yes 为 disable = no
+
+为 rsync 客户端添加用户名及密码：
+
+vi /etc/rsyncd.secrets
+
+    adminname:hispassword
+
+rsync 配置文件的修改：
+
+vi /etc/rsyncd.conf
+
+    uid = root
+    gid = root
+
+    max connections = 10
+    log file = /srvapp/logfiles/rsyncd.log
+    timeout = 300
+
+    [test]
+    comment = test rsync
+    path = /home/tmp
+    read only = no
+    list = yes
+    hosts allow = 10.10.105.0/24
+    auth users = g9N1lsEm8Q
+    secrets file = /etc/rsyncd.secrets
+
+rsync 安全相关配置：
+
+```sh
+chown root.root /etc/rsyncd.*
+chmod 600 /etc/rsyncd.*
+```
+
+重启 xinetd 服务使用配置生效：
+
+```sh
+service xinetd restart
+```
+
+另外，rsync 服务使用873端口，iptables 中的端口设置要注意。
+
+### 5.3. ProFTPd
 
 FTP 服务器
 

@@ -10,6 +10,7 @@
 - [ ] [How to Install nginx wiith PHP7 and MySQL 5.7 on FreeBSD 10.3](howto-install-nginx-php7-mysql57-on-freebsd.md)
 - [ ] [How To Use Systemctl to Manage Systemd Services and Units](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
 - [x] [How to Install postfix on CentOS 6](howto-install-postfix-on-centos6.md)
+- [ ] [How to Set Up iptables Firewall on CentOS 6](howto-set-up-iptables-firewall-on-centos6.md)
 
 **Perl**
 
