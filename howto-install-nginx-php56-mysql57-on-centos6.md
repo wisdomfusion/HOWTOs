@@ -1006,17 +1006,11 @@ cat > /usr/local/firewall/iptables.rule <<\EOF
   done
 
 # 5. 允许某些服务的进入，请依照您自己的环境开启
-# iptables -A INPUT -p TCP -i $EXTIF --dport  21  -j ACCEPT   # FTP
+
   iptables -A INPUT -p TCP -i $EXTIF --dport 3306 -j ACCEPT   # MYSQL
-  iptables -A INPUT -p TCP -i $EXTIF --dport 6813 -j ACCEPT   # SSH
-  iptables -A INPUT -p TCP -i $EXTIF --dport  25  -j ACCEPT   # SMTP
-# iptables -A INPUT -p UDP -i $EXTIF --sport  53  -j ACCEPT   # DNS
-# iptables -A INPUT -p TCP -i $EXTIF --sport  53  -j ACCEPT   # DNS
-  iptables -A INPUT -p TCP -i $EXTIF --dport  80  -j ACCEPT   # WWW
-# iptables -A INPUT -p TCP -i $EXTIF --dport 8080 -j ACCEPT   # WWW
-# iptables -A INPUT -p TCP -i $EXTIF --dport 110  -j ACCEPT   # POP3
-# iptables -A INPUT -p TCP -i $EXTIF --dport 443  -j ACCEPT   # HTTPS
-# iptables -A INPUT -p TCP -i $EXTIF --dport 873  -j ACCEPT   # RSYNC
+  iptables -A INPUT -p TCP -i $EXTIF --dport 22   -j ACCEPT   # SSH
+  iptables -A INPUT -p TCP -i $EXTIF --dport 80   -j ACCEPT   # WWW
+  iptables -A INPUT -p TCP -i $EXTIF --dport 873  -j ACCEPT   # RSYNC
 
 # 防止SYN攻击 轻量
   iptables -N syn-flood
@@ -1038,11 +1032,11 @@ cat > /usr/local/firewall/iptables.rule <<\EOF
 # iptables -I INPUT -p icmp --icmp-type echo-request -m state --state NEW -j DROP
 
 #标志为FIN，URG，PSH拒绝
-  iptables -A INPUT -i eth0 -p TCP --tcp-flags SYN,RST SYN,RST -j DROP
-  iptables -A INPUT -i eth0 -p TCP --tcp-flags SYN,FIN SYN,FIN -j DROP
-  iptables -A INPUT -i eth0 -p TCP --tcp-flags ALL ALL -j DROP
-  iptables -A INPUT -i eth0 -p TCP --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
-  iptables -A INPUT -i eth0 -p TCP  --tcp-flags ALL NONE -j DROP
+  iptables -A INPUT -i $EXTIF -p TCP --tcp-flags SYN,RST SYN,RST -j DROP
+  iptables -A INPUT -i $EXTIF -p TCP --tcp-flags SYN,FIN SYN,FIN -j DROP
+  iptables -A INPUT -i $EXTIF -p TCP --tcp-flags ALL ALL -j DROP
+  iptables -A INPUT -i $EXTIF -p TCP --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
+  iptables -A INPUT -i $EXTIF -p TCP  --tcp-flags ALL NONE -j DROP
 
 # 第二部份，针对后端主机的防火墙设定！##############################
 # 1. 先加载一些有用的模块
@@ -1075,10 +1069,10 @@ cat > /usr/local/firewall/iptables.rule <<\EOF
 #   fi
 # fi
 
-  # 如果你的 MSN 一直无法联机，或者是某些网站 OK 某些网站不 OK，
-  # 可能是 MTU 的问题，那你可以将底下这一行给他取消批注来启动 MTU 限制范围
-  # iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss \
-  #          --mss 1400:1536 -j TCPMSS --clamp-mss-to-pmtu
+# 如果你的 MSN 一直无法联机，或者是某些网站 OK 某些网站不 OK，
+# 可能是 MTU 的问题，那你可以将底下这一行给他取消批注来启动 MTU 限制范围
+# iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss \
+#          --mss 1400:1536 -j TCPMSS --clamp-mss-to-pmtu
 
 # 4. 内部服务器的设定：
 # iptables -t nat -A PREROUTING -p tcp -i $EXTIF --dport 80  \
