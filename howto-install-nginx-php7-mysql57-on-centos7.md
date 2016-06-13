@@ -1,4 +1,4 @@
-# How to Install nginx with PHP7 and MySQL5.7 on CentOS 7
+# How to Install nginx with PHP 7 and MySQL 5.7 on CentOS 7
 
 ## 1. Introduction
 

@@ -1,4 +1,4 @@
-# How to Install httpd2.2 with PHP5.6 and MySQL5.7 on Mac OS X
+# How to Install httpd 2.2 with PHP 5.6 and MySQL 5.7 on Mac OS X
 
 ## 0. 简介
 

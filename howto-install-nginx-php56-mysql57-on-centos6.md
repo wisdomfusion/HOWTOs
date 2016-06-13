@@ -1,4 +1,4 @@
-# How to Install nginx with PHP5.6 and MySQL5.7 on CentOS 6
+# How to Install nginx with PHP 5.6 and MySQL 5.7 on CentOS 6
 
 ## 0. 约定
 
