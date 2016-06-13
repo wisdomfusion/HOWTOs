@@ -8,6 +8,7 @@
 - [ ] [How to Install nginx with PHP7 and MySQL5.7 on CentOS 7](howto-install-nginx-php7-mysql57-on-centos7.md)
 - [ ] [How to Install nginx with PHP7 and MySQL 5.7 on Ubuntu 16.04 LTS](howto-install-nginx-php7-mysql57-on-ubuntu1604.md)
 - [ ] [How to Install nginx wiith PHP7 and MySQL 5.7 on FreeBSD 10.3](howto-install-nginx-php7-mysql57-on-freebsd.md)
+- [ ] [How to Install Elasticsearch, Logstash, and Kibana (ELK Stack) on Centos 7](howto-install-elasticsearch-logstash-and-kibana-on-centos7.md)
 - [ ] [How To Use Systemctl to Manage Systemd Services and Units](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
 - [x] [How to Install postfix on CentOS 6](howto-install-postfix-on-centos6.md)
 - [ ] [How to Set Up iptables Firewall on CentOS 6](howto-set-up-iptables-firewall-on-centos6.md)
