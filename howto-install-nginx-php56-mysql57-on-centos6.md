@@ -944,9 +944,6 @@ chmod 700 /usr/local/firewall/iptables.*
 
 cat > /usr/local/firewall/iptables.rule <<\EOF
 #!/bin/bash
-# modified:     26-06-2008
-# author:       gavin
-# perpose:      config iptables
 
 # 请先输入您的相关参数，不要输入错误了！
   EXTIF="eth0"              # 这个是可以连上 Public IP 的网络接口
@@ -1056,27 +1053,6 @@ cat > /usr/local/firewall/iptables.rule <<\EOF
   iptables -t nat -P PREROUTING  ACCEPT
   iptables -t nat -P POSTROUTING ACCEPT
   iptables -t nat -P OUTPUT      ACCEPT
-
-# 3. 开放成为路由器，且为 IP 分享器！
-# if [ "$INIF" != "" ]; then
-#   iptables -A INPUT -i $INIF -j ACCEPT
-#   echo "1" > /proc/sys/net/ipv4/ip_forward
-#   if [ "$INNET" != "" ]; then
-#     for innet in $INNET
-#     do
-#       iptables -t nat -A POSTROUTING -s $innet -o $EXTIF -j MASQUERADE
-#     done
-#   fi
-# fi
-
-# 如果你的 MSN 一直无法联机，或者是某些网站 OK 某些网站不 OK，
-# 可能是 MTU 的问题，那你可以将底下这一行给他取消批注来启动 MTU 限制范围
-# iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss \
-#          --mss 1400:1536 -j TCPMSS --clamp-mss-to-pmtu
-
-# 4. 内部服务器的设定：
-# iptables -t nat -A PREROUTING -p tcp -i $EXTIF --dport 80  \
-#          -j DNAT --to 192.168.1.210:80
 EOF
 ```
 
