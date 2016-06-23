@@ -20,7 +20,7 @@
 
     nginx-1.10.0.tar.gz
     php-5.6.22.tar.gz
-    mysql-5.7.12.tar.gz
+    mysql-5.7.13.tar.gz
 
 相关库：
 
@@ -111,7 +111,7 @@ cd /usr/src
 wget http://nginx.org/download/nginx-1.10.0.tar.gz
 wget http://cn2.php.net/distributions/php-5.6.22.tar.gz
 wget http://cn2.php.net/distributions/php-7.0.7.tar.gz
-wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.12.tar.gz
+wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.13.tar.gz
 wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
@@ -199,8 +199,8 @@ tar zxvf boost_1_59_0.tar.gz -C /usr/local/
 解压前配置软件包
 
 ```sh
-tar zxvf mysql-5.7.12.tar.gz
-cd mysql-5.7.12/
+tar zxvf mysql-5.7.13.tar.gz
+cd mysql-5.7.13/
 cmake \
 -DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
 -DMYSQL_DATADIR=/u01/mysql \
@@ -228,7 +228,7 @@ cmake \
 
 编译安装：
 ```sh
-make -j `grep processor /proc/cpuinfo | wc -l`
+make -j `nproc`
 make install
 ```
 
@@ -419,7 +419,7 @@ cd php-5.6.22/
 编译安装：
 
 ```sh
-make ZEND_EXTRA_LIBS='-liconv'
+make ZEND_EXTRA_LIBS='-liconv' -j `nproc`
 make install
 ```
 
@@ -852,10 +852,13 @@ useradd -G wheel username
 
 启用 wheel 用户组的 su 权限
 
-vi /etc/pam.d/su	uncomment the following line:
+vi /etc/pam.d/su 取消注释如下行：
 
     #auth required pam_wheel.so use_uid
-    echo "SU_WHEEL_ONLY yes" >> /etc/login.defs
+
+```sh
+echo "SU_WHEEL_ONLY yes" >> /etc/login.defs
+```
 
 SSH2 的公钥与私钥的建立
 
@@ -877,7 +880,9 @@ vi /etc/ssh/sshd_config
 
 ### 5.2. rsync
 
-yum -y rsync xinetd
+```sh
+yum -y install rsync xinetd
+```
 
 启用 rsync 服务：
 
