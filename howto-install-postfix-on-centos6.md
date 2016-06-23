@@ -50,6 +50,8 @@ wget http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-3.
 - extmail-1.2
 - extman-1.1
 
+可以直接在这里下载：[packages][./packages/]
+
 ### 2.3. 编译工具及相关库
 
 安装开发工具组：
