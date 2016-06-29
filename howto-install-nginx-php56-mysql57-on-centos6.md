@@ -193,7 +193,7 @@ tar zxvf boost_1_59_0.tar.gz -C /usr/local/
 
 ```sh
 /usr/sbin/groupadd mysql
-/usr/sbin/useradd -g mysql mysql
+/usr/sbin/useradd -g mysql -s /sbin/nologin mysql
 ```
 
 解压前配置软件包
@@ -363,7 +363,7 @@ dbrootpwd=123456
 
 ```sh
 /usr/sbin/groupadd www
-/usr/sbin/useradd -g www www
+/usr/sbin/useradd -g www -s /sbin/nologin www
 mkdir -p /u01/www
 chmod +w /u01/www
 chown -R www:www /u01/www
