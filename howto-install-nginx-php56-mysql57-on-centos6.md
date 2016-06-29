@@ -823,11 +823,11 @@ cat > /usr/local/webserver/nginx/cut_nginx_log.sh <<\EOF
 # This script run at 00:00
 
 # The Nginx logs path
-logs_path="/u01/logfiles/nginx"
-newlogs_path=${logs_path}/$(date -d 'yesterday' '+%Y%m%d')
+log_path="/u01/logfiles/nginx"
+new_log_path=${log_path}/$(date -d 'yesterday' '+%Y%m%d')
 
-mkdir -p ${newlogs_path}
-mv ${logs_path}/*.log ${newlogs_path}
+mkdir -p ${new_log_path}
+mv ${log_path}/*.log ${new_log_path}
 
 kill -USR1 `cat /usr/local/webserver/nginx/logs/nginx.pid`
 EOF
