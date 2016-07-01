@@ -1240,7 +1240,7 @@ find /var/spool/postfix/defer -type f -mtime +5 -exec rm -f {} \;
 ### 6.1. 查看异常 IP
 
 ```sh
-grep "SASL LOGIN authentication failed" /var/log/maillog | sed 's/^.*\[\(\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\)\].*$/\1/' | sort | uniq -c | sort -nr
+sed '/SASL LOGIN authentication failed/!d;s/^.*\[\(\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\)\].*$/\1/' /var/log/maillog | sort | uniq -c | sort -nr
 ```
 示例输出：
 
