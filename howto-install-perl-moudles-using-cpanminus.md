@@ -14,25 +14,44 @@ meta::cpan 中的模块页面中有关于 App::cpanminus 的[安装说明](https
 
 一般我们会把 cpanm 和将要安装的 Perl 模块安装在当前用户（非 root 用户）目录下的 `~/perl5/` 文件夹中。运行如下几条命令：
 
-    curl -L https://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
-    eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
-    echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
+```sh
+curl -L https://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
+echo 'export MANPATH=$HOME/perl5/man:$MANPATH' >> ~/.profile
+```
+
+以上是使用系统预装或 `sudo port` 安装的 Perl 安装 cpanm 的方法，下面是更通用的，也是推荐大家的一种安装方式，使用 perlbrew：
+
+```sh
+\curl -L http://install.perlbrew.pl | bash
+source ~/perl5/perlbrew/etc/bashrc
+echo 'source ~/perl5/perlbrew/etc/bashrc' >> ~/.bash_profile
+perlbrew available
+perlbrew install perl-5.24.0
+perlbrew switch perl-5.24.0
+perlbrew install-cpanm
+```
 
 **Linux**
 
 Linux 平台下安装比较直接，一条命令搞惦：
 
-    curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+```sh
+curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+```
 
 也可以直接手动下载安装：
 
-    cd ~/bin
-    curl -L https://cpanmin.us/ -o cpanm
-    chmod +x cpanm
+```sh
+cd ~/bin
+curl -L https://cpanmin.us/ -o cpanm
+chmod +x cpanm
+```
 
 **Windows**
 
-``When I'm on Windows, I use Strawberry Perl'' -- Larry Wall
+    When I'm on Windows, I use Strawberry Perl. -- Larry Wall
 
 我在 Windows 平台也使用[大草莓 Perl](http://strawberryperl.com/)，安装后，打开 Perl 命令行或命令提示符，执行 `cpan App::cpanminus` 命令即可快速安装 cpanm。
 
@@ -47,7 +66,7 @@ Linux 平台下安装比较直接，一条命令搞惦：
 已安装的模块，该命令会输出当然的模块信息：
 
     $ cpanm Mojolicious
-    Mojolicious is up to date. (6.62)
+    Mojolicious is up to date. (6.66)
 
 也可以一次性安装多个模块：
 
