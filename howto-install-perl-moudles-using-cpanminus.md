@@ -33,6 +33,19 @@ perlbrew switch perl-5.24.0
 perlbrew install-cpanm
 ```
 
+perlbrew 不只是 non-root 安装，而且也可以同时安装多个版本的 perl 随时在不同版本之间进行切换。更多 perlbrew 的信息请访问[项目页](https://perlbrew.pl/)。
+
+perlbrew 会把模块安装在当时 perlbrew 的 Perl 版本的如下目录（以 5.24.0 版本为例）：
+
+    ~/perl5/perlbrew/perls/perl-5.24.0/lib/
+
+如果想安装新的版本，如 `perl-5.25.2`，可以很方便的把旧版本中安装的模块安装到新版的 `lib` 中，执行如下命令：
+
+```sh
+perlbrew install perl-5.25.2
+perlbrew list-modules | perlbrew exec --with perl-5.25.2 cpanm
+```
+
 **Linux**
 
 Linux 平台下安装比较直接，一条命令搞惦：
