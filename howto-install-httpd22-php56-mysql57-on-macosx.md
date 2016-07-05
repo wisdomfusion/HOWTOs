@@ -37,9 +37,11 @@ sudo vi /opt/local/apache2/conf/extra/httpd-vhosts.conf
         CustomLog "logs/localhost-access_log" common
     </VirtualHost>
 
-$ /opt/local/apache2/bin/apachectl -t
-$ sudo port unload apache2
-$ sudo port load apache2
+```sh
+/opt/local/apache2/bin/apachectl -t
+sudo port unload apache2
+sudo port load apache2
+```
 
 ### 4.2. MySQL 5.6
 
@@ -81,10 +83,9 @@ sudo port load mysql56-server
 ```sh
 sudo port install php70 php70-apache2handler
 sudo port install php70-cgi php70-gd php70-curl php70-iconv php70-gettext php70-mbstring php70-mcrypt php70-mysql php70-openssl php70-sockets php70-zip php70-opcache php70-sqlite
-```
-
 cd /opt/local/etc/php70
 sudo cp php.ini-development php.ini
+```
 
 sudo vi /opt/local/apache2/conf/httpd.conf
 
@@ -94,8 +95,10 @@ sudo vi /opt/local/apache2/conf/httpd.conf
     AddType application/x-httpd-php-source .phps
     </IfModule>
 
+```sh
 cd /opt/local/apache2/modules
 sudo /opt/local/apache2/bin/apxs -a -e -n php7 mod_php70.so
+```
 
 sudo vi /opt/local/apache2/conf/httpd.conf
 
@@ -119,12 +122,13 @@ sudo vi /opt/local/apache2/conf/httpd.conf
     # mv tmp.ini php.ini
     # exit # OR rm php.ini.bak && exit
 
+
+```sh
 sudo port unload apache2
 sudo port load apache2
-
 export PATH=$PATH:/opt/local/bin
-vi ~/.profile
-export PATH=$PATH:/opt/local/bin
+echo 'export PATH=$PATH:/opt/local/bin' ~/.profile
+```
 
 port select --list php
 
@@ -143,11 +147,12 @@ php -v
 
 ### 4.4. PHP 5.6
 
+```sh
 sudo port install php56 php56-apache2handler
 sudo port install php56-cgi php56-gd php56-curl php56-iconv php56-gettext php56-mbstring php56-mcrypt php56-mysql php56-openssl php56-sockets php56-zip php56-opcache php56-sqlite
-
 cd /opt/local/etc/php56
 sudo cp php.ini-development php.ini
+```
 
 sudo vi /opt/local/apache2/conf/httpd.conf
 
@@ -157,8 +162,10 @@ sudo vi /opt/local/apache2/conf/httpd.conf
     AddType application/x-httpd-php-source .phps
     </IfModule>
 
+```sh
 cd /opt/local/apache2/modules
 sudo /opt/local/apache2/bin/apxs -a -e -n php5 mod_php56.so
+```
 
 sudo vi /opt/local/apache2/conf/httpd.conf
 
@@ -183,12 +190,13 @@ sudo vi /opt/local/apache2/conf/httpd.conf
     # mv tmp.ini php.ini
     # exit # OR rm php.ini.bak && exit
 
+```sh
 sudo port unload apache2
 sudo port load apache2
 
 export PATH=$PATH:/opt/local/bin
-vi ~/.profile
-export PATH=$PATH:/opt/local/bin
+echo 'export PATH=$PATH:/opt/local/bin' ~/.profile
+```
 
 port select --list php
 
