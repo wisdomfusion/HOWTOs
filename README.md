@@ -11,7 +11,6 @@
 - [ ] [How to Install Elasticsearch, Logstash, and Kibana (ELK Stack) on Centos 7](howto-install-elasticsearch-logstash-and-kibana-on-centos7.md)
 - [ ] [How To Use Systemctl to Manage Systemd Services and Units](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
 - [x] [How to Install postfix on CentOS 6](howto-install-postfix-on-centos6.md)
-- [ ] [How to Set Up iptables Firewall on CentOS 6](howto-set-up-iptables-firewall-on-centos6.md)
 
 **Perl**
 
@@ -23,4 +22,3 @@
 
 - [ ] [How to Use Macports and Homebrew on Mac OS X](howto-use-macports-and-homebrew-on-macosx.md)
 - [x] [How to Install httpd 2.2 with PHP 5.6 and MySQL 5.7 on Mac OS X](howto-install-httpd22-php56-mysql57-on-macosx.md)
-
