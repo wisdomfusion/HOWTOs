@@ -725,18 +725,19 @@ chmod +w /u01/logfiles/nginx
 chown -R www:www /u01/logfiles/nginx
 
 cp /usr/local/webserver/nginx/conf/nginx.conf{,.original}
-cat > nginx.conf <<\EOF
+cat > /usr/local/webserver/nginx/conf/nginx.conf <<\EOF
 user  www www;
-worker_processes 1;
-error_log  /u01/logfiles/nginx/nginx_error.log  crit;
-#pid        logs/nginx.pid;
 
-worker_rlimit_nofile 51200;
+#worker_processes 8;
+#worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+worker_rlimit_nofile 65535;
+
+error_log  /u01/logfiles/nginx/nginx_error.log  warn;
 
 events
 {
   use epoll;
-  worker_connections 51200;
+  worker_connections 65535;
 }
 
 http
@@ -749,10 +750,13 @@ http
   large_client_header_buffers 4 32k;
   client_max_body_size 8m;
 
-  sendfile on;
-  tcp_nopush     on;
+#  limit_conn_zone $binary_remote_addr zone=connlimit:9m;
 
-  keepalive_timeout 5;
+  server_tokens off;
+  sendfile on;
+  tcp_nopush on;
+
+  keepalive_timeout 10;
 
   tcp_nodelay on;
 
@@ -779,28 +783,31 @@ http
   server
   {
     listen       80;
-    server_name  localhost;
     index index.php index.html;
     root  /u01/www/;
 
-    location ~ \.php$ {
-        fastcgi_pass   127.0.0.1:9000;
-        fastcgi_index  index.php;
-        include        fastcgi.conf;
+    #limit_conn  connlimit 15;
+    #limit_rate  256k;
+
+    location ~ .*\.php$
+    {
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index index.php;
+      include fastcgi.conf;
     }
-    location ~ /\.ht {
-        deny  all;
-    }
+
     location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
     {
       expires      30d;
+      access_log   off;
     }
-    location ~ .*\.(js|css)?$
+    location ~ .*\.(js|css)$
     {
       expires      1h;
+      access_log   off;
     }
 
-    access_log  /u01/logfiles/nginx/localhost.access.log  access;
+    access_log  /u01/logfiles/nginx/access.log  access;
   }
 
 }
