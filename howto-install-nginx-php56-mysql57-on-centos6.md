@@ -18,9 +18,9 @@
 
 所需软件包：
 
-    nginx-1.10.0.tar.gz
-    php-5.6.22.tar.gz
-    mysql-5.7.13.tar.gz
+    nginx-1.10.1.tar.gz
+    php-5.6.24.tar.gz
+    mysql-5.7.14.tar.gz
 
 相关库：
 
@@ -36,8 +36,7 @@
     
 其他服务软件包：
 
-    memcached-1.4.25.tar.gz
-    redis-3.2.0.tar.gz
+    redis-3.2.3.tar.gz
 
 ## 2. 系统基本设定
 
@@ -111,15 +110,13 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 
 ```sh
 cd /usr/src
-wget http://nginx.org/download/nginx-1.10.0.tar.gz
-wget http://cn2.php.net/distributions/php-5.6.22.tar.gz
-wget http://cn2.php.net/distributions/php-7.0.7.tar.gz
-wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.13.tar.gz
+wget http://nginx.org/download/nginx-1.10.1.tar.gz
+wget -O php-5.6.24.tar.gz http://cn2.php.net/distributions/php-5.6.24.tar.gz
+wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.14.tar.gz
 wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
-wget http://pecl.php.net/get/memcache-2.2.7.tgz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
@@ -202,8 +199,8 @@ tar zxvf boost_1_59_0.tar.gz -C /usr/local/
 解压前配置软件包
 
 ```sh
-tar zxvf mysql-5.7.13.tar.gz
-cd mysql-5.7.13/
+tar zxvf mysql-5.7.*.tar.gz
+cd mysql-5.7.*/
 cmake \
 -DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
 -DMYSQL_DATADIR=/u01/mysql \
@@ -340,6 +337,14 @@ chown mysql:mysql /u01/mysql/
 /usr/local/webserver/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/usr/local/webserver/mysql --datadir=/u01/mysql
 ```
 
+将MySQL数据库的动态链接库共享至系统链接库：
+
+```sh
+echo "/usr/local/webserver/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
+/sbin/ldconfig
+/sbin/ldconfig -v | grep mysql
+```
+
 启动 MySQL：
 
 ```sh
@@ -360,7 +365,7 @@ dbrootpwd=123456
 /etc/init.d/mysqld stop
 ```
 
-### 4.3. 安装 PHP 5.6.22
+### 4.3. 安装 PHP 5.6.24
 
 先建立 www:www 用户：
 
@@ -376,8 +381,8 @@ chown -R www:www /u01/www
 
 ```sh
 cd /usr/src/
-tar zxvf php-5.6.22.tar.gz
-cd php-5.6.22/
+tar zxvf php-5.6.*.tar.gz
+cd php-5.6.*/
 ./configure --prefix=/usr/local/webserver/php \
 --with-config-file-path=/usr/local/webserver/php/etc \
 --with-libdir=lib64 \
@@ -489,13 +494,6 @@ PHP 模块安装：
 
 ```sh
 cd /usr/src/
-tar zxvf memcache-2.2.7.tgz
-cd memcache-2.2.7/
-/usr/local/webserver/php/bin/phpize
-./configure --with-php-config=/usr/local/webserver/php/bin/php-config
-make && make install
-cd ../
-
 tar zxvf ImageMagick.tar.gz
 cd ImageMagick-*/
 ./configure && make && make install
@@ -510,9 +508,9 @@ cd imagick-3.4.1/
 make && make install
 cd ../
 
-wget https://pecl.php.net/get/redis-2.2.7.tgz
-tar zxvf redis-2.2.7.tgz
-cd redis-2.2.7
+wget https://pecl.php.net/get/redis-3.0.0.tgz
+tar zxvf redis-3.0.0.tgz
+cd redis-3.0.0/
 /usr/local/webserver/php/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php/bin/php-config
 make && make install
@@ -531,7 +529,6 @@ vi /usr/local/webserver/php/etc/php.ini
     ; 在该行下添加如下配置：
     extension_dir = "/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20131226/"
     extension=imagick.so
-    extension=memcache.so
     extension=redis.so
 
 再次注意 `php.ini` 的位置，这个真的很重要！
@@ -550,7 +547,7 @@ vi /usr/local/webserver/php/etc/php.ini
 
 重新启动 php-fpm 即可生效。
 
-### 4.4. 安装 nginx 1.10.0
+### 4.4. 安装 nginx
 
 先要安装 PCRE 支持：
 
@@ -565,8 +562,8 @@ cd ../
 配置并安装 nginx：
 
 ```sh
-tar zxvf nginx-1.10.0.tar.gz
-cd nginx-1.10.0
+tar zxvf nginx-1.10.*.tar.gz
+cd nginx-1.10.*/
 /sbin/ldconfig
 ./configure \
 --prefix=/usr/local/webserver/nginx \
@@ -1101,9 +1098,5 @@ echo "exclude=kernel*" >> /etc/yum.conf
 export PATH=$PATH:/usr/local/webserver/php/bin:/usr/local/webserver/mysql/bin
 echo "export PATH=$PATH:/usr/local/webserver/php/bin:/usr/local/webserver/mysql/bin" >> ~/.bashrc
 ```
-
-
-
-
 
 
