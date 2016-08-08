@@ -16,7 +16,6 @@
 
 - [x] [How to Install Multiple Versions of Perl on Mac OS X](howto-install-multiple-versions-of-perl-on-macosx.md)
 - [x] [How to Install Perl Modules Using App::cpanminus (cpanm)](howto-install-perl-moudles-using-cpanminus.md)
-- [ ] [How to Create a Perl Module](howto-create-a-perl-module.md)
 
 **OS X**
 
