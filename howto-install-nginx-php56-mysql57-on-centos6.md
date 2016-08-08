@@ -67,7 +67,7 @@ echo "nameserver 114.114.114.114" >> /etc/resolv.conf
 
 ```sh
 setenforce 0
-sed -i 's/^SELINUX=*$/SELINUX=disabled/' /etc/selinux/config
+sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
 ### 2.3. 禁用 IPv6
@@ -78,9 +78,12 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 
 ### 2.4. 进程打开文件数
 ```sh
-echo >> /etc/security/limits.conf
-echo "* soft nofile 65535" >> /etc/security/limits.conf
-echo "* hard nofile 65535" >> /etc/security/limits.conf
+cat >> /etc/security/limits.conf <<EOF
+* soft nproc 65535
+* hard nproc 65535
+* soft nofile 65535
+* hard nofile 65535
+EOF
 ```
 
 ## 3. 安装前的准备
