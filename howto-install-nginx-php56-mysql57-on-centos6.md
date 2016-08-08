@@ -21,6 +21,7 @@
     nginx-1.10.1.tar.gz
     php-5.6.24.tar.gz
     mysql-5.7.14.tar.gz
+    redis-3.2.3.tar.gz
 
 相关库：
 
@@ -34,10 +35,6 @@
     ImageMagick.tar.gz
     imagick-3.4.1.tgz
     
-其他服务软件包：
-
-    redis-3.2.3.tar.gz
-
 ## 2. 系统基本设定
 
 ### 2.1. 网络设置
