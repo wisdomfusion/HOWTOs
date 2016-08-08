@@ -22,6 +22,7 @@
     php-7.0.9.tar.gz
     mysql-5.7.14.tar.gz
     redis-3.2.3.tar.gz
+    node-v4.4.7.tar.gz
 
 相关库：
 
@@ -107,13 +108,14 @@ wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.1.tgz
+wget https://nodejs.org/dist/v4.4.7/node-v4.4.7.tar.gz
 ```
 ### 3.3. 安装常用工具
 
 安装 Vim 等工具：
 
 ```sh
-yum -y install man wget iptraf iotop htop vim-enhanced lrzsz
+yum -y install man wget iptraf iotop htop vim-enhanced lrzsz bash-completion
 ```
 
 简单配置 Vim：
@@ -1102,7 +1104,24 @@ php.ini 官方手册参考 [Description of core php.ini directives][phpini]
 echo "exclude=kernel*" >> /etc/yum.conf
 ```
 
-### 7. 运维笔记
+## 7. 其他工具安装
+
+### 7.1. 安装 node.js
+
+```sh
+cd /usr/src/
+wget https://nodejs.org/dist/v4.4.7/node-v4.4.7.tar.gz
+tar zxvf node-v4.4.7.tar.gz
+cd node-v4.4.7/
+./configure
+make && make install
+```
+
+### 7.2. 安装 composer
+
+
+
+## 8. 其他
 
 
 把 PHP 和 MySQL 相关命令添加到 PATH 中：
