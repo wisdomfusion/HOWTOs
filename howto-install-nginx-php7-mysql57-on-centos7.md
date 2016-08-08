@@ -20,7 +20,7 @@
 
     nginx-1.10.1.tar.gz
     php-7.0.9.tar.gz
-    mysql-5.7.13.tar.gz
+    mysql-5.7.14.tar.gz
     redis-3.2.3.tar.gz
 
 相关库：
@@ -103,7 +103,6 @@ wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.ta
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
-wget http://pecl.php.net/get/memcache-2.2.7.tgz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
@@ -114,7 +113,7 @@ wget https://pecl.php.net/get/imagick-3.4.1.tgz
 安装 Vim 等工具：
 
 ```sh
-yum -y install man wget iptraf iotop vim-enhanced lrzsz
+yum -y install man wget iptraf iotop htop vim-enhanced lrzsz
 ```
 
 简单配置 Vim：

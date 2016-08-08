@@ -1,4 +1,4 @@
-# How to Install Elasticsearch, Logstash, and Kibana (ELK Stack) on Centos 7
+# How to Install Elasticsearch, Logstash, and Kibana (ELK Stack) on CentOS 7
 
 ## 1. 简介
 
