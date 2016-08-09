@@ -1119,7 +1119,11 @@ make && make install
 
 ### 7.2. 安装 composer
 
-
+**注意：请不要在`root`权限下使用 composer，更不要在线上使用 composer：**
+```sh
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+```
 
 ## 8. 其他
 
