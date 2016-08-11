@@ -155,26 +155,82 @@ docker info
 
 ### 2.3. Docker 镜像
 
+    docker run hello-world
+
+    docker search centos
+
+     STARS     OFFICIAL   AUTOMATED
+     2526      [OK]       
+     27                   [OK]
+     13                   [OK]
+     12                   [OK]
+     11                   [OK]
+     8                    [OK]
+     4                    [OK]
+     3                    [OK]
+     3                    [OK]
+     2                    [OK]
+     1                    [OK]
+     1                    [OK]
+     1                    [OK]
+     1                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+     0                    [OK]
+
+    docker pull centos
+
+    docker images
+
 
 
 
 ### 2.4. 运行 Docker 容器
 
+    docker run -it centos /bin/bash
+
+    docker commit -m "What did you do to the image" -a "Author Name" <name>/new_image_name
+
+    docker images
+
+
 
 
 ### 2.5. 提交变更到 Docker 镜像
+
+    exit
+
 
 
 
 ### 2.6. Docker 容器管理
 
 
+    docker ps
+
+    docker ps -a
+
+    docker stop container-id
+
 
 ### 2.7. 推送 Docker 镜像到 Docker 仓库
 
+    docker login -u docker-registry-username
+
+    docker push docker-registry-username/docker-image-name
+
+## 3. 总结
 
 
-## 3. 结论
+
 
 
 
