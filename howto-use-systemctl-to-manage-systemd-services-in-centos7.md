@@ -2,6 +2,18 @@
 
 ## 0. 简介
 
+CentOS 7 使用 systemd 替换了 SysV。Systemd 目的是要取代 Unix 时代以来一直在使用的 init 系统，兼容 SysV 和 LSB 的启动脚本，而且够在进程启动过程中更有效地引导加载服务。
+
+systemd 的特性有：
+
+- 支持并行化任务
+- 同时采用 socket 式与 D-Bus 总线式激活服务；
+- 按需启动守护进程（daemon）；
+- 利用 Linux 的 cgroups 监视进程；
+- 支持快照和系统恢复；
+- 维护挂载点和自动挂载点；
+- 各服务间基于依赖关系进行精密控制。
+
 检视和控制systemd的主要命令是 `systemctl`。该命令可用于查看系统状态和管理系统及服务。详见 `man systemctl`。在 `systemctl` 参数中添加 `-H <用户名>@<主机名>` 可以实现对其他机器的远程控制。该过程使用 SSH 连接。
 
 ## 1. 服务管理
@@ -94,7 +106,12 @@
 
 ### 2.2. 列出所有单元文件
 
-所有可用的单元文件存放在 `/usr/lib/systemd/system` 和 `/etc/systemd/system` 目录（**后者优先级更高**）。查看所有已安装服务：
+所有可用的单元文件存放在 `/usr/lib/systemd/system` 和 `/etc/systemd/system` 目录（**后者优先级更高**）。
+
+- `/usr/lib/systemd/system` 软件包安装的单元
+- `/etc/systemd/system` 系统管理员安装的单元
+
+查看所有已安装服务：
 
     systemctl list-unit-files
 
@@ -261,11 +278,16 @@ WantedBy=multi-user.target
 EOF
 ```
 
-参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。
+参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/eventhorizonpl/systemd-services)
+
+[nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
+
+service 文件字段说明
 
     [Unit]:服务的说明
     Description:描述服务
     After:描述服务类别
+
     [Service]服务运行参数的设置
     Type=forking是后台运行的形式
     ExecStart为服务的具体运行命令
@@ -275,9 +297,18 @@ EOF
     注意：[Service]的启动、重启、停止命令全部要求使用绝对路径
     [Install]服务安装的相关设置，可设置为多用户
 
-更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/eventhorizonpl/systemd-services)
 
-[nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
+**服务类型**
+
+编写自定义的 service 文件时，可以选择几种不同的服务启动方式。启动方式可通过配置文件 `[Service]` 段中的 `Type=` 参数进行设置。
+
+- **Type=simple**（默认值）：systemd 认为该服务将立即启动。服务进程不会 fork。如果该服务要启动其他服务，不要使用此类型启动，除非该服务是 socket 激活型。
+- **Type=forking**：systemd 认为当该服务进程 fork，且父进程退出后服务启动成功。对于常规的守护进程（daemon），除非你确定此启动方式无法满足需求，使用此类型启动即可。使用此启动类型应同时指定 PIDFile=，以便 systemd 能够跟踪服务的主进程。
+- **Type=oneshot**：这一选项适用于只执行一项任务、随后立即退出的服务。可能需要同时设置 RemainAfterExit=yes 使得 systemd 在服务进程退出之后仍然认为服务处于激活状态。
+- **Type=notify**：与 Type=simple 相同，但约定服务会在就绪后向 systemd 发送一个信号。这一通知的实现由 libsystemd-daemon.so 提供。
+- **Type=dbus**：若以此方式启动，当指定的 BusName 出现在 DBus 系统总线上时，systemd 认为服务就绪。
+- **Type=idle**: systemd 会等待所有任务(Jobs)处理完成后，才开始执行 idle 类型的单元。除此之外，其他行为和 **Type=simple** 类似。
+
 
 ## 4. 使用目标（target）管理系统启动级别（runlevel）
 
@@ -329,34 +360,35 @@ systemd 中，启动级别通过“目标单元”访问。通过如下命令切
 
 可以在 `systemctl` 的输出中看到命令执行的效果：链接 `/etc/systemd/system/default.target` 被创建，指向新的默认 runlevel。
 
-### 4.4. Using Shortcuts for Important Events
+### 4.4. 电源管理
 
-    sudo systemctl rescue
+重启：
 
-    sudo systemctl halt
+    systemctl reboot
 
-    sudo systemctl poweroff
+退出系统并停止电源：
 
-    sudo systemctl reboot
+    systemctl poweroff
 
-## 5. 
+待机：
 
+    systemctl suspend
 
+休眠：
 
-## 6. 
+    systemctl hibernate
 
+混合休眠模式（同时休眠到硬盘并待机）：
 
+    systemctl hybrid-sleep
 
-## 7. 总结
+## 5. 总结
 
-conclusion
+怎么样？systemd 有够强大吧，除此之外，systemd 还有计时器和日志功能等功能：
 
+- 定时器是以 .timer 为后缀的配置文件，记录由system的里面由时间触发的动作, 定时器可以替代 cron 的大部分功能。
+- systemd 提供了自己日志系统（logging system），称为 journal. 使用 systemd 日志，无需额外安装日志服务（syslog）。
 
-
-
-
-
-
-
+限于篇幅，本文不在展开，详细用法说明请参看 `man systemd.timer` 和 `man journalctl`。
 
 
