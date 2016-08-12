@@ -290,19 +290,19 @@ EOF
 
 ### 4.2. 创建新目标
 
-启动级别 0、1、3、5、6 都被赋予特定用途，并且都对应一个 systemd 的目标。然而，没有什么很好的移植用户定义的启动级别（2、4）的方法。要实现类似功能，可以以原有的启动级别为基础，创建一个新的目标 /etc/systemd/system/<新目标>（可以参考 /usr/lib/systemd/system/graphical.target），创建 /etc/systemd/system/<新目标>.wants 目录，向其中加入额外服务的链接（指向 /usr/lib/systemd/system/ 中的单元文件）。
+启动级别 0、1、3、5、6 都被赋予特定用途，并且都对应一个 systemd 的目标。然而，没有什么很好的移植用户定义的启动级别（2、4）的方法。要实现类似功能，可以以原有的启动级别为基础，创建一个新的目标 `/etc/systemd/system/<新目标>`（可以参考 `/usr/lib/systemd/system/graphical.target`），创建 `/etc/systemd/system/<新目标>.wants` 目录，向其中加入额外服务的链接（指向 `/usr/lib/systemd/system` 中的单元文件）。
 
 目标表
 
-|SysV 启动级别|Systemd 目标|注释|
-|------------|------------|----|
-|0|runlevel0.target, poweroff.target|中断系统（halt）|
-|1, s, single|runlevel1.target, rescue.target|单用户模式|
-|2, 4|runlevel2.target, runlevel4.target, multi-user.target|用户自定义启动级别，通常识别为级别3。|
-|3|runlevel3.target, multi-user.target|多用户，无图形界面。用户可以通过终端或网络登录。|
-|5|runlevel5.target, graphical.target|多用户，图形界面。继承级别3的服务，并启动图形界面服务。|
-|6|runlevel6.target, reboot.target|重启|
-|emergency|emergency.target|急救模式（Emergency shell）|
+| SysV 启动级别 | Systemd 目标                                          | 注释                                                    |
+|---------------|-------------------------------------------------------|---------------------------------------------------------|
+|             0 | runlevel0.target, poweroff.target                     | 中断系统（halt）                                        |
+|  1, s, single | runlevel1.target, rescue.target                       | 单用户模式                                              |
+|          2, 4 | runlevel2.target, runlevel4.target, multi-user.target | 用户自定义启动级别，通常识别为级别3。                   |
+|             3 | runlevel3.target, multi-user.target                   | 多用户，无图形界面。用户可以通过终端或网络登录。        |
+|             5 | runlevel5.target, graphical.target                    | 多用户，图形界面。继承级别3的服务，并启动图形界面服务。 |
+|             6 | runlevel6.target, reboot.target                       | 重启                                                    |
+|     emergency | emergency.target                                      | 急救模式（Emergency shell）                             |
 
 ### 4.3. 切换启动级别/目标
 
