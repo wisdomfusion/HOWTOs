@@ -238,7 +238,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/eventhorizonpl/systemd-services)。
+参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/WisdomFusion/systemd-services)。
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 
