@@ -238,7 +238,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/WisdomFusion/systemd-services)。
+参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo :point_right: [systemd-services](https://github.com/WisdomFusion/systemd-services)。
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 
@@ -354,7 +354,7 @@ systemd 中，启动级别通过“目标单元”访问。通过如下命令切
 
 限于篇幅，本文不在展开，详细用法说明请参看 `man systemd.timer` 和 `man journalctl`。
 
-有些同学可能觉得 `systemctl` 的命令加上子命令和参数，太长了，安上 bash-completion 可以加快命令的输入：
+有些同学可能觉得 `systemctl` 的命令加上子命令和参数，太:cry:长:weary:了，安上 bash-completion 可以加快命令的输入：
 
     yum -y install bash-completion
 
