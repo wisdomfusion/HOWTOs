@@ -4,7 +4,7 @@
 
 CentOS 7 使用 systemd 替换了 SysV。Systemd 目的是要取代 Unix 时代以来一直在使用的 init 系统，兼容 SysV 和 LSB 的启动脚本，而且够在进程启动过程中更有效地引导加载服务。
 
-systemd 的特性有：
+systemd 特性：
 
 - 支持并行化任务
 - 同时采用 socket 式与 D-Bus 总线式激活服务；
@@ -282,7 +282,7 @@ EOF
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 
-service 文件字段说明
+service 文件字段说明：
 
     [Unit]:服务的说明
     Description:描述服务
@@ -297,6 +297,7 @@ service 文件字段说明
     注意：[Service]的启动、重启、停止命令全部要求使用绝对路径
     [Install]服务安装的相关设置，可设置为多用户
 
+详细说明请参看 `man systemd.service`，或参看 [systemd.service 中文手册](http://www.jinbuguo.com/systemd/systemd.service.html) 下面针对服务类型作说明：
 
 **服务类型**
 
