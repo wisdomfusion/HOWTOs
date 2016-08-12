@@ -261,6 +261,22 @@ WantedBy=multi-user.target
 EOF
 ```
 
+Redis 服务文件：
+
+```sh
+cat > /usr/lib/systemd/system/redis.service <<\EOF
+[Unit]
+Description=Load redis daemon.
+
+[Service]
+ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 [mysqld.service]: https://dev.mysql.com/doc/refman/5.7/en/server-management-using-systemd.html
 
