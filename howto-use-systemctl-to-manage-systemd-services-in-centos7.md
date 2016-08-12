@@ -134,7 +134,7 @@
 
 检查单元是否配置为自动启动：
 
-    systemctl is-enabled <>
+    systemctl is-enabled <unit>
 
 开机自动激活单元：
 
@@ -144,7 +144,7 @@
 
     systemctl disable <unit>
 
-禁用一个单元(禁用后，间接启动也是不可能的)：
+禁用一个单元（禁用后，间接启动也是不可能的）：
 
     systemctl mask <unit>
 
@@ -233,14 +233,11 @@ Description=OpenSSH server daemon
 
 ### 3.6. 修改已有单元文件
 
-    system
+    systemctl edit --full sshd.service
 
-
-### 3.7. 创建自定义服务文件
+### 3.7. 创建新单元文件
 
 CentOS 系统系统脚本目录在 `/usr/lib/systemd` 或 `/lib/systemd`中（`/lib` 只是 `/usr/lib` 目录的一个链接，指向同一个目录），有系统（system）和用户（user）之分，如需要在3运行时运行的服务，存放在系统（system）服务里 `/usr/lib/systemd/system`，反之，用户登录后才能运行的程序，存放在用户（user）服务里，服务以 `.service` 结尾。
-
-修改 service 文件 `systemctl edit`
 
 这里以 nginx 服务文件为例，建立服务文件。
 
@@ -282,7 +279,7 @@ EOF
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 
-## 4. 使用目标（target）管理系统启动级别
+## 4. 使用目标（target）管理系统启动级别（runlevel）
 
 启动级别（runlevel）是一个旧的概念。现在，systemd 引入了一个和启动级别功能相似又不同的概念——目标（target）。不像数字表示的启动级别，每个目标都有名字和独特的功能，并且能同时启用多个。一些目标继承其他目标的服务，并启
 动新服务。systemd 提供了一些模仿 sysvinit 启动级别的目标，仍可以使用旧的 `telinit <启动级别>` 命令切换。
@@ -296,6 +293,7 @@ EOF
 启动级别 0、1、3、5、6 都被赋予特定用途，并且都对应一个 systemd 的目标。然而，没有什么很好的移植用户定义的启动级别（2、4）的方法。要实现类似功能，可以以原有的启动级别为基础，创建一个新的目标 /etc/systemd/system/<新目标>（可以参考 /usr/lib/systemd/system/graphical.target），创建 /etc/systemd/system/<新目标>.wants 目录，向其中加入额外服务的链接（指向 /usr/lib/systemd/system/ 中的单元文件）。
 
 目标表
+
 |SysV|启动级别|Systemd 目标|注释|
 |----|-------|-----------|----|
 |0|runlevel0.target, poweroff.target|中断系统（halt）|
