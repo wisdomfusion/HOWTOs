@@ -227,10 +227,22 @@ docker info
 
     docker push docker-registry-username/docker-image-name
 
-## 3. 总结
+## 3. 搭建 Docker 私有仓库 Registry
+
+### 3.1. 关于 Registry
+
+官方的 Docker hub 是一个用于管理公共镜像的好地方，我们可以在上面找到我们想要的镜像，也可以把我们自己的镜像推送上去。但是，有时候，我们的使用场景需要我们拥有一个私有的镜像仓库用于管理我们自己的镜像。这个可以通过开源软件 Registry 来达成目的。
+
+### 3.2. 搭建 Registry
+
+Regitstry
+
+## 4. 使用 Dockerfile 构建镜像
 
 
+[我的 Dockefile](https://github.com/WisdomFusion/dockerfiles)
 
+## 5. 总结
 
 
 
