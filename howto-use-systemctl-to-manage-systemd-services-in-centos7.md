@@ -87,7 +87,7 @@ systemd 特性：
 - 挂载点会自动转化为相应的 `.mount` 单元。例如 `/home` 等价于 `home.mount`。
 - 设备会自动转化为相应的 `.device` 单元，所以 `/dev/sda2` 等价于 `dev-sda2.device`。
 
-### 2.2. 单元和基本管理
+### 2.2. 单元的基本管理
 
 立即启动单元：
 
@@ -353,5 +353,9 @@ systemd 中，启动级别通过“目标单元”访问。通过如下命令切
 - systemd 提供了自己日志系统（logging system），称为 journal. 使用 systemd 日志，无需额外安装日志服务（syslog）。
 
 限于篇幅，本文不在展开，详细用法说明请参看 `man systemd.timer` 和 `man journalctl`。
+
+有些同学可能觉得 `systemctl` 的命令加上子命令和参数，太长了，安上 bash-completion 可以加快命令的输入：
+
+    yum -y install bash-completion
 
 
