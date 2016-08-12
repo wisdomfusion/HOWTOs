@@ -181,7 +181,7 @@ EOF
     注意：[Service]的启动、重启、停止命令全部要求使用绝对路径
     [Install]服务安装的相关设置，可设置为多用户
 
-MySQL 的服务文件，参考 [Managing MySQL Server with systemd][mysql.service]，service 文件如下：
+MySQL 的服务文件，参考 [Managing MySQL Server with systemd][mysqld.service]，service 文件如下：
 
 ```sh
 cat > /usr/lib/systemd/system/mariadb.service <<\EOF
@@ -279,12 +279,6 @@ EOF
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 [mysqld.service]: https://dev.mysql.com/doc/refman/5.7/en/server-management-using-systemd.html
-
-### 3.6. 编辑 Unit 文件
-
-    sudo systemctl edit nginx.service
-
-    sudo systemctl edit --full nginx.service
 
 ## 4. Adjusting the System State (Runlevel) with Targets
 
