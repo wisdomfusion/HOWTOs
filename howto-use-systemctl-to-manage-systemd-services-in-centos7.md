@@ -294,8 +294,8 @@ EOF
 
 目标表
 
-|SysV|启动级别|Systemd 目标|注释|
-|----|-------|-----------|----|
+|SysV 启动级别|Systemd 目标|注释|
+|------------|------------|----|
 |0|runlevel0.target, poweroff.target|中断系统（halt）|
 |1, s, single|runlevel1.target, rescue.target|单用户模式|
 |2, 4|runlevel2.target, runlevel4.target, multi-user.target|用户自定义启动级别，通常识别为级别3。|
