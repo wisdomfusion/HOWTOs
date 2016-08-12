@@ -50,19 +50,19 @@ systemd 特性：
 
 使用 `status` 子命令查看服务的状态：
 
-    systemctl status <application>.service
+    systemctl status <unit>
 
 使用 `is-active` 查看服务是否是运行（running）的状态：
 
-    systemctl is-active <application>.service
+    systemctl is-active <unit>
 
 使用 `is-enabled` 检查服务是否被启用：
 
-    systemctl is-enabled <application>.service
+    systemctl is-enabled <unit>
 
 还可以检查服务是否处于失败状态：
 
-    systemctl is-failed <application>.service
+    systemctl is-failed <unit>
 
 ### 1.3. 列出所有单元文件
 
@@ -238,7 +238,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/eventhorizonpl/systemd-services)
+参考 [NGINX systemd service file][nginx.service]，其中，nginx pid 路径和 nginx 可执行程序的路径按实际情况修改之，上面是按照我编译安装后对应的路径改的 service 文件。更多其他服务的 service 文件请看我的这个 Git Repo：[systemd-services](https://github.com/eventhorizonpl/systemd-services)。
 
 [nginx.service]: https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
 
