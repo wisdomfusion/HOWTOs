@@ -10,7 +10,7 @@
 - [ ] [How to Install nginx with PHP 7 and MySQL 5.7 on FreeBSD 10.3](howto-install-nginx-php7-mysql57-on-freebsd.md)
 - [x] [How to Install and Use Docker on CentOS 7](howto-install-and-use-docker-on-centos7.md)
 - [ ] [How to Install Elasticsearch, Logstash, and Kibana (ELK Stack) on CentOS 7](howto-install-elasticsearch-logstash-and-kibana-on-centos7.md)
-- [x] [How To Use Systemctl to Manage Systemd Services and Units](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
+- [x] [How To Use Systemctl to Manage Systemd Services in CentOS 7](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
 - [x] [How to Install postfix on CentOS 6](howto-install-postfix-on-centos6.md)
 
 **Perl**
