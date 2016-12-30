@@ -927,6 +927,21 @@ service xinetd restart
 FTP 服务器
 
 
+### 5.4. Redis
+
+```sh
+cp -a /usr/src/redis-3.2.6 /usr/local/webserver/redis
+cd /usr/local/webserver/redis/
+make
+```
+
+### 5.5. node.js
+
+```sh
+cd /usr/src/node-*/
+./configure && make && make install
+```
+
 ## 6. 系统安全加固
 
 ### 6.1. iptables 防火墙
@@ -1103,25 +1118,11 @@ mv composer.phar /usr/local/bin/composer
 
 ### 7.3. 安装 Git
 
-安装 Git 需要 libiconv 支持，上述步骤中已安装过：
+安装 Git 需要 libiconv 支持，上述步骤中已安装过，接下来安装 Git：
 
 ```sh
-cd /usr/src/
-wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
-tar zxvf libiconv-1.14.tar.gz
-cd libiconv-1.14
-./configure --prefix=/usr/local/libiconv
-make && make install
-```
-
-接下来安装 Git：
-
-```sh
-cd /usr/src/
-wget https://www.kernel.org/pub/software/scm/git/git-2.9.2.tar.gz
-tar zxvf git-2.9.*.tar.gz
-cd git-2.9.*/
-./configure --prefix=/usr/local --with-iconv=/usr/local/libiconv
+cd /usr/src/git-*/
+./configure --prefix=/usr/local --with-iconv=/usr/local/lib
 make && make install
 ```
 
@@ -1150,4 +1151,5 @@ yum -y install perl-ExtUtils-MakeMaker
 export PATH=$PATH:/usr/local/webserver/php7/bin:/usr/local/webserver/mysql/bin
 echo "export PATH=$PATH:/usr/local/webserver/php7/bin:/usr/local/webserver/mysql/bin" >> ~/.bashrc
 ```
+
 
