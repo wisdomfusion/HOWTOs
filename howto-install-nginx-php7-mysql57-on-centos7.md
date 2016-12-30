@@ -14,27 +14,25 @@
 
 系统环境：
 
-- CentOS 7.2.1511
+- CentOS 7.3.1611
 
 所需软件包：
 
-    nginx-1.10.1.tar.gz
-    php-7.0.9.tar.gz
-    mysql-5.7.14.tar.gz
+    nginx-1.10.2.tar.gz
+    php-7.1.0.tar.gz
+    mysql-boost-5.7.17.tar.gz
     redis-3.2.3.tar.gz
-    node-v4.4.7.tar.gz
+    node-v6.9.2.tar.gz
 
 相关库：
 
-    boost_1_59_0.tar.gz
+    ImageMagick.tar.gz
+    imagick-3.4.3RC1.tgz
     libiconv-1.14.tar.gz
     libmcrypt-2.5.8.tar.gz
     mcrypt-2.6.8.tar.gz
-    memcache-2.2.7.tgz
     mhash-0.9.9.9.tar.gz
-    pcre-8.38.tar.gz
-    ImageMagick.tar.gz
-    imagick-3.4.1.tgz
+    pcre-8.39.tar.gz
     
 ## 2. 系统基本设定
 
@@ -56,8 +54,8 @@ GATEWAY=192.168.1.1
 DNS 服务器：
 
 ```sh
-echo "nameserver 202.106.196.115" >> /etc/resolv.conf
-echo "nameserver 114.114.114.114" >> /etc/resolv.conf
+echo "nameserver 233.5.5.5" >> /etc/resolv.conf
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 ```
 
 ### 2.2. 禁用 SELinux
@@ -90,32 +88,32 @@ EOF
 ```sh
 sudo -s
 LANG=C
-yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel unzip zip nmap ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
 ```
 
 ### 3.2. 下载所需软件包
 
 ```sh
 cd /usr/src
-wget http://nginx.org/download/nginx-1.10.1.tar.gz
-wget -O php-7.0.9.tar.gz http://cn2.php.net/get/php-7.0.9.tar.gz/from/this/mirror
-wget http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.14.tar.gz
-wget http://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
+wget http://nginx.org/download/nginx-1.10.2.tar.gz
+wget -O php-7.1.0.tar.gz http://cn2.php.net/get/php-7.1.0.tar.gz/from/this/mirror
+wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.17.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
-wget https://pecl.php.net/get/imagick-3.4.1.tgz
-wget https://nodejs.org/dist/v4.4.7/node-v4.4.7.tar.gz
+wget https://pecl.php.net/get/imagick-3.4.3RC1.tgz
+wget https://nodejs.org/dist/v6.9.2/node-v6.9.2.tar.gz
+cat *.gz *.tgz | tar zxf - -i
 ```
 ### 3.3. 安装常用工具
 
 安装 Vim 等工具：
 
 ```sh
-yum -y install man wget iptraf iotop htop vim-enhanced lrzsz bash-completion
+yum -y install man wget unzip zip net-tools nmap iptraf iotop htop vim-enhanced bash-completion
 ```
 
 简单配置 Vim：
@@ -132,26 +130,18 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 ### 4.1. 相关库
 
 ```sh
-cd /usr/src/
-tar zxvf libiconv-1.14.tar.gz
-cd libiconv-1.14
+cd /usr/src/libiconv-*/
 ./configure --prefix=/usr/local
+make
+sed -i '/gets is a security hole/c\#if defined(__GLIBC__) && !defined(__UCLIBC__) && !__GLIBC_PREREQ(2, 16)\n_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");\n#endif' srclib/stdio.h
 make && make install
-cd ../
 
-tar zxvf libmcrypt-2.5.8.tar.gz
-cd libmcrypt-2.5.8/
+cd /usr/src/libmcrypt-*/
 ./configure && make && make install
 /sbin/ldconfig
 cd libltdl/
 ./configure --enable-ltdl-install
 make && make install
-cd ../../
-
-tar zxvf mhash-0.9.9.9.tar.gz
-cd mhash-0.9.9.9/
-./configure && make && make install
-cd ../
 
 ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
 ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
@@ -162,36 +152,18 @@ ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
 ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
 ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
 ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
-ln -s /usr/local/bin/libmcrypt-config /usr/bin/libmcrypt-config
 
-tar zxvf mcrypt-2.6.8.tar.gz
-cd mcrypt-2.6.8/
+cd /usr/src/mhash-*/
+./configure && make && make install
+
+cd /usr/src/mcrypt-*/
 /sbin/ldconfig
 ./configure && make && make install
-cd ../
-
 echo "/usr/local/lib" >> /etc/ld.so.conf
 /sbin/ldconfig
 ```
 
 ### 4.2. 安装 MySQL 5.7
-
-MySQL 5.7 GA版本的发布，也就是说从现在开始5.7已经可以在生产环境中使用，有任何问题官方都将立刻修复。
-
-MySQL 5.7 主要特性：
-- 更好的性能：对于多核 CPU、固态硬盘、锁有着更好的优化，每秒 100W QPS 已不再是 MySQL 的追求，下个版本能否上 200W QPS才 是吾等用户更关心的
-- 更好的 InnoDB 存储引擎
-- 更为健壮的复制功能：复制带来了数据完全不丢失的方案，传统金融客户也可以选择使用 MySQL 数据库。此外，GTID 在线平滑升级也变得可能
-- 更好的优化器：优化器代码重构的意义将在这个版本及以后的版本中带来巨大的改进，Oracle 官方正在解决 MySQL 之前最大的难题
-- 原生 JSON 类型的支持
-- 更好的地理信息服务支持：InnoDB 原生支持地理位置类型，支持 GeoJSON，GeoHash 特性
-- 新增 sys 库：以后这会是 DBA 访问最频繁的库
-
-MySQL 编译安装时需要用到 boost C++ 库：
-```sh
-cd /usr/src/
-tar zxvf boost_1_59_0.tar.gz -C /usr/local/
-```
 
 正式安装前先建立 `mysql:mysql` 用户：
 
@@ -203,8 +175,7 @@ tar zxvf boost_1_59_0.tar.gz -C /usr/local/
 解压前配置软件包
 
 ```sh
-tar zxvf mysql-5.7.*.tar.gz
-cd mysql-5.7.*/
+cd /usr/src/mysql-5.7.*/
 cmake \
 -DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
 -DMYSQL_DATADIR=/u01/mysql \
@@ -219,21 +190,34 @@ cmake \
 -DWITH_PARTITION_STORAGE_ENGINE=1 \
 -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
 -DWITH_MEMORY_STORAGE_ENGINE=1 \
--DWITH_BOOST=/usr/local/boost_1_59_0 \
+-DWITH_BOOST=boost/boost_1_59_0 \
 -DENABLE_DOWNLOADS=1
 ```
 
 如果主要用于移动端数据存储，可以默认 utf8mb4 编码，可存储 emoji 表情符号：
 
 ```sh
+cmake \
+-DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
+-DMYSQL_DATADIR=/u01/mysql \
+-DEXTRA_CHARSETS=all \
 -DDEFAULT_CHARSET=utf8mb4 \
 -DDEFAULT_COLLATION=utf8mb4_general_ci \
+-DMYSQL_TCP_PORT=3306 \
+-DMYSQL_USER=mysql \
+-DSYSCONFDIR=/etc \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_PARTITION_STORAGE_ENGINE=1 \
+-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_BOOST=boost/boost_1_59_0 \
+-DENABLE_DOWNLOADS=1
 ```
 
 编译安装：
 ```sh
-make -j `nproc`
-make install
+make -j `nproc` && make install
 ```
 
 MySQL 启动脚本：
@@ -359,9 +343,9 @@ echo "/usr/local/webserver/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
 给 MySQL root 用户添加密码：
 
 ```sh
-dbrootpwd=123456
-/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$dbrootpwd\" with grant option;"
-/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$dbrootpwd\" with grant option;"
+DBROOTPWD=123456
+/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$DBROOTPWD\" with grant option;"
+/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$DBROOTPWD\" with grant option;"
 ```
 
 关闭 MySQL：
@@ -370,7 +354,7 @@ dbrootpwd=123456
 /etc/init.d/mysqld stop
 ```
 
-### 4.3. 安装 PHP 7.0.9
+### 4.3. 安装 PHP7
 
 先建立 www:www 用户：
 
@@ -385,9 +369,7 @@ chown -R www:www /u01/www
 安装 PHP：
 
 ```sh
-cd /usr/src/
-tar zxvf php-7.*.tar.gz
-cd php-7.*/
+cd /usr/src/php-7.*/
 ./configure --prefix=/usr/local/webserver/php7 \
 --with-config-file-path=/usr/local/webserver/php7/etc \
 --with-libdir=lib64 \
@@ -432,7 +414,7 @@ cd php-7.*/
 编译安装：
 
 ```sh
-make -j `nproc` && make install
+make ZEND_EXTRA_LIBS='-liconv' -j `nproc` && make install
 ```
 
 php.ini 和 php-fpm.conf
@@ -501,28 +483,20 @@ chkconfig php-fpm on
 PHP 模块安装：
 
 ```sh
-cd /usr/src/
-tar zxvf ImageMagick.tar.gz
-cd ImageMagick-*/
+cd /usr/src/ImageMagick-*/
 ./configure && make && make install
 /sbin/ldconfig
-cd ../
 
-tar zxvf imagick-3.4.1.tgz
-cd imagick-3.4.1/
+cd /usr/src/imagick-*/
 /sbin/ldconfig
 /usr/local/webserver/php7/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
-cd ../
 
-wget https://pecl.php.net/get/redis-3.0.0.tgz
-tar zxvf redis-3.0.0.tgz
-cd redis-3.0.0/
+cd /usr/src/redis-3.1.0/
 /usr/local/webserver/php7/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
-cd ../
 ```
 
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
@@ -553,6 +527,13 @@ vi /usr/local/webserver/php7/etc/php.ini
     opcache.revalidate_freq=60
     opcache.fast_shutdown=1
 
+以上也可以直接用下面两条 sed 命令修改：
+
+```sh
+sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so' /usr/local/webserver/php7/etc/php.ini
+sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /usr/local/webserver/php7/etc/php.ini
+```
+
 重新启动 php-fpm 即可生效。
 
 ### 4.4. 安装 nginx
@@ -560,18 +541,14 @@ vi /usr/local/webserver/php7/etc/php.ini
 先要安装 PCRE 支持：
 
 ```sh
-cd /usr/src/
-tar zxvf pcre-8.38.tar.gz
-cd pcre-8.38/
+cd /usr/src/pcre-*/
 ./configure && make && make install
-cd ../
 ```
 
 配置并安装 nginx：
 
 ```sh
-tar zxvf nginx-1.10.*.tar.gz
-cd nginx-1.10.*/
+cd /usr/src/nginx-*/
 /sbin/ldconfig
 ./configure \
 --prefix=/usr/local/webserver/nginx \
@@ -587,7 +564,6 @@ cd nginx-1.10.*/
 --with-http_stub_status_module \
 --with-http_addition_module
 make && make install
-cd ../
 ```
 
 启动脚本：
