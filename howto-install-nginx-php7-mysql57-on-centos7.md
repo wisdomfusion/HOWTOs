@@ -942,6 +942,53 @@ cd /usr/src/node-*/
 ./configure && make && make install
 ```
 
+### 5.6. 安装 Elasticsearch
+
+Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 jdk-8u112-linux-x64.tar.gz，解压至 `/usr/local/jdk1.8.0_112`，配置 JDK 环境：
+
+```sh
+cat >> /etc/profile <<'EOF'
+
+export JAVA_HOME=/usr/local/jdk1.8.0_112
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
+export PATH=${JAVA_HOME}/bin:${PATH}
+
+EOF
+
+source /etc/profile
+```
+
+查看是否安装成功：
+```sh
+java -version
+```
+
+下载 Elasticsearch，并解压至 `/usr/local/webserver/elasticsearch-5.1.1`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
+
+```sh
+useradd elastic
+su elastic
+```
+
+开发机可以根据实际情况更改 JVM 空间分配，这里设为 512MB：
+```sh
+sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /usr/local/webserver/elasticsearch-5.1.1/config/jvm.options
+```
+
+Elasticsearch 启动前的必要配置：
+
+```sh
+ulimit -n 65536
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+sysctl -p
+```
+
+启动 Elasticsearch：
+```sh
+/usr/local/webserver/elasticsearch-5.1.1/bin/elasticsearch -d
+```
+
 ## 6. 系统安全加固
 
 ### 6.1. iptables 防火墙
@@ -1156,53 +1203,6 @@ gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
 gem sources -l
 gem install sass
 cnpm install -g gulp
-```
-
-### 7.5. 安装 Elasticsearch
-
-Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 jdk-8u112-linux-x64.tar.gz，解压至 `/usr/local/jdk1.8.0_112`，配置 JDK 环境：
-
-```sh
-cat >> /etc/profile <<'EOF'
-
-export JAVA_HOME=/usr/local/jdk1.8.0_112
-export JRE_HOME=${JAVA_HOME}/jre
-export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
-export PATH=${JAVA_HOME}/bin:${PATH}
-
-EOF
-
-source /etc/profile
-```
-
-查看是否安装成功：
-```sh
-java -version
-```
-
-下载 Elasticsearch，并解压至 `/usr/local/webserver/elasticsearch-5.1.1`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
-
-```sh
-useradd elastic
-su elastic
-```
-
-开发机可以根据实际情况更改 JVM 空间分配，这里设为 512MB：
-```sh
-sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /usr/local/webserver/elasticsearch-5.1.1/config/jvm.options
-```
-
-Elasticsearch 启动前的必要配置：
-
-```sh
-ulimit -n 65536
-echo "vm.max_map_count=262144" >> /etc/sysctl.conf
-sysctl -p
-```
-
-启动 Elasticsearch：
-```sh
-/usr/local/webserver/elasticsearch-5.1.1/bin/elasticsearch -d
 ```
 
 ## 8. 其他
