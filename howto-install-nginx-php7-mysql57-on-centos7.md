@@ -1205,14 +1205,30 @@ gem install sass
 cnpm install -g gulp
 ```
 
+### 7.5. 安装 Python 3.6.0/pip
+
+```sh
+cd /usr/src/
+wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz 
+tar zxvf Python-3.6.0.tgz
+cd Python-3.6.0/
+./configure --prefix=/usr/local && make && make altinstall
+python3.6 --version
+easy_install-3.6 pip
+pip3.6 --version
+```
+
 ## 8. 其他
 
 
 把 PHP 和 MySQL 相关命令添加到 PATH 中：
 
 ```sh
-export PATH=$PATH:/usr/local/webserver/php7/bin:/usr/local/webserver/mysql/bin
-echo "export PATH=$PATH:/usr/local/webserver/php7/bin:/usr/local/webserver/mysql/bin" >> ~/.bashrc
-```
+cat >> ~/.bashrc <<'EOF'
 
+export PATH=$PATH:/usr/local/webserver/php7/bin
+export PATH=$PATH:/usr/local/webserver/mysql/bin
+export PATH=$PATH:/usr/local/webserver/redis/src
+EOF
+```
 
