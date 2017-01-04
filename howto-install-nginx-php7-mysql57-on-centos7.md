@@ -3,7 +3,7 @@
 ## 0. 约定
 
 - 暂用系统用户 root 方便安装调试
-- 主机IP地址：192.168.1.10
+- 主机IP地址：192.168.187.10
 - 软件包下载到 `/usr/src/` 目录下
 - 所有软件包安装在 `/usr/local/webserver/` 目录下
 - `/u01/mysql/` 存放数据库
@@ -23,6 +23,7 @@
     mysql-boost-5.7.17.tar.gz
     redis-3.2.3.tar.gz
     node-v6.9.2.tar.gz
+    Python-3.6.0.tgz 
 
 相关库：
 
@@ -93,8 +94,9 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 
 ### 3.2. 下载所需软件包
 
+下载：
 ```sh
-cd /usr/src
+cd /usr/src/
 wget http://nginx.org/download/nginx-1.10.2.tar.gz
 wget -O php-7.1.0.tar.gz http://cn2.php.net/get/php-7.1.0.tar.gz/from/this/mirror
 wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.17.tar.gz
@@ -106,6 +108,12 @@ wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3RC1.tgz
 wget https://nodejs.org/dist/v6.9.2/node-v6.9.2.tar.gz
+wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
+```
+
+解压：
+```sh
+cd /usr/src/
 cat *.gz *.tgz | tar zxf - -i
 ```
 ### 3.3. 安装常用工具
@@ -1208,10 +1216,7 @@ cnpm install -g gulp
 ### 7.5. 安装 Python 3.6.0/pip
 
 ```sh
-cd /usr/src/
-wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz 
-tar zxvf Python-3.6.0.tgz
-cd Python-3.6.0/
+cd /usr/src/Python-3.6.0/
 ./configure --prefix=/usr/local && make && make altinstall
 python3.6 --version
 easy_install-3.6 pip
