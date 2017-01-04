@@ -279,9 +279,10 @@ query_cache_type = 1
 query_cache_size = 8M
 query_cache_limit = 2M
 ft_min_word_len = 4
-log_bin = mysql-bin
+
+log_bin = /u01/mysql/binlogs/mysql-bin
 binlog_format = mixed
-expire_logs_days = 30
+expire_logs_days = 0
 log_error = /u01/mysql/mysql-error.log
 slow_query_log = 1
 long_query_time = 1
@@ -330,7 +331,11 @@ EOF
 ```sh
 mkdir -p /u01/mysql
 chown mysql:mysql /u01/mysql/
+
 /usr/local/webserver/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/usr/local/webserver/mysql --datadir=/u01/mysql
+
+mkdir -p /u01/mysql/binlogs
+chow mysql:mysql /u01/mysql/binlogs
 ```
 
 将MySQL数据库的动态链接库共享至系统链接库：
