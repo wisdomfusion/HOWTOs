@@ -34,6 +34,8 @@
     mcrypt-2.6.8.tar.gz
     mhash-0.9.9.9.tar.gz
     pcre-8.39.tar.gz
+    redis-3.1.0
+    mongodb-1.2.2
     
 ## 2. 系统基本设定
 
@@ -107,11 +109,15 @@ wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3RC1.tgz
+wget http://download.redis.io/releases/redis-3.2.6.tar.gz
+wget https://pecl.php.net/get/redis-3.1.0.tgz
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.1.tgz
+wget https://pecl.php.net/get/mongodb-1.2.2.tgz
 wget https://nodejs.org/dist/v6.9.2/node-v6.9.2.tar.gz
 wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
 ```
 
-解压：
+全部解压：
 ```sh
 cd /usr/src/
 cat *.gz *.tgz | tar zxf - -i
@@ -346,7 +352,6 @@ echo "/usr/local/webserver/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
 /sbin/ldconfig -v | grep mysql
 ```
 
-
 启动 MySQL：
 
 ```sh
@@ -510,6 +515,11 @@ cd /usr/src/redis-3.1.0/
 /usr/local/webserver/php7/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
+
+cd /usr/src/mongodb-1.2.2/
+/usr/local/webserver/php7/bin/phpize
+./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
+make && make install
 ```
 
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
@@ -525,6 +535,7 @@ vi /usr/local/webserver/php7/etc/php.ini
     extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20151012/"
     extension=imagick.so
     extension=redis.so
+    extension=mongodb.so
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
@@ -543,7 +554,7 @@ vi /usr/local/webserver/php7/etc/php.ini
 以上也可以直接用下面两条 sed 命令修改：
 
 ```sh
-sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so' /usr/local/webserver/php7/etc/php.ini
+sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' /usr/local/webserver/php7/etc/php.ini
 sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /usr/local/webserver/php7/etc/php.ini
 ```
 
@@ -782,9 +793,10 @@ http
 
   server
   {
-    listen       80;
+    listen 80;
+    server_name example.com;
     index index.php index.html;
-    root  /u01/www/;
+    root /u01/www/;
 
     #limit_conn  connlimit 15;
     #limit_rate  256k;
@@ -892,7 +904,7 @@ yum -y install rsync xinetd
 
 vi /etc/xinetd.d/rsync
 
-修改 disable = yes 为 disable = no
+修改 `disable = yes` 为 `disable = no`
 
 为 rsync 客户端添加用户名及密码：
 
@@ -942,10 +954,51 @@ FTP 服务器
 
 ### 5.4. Redis
 
+编译安装：
 ```sh
-cp -a /usr/src/redis-3.2.6 /usr/local/webserver/redis
-cd /usr/local/webserver/redis/
-make
+cd /usr/src/redis-3.2.6/
+make && make install
+```
+
+建立 redis data 目录：
+
+```sh
+mkdir -p /u01/redis/
+```
+
+安装启动脚本（注意其中的 conf 文件、日志文件、数据目录等的位置）：
+```
+# ./install_server.sh
+Welcome to the redis service installer
+This script will help you easily set up a running redis server
+
+Please select the redis port for this instance: [6379]
+Selecting default: 6379
+Please select the redis config file name [/etc/redis/6379.conf]
+Selected default - /etc/redis/6379.conf
+Please select the redis log file name [/var/log/redis_6379.log] /u01/logfiles/redis.log
+Please select the data directory for this instance [/var/lib/redis/6379] /u01/redis
+Please select the redis executable path [/usr/local/bin/redis-server]
+Selected config:
+Port           : 6379
+Config file    : /etc/redis/6379.conf
+Log file       : /u01/logfiles/redis.log
+Data dir       : /u01/redis
+Executable     : /usr/local/bin/redis-server
+Cli Executable : /usr/local/bin/redis-cli
+Is this ok? Then press ENTER to go on or Ctrl-C to abort.
+Copied /tmp/6379.conf => /etc/init.d/redis_6379
+Installing service...
+Successfully added to chkconfig!
+Successfully added to runlevels 345!
+Starting Redis server...
+Installation successful!
+```
+
+启动 redis-server：
+```sh
+chkconfig redis_6379 on
+/etc/init.d/redis_6379 start
 ```
 
 ### 5.5. node.js
@@ -957,7 +1010,7 @@ cd /usr/src/node-*/
 
 ### 5.6. 安装 Elasticsearch
 
-Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 jdk-8u112-linux-x64.tar.gz，解压至 `/usr/local/jdk1.8.0_112`，配置 JDK 环境：
+Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u112-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_112`，配置 JDK 环境：
 
 ```sh
 cat >> /etc/profile <<'EOF'
@@ -966,7 +1019,6 @@ export JAVA_HOME=/usr/local/jdk1.8.0_112
 export JRE_HOME=${JAVA_HOME}/jre
 export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 export PATH=${JAVA_HOME}/bin:${PATH}
-
 EOF
 
 source /etc/profile
@@ -1000,6 +1052,50 @@ sysctl -p
 启动 Elasticsearch：
 ```sh
 /usr/local/webserver/elasticsearch-5.1.1/bin/elasticsearch -d
+```
+
+### 5.7. 安装 mongodb
+
+安装：
+```sh
+mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.1 /usr/local/webserver/mongodb
+cat > /usr/local/webserver/mongodb/mongodb.conf <<'EOF'
+dbpath=/u01/mongodb/db
+logpath=/u01/mongodb/log/mongodb.log
+port=27017
+fork=true
+nohttpinterface=true
+EOF
+
+mkdir -p /u01/mongodb/db
+mkdir -p /u01/mongodb/log
+```
+
+禁用大内存页面：
+```sh
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
+echo never > /sys/kernel/mm/transparent_hugepage/defrag
+
+cat >> /etc/rc.local <<'EOF'
+
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+   echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+   echo never > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+
+EOF
+```
+
+运行：
+```sh
+/usr/local/webserver/mongodb/bin/mongod --config /etc/mongodb.conf
+```
+
+开机启动：
+```sh
+echo "/usr/local/webserver/mongodb/bin/mongod --config /etc/mongodb.conf" >> /etc/rc.local
 ```
 
 ## 6. 系统安全加固
@@ -1241,4 +1337,3 @@ export PATH=$PATH:/usr/local/webserver/mysql/bin
 export PATH=$PATH:/usr/local/webserver/redis/src
 EOF
 ```
-
