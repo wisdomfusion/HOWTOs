@@ -358,4 +358,3 @@ systemd 中，启动级别通过“目标单元”访问。通过如下命令切
 
     yum -y install bash-completion
 
-
