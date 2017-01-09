@@ -334,6 +334,7 @@ EOF
 ```
 
 初始化数据库，请保持 `/u01/mysql/` 目录为空：
+
 ```sh
 mkdir -p /u01/mysql
 chown mysql:mysql /u01/mysql/
@@ -531,7 +532,6 @@ vi /usr/local/webserver/php7/etc/php.ini
 配置项：
 
     ; extension_dir = "ext"
-    ; 在该行下添加如下配置：
     extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20151012/"
     extension=imagick.so
     extension=redis.so
@@ -539,11 +539,9 @@ vi /usr/local/webserver/php7/etc/php.ini
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
-还是在 `php.ini` 文件中，启用内置的 opcache 模块，并调整相关配置：
+还是在 `php.ini` 文件中，启用内置的 opcache 模块，并调整相关配置，可以直接在`[opcache]`这一行下添加如下配置项：
 
-    ; 添加
     zend_extension=opcache.so
-    ; 修改
     opcache.enable=1
     opcache.memory_consumption=256
     opcache.interned_strings_buffer=8
@@ -740,7 +738,6 @@ cat > /usr/local/webserver/nginx/conf/nginx.conf <<\EOF
 user  www www;
 
 #worker_processes 8;
-#worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
 worker_rlimit_nofile 65535;
 
 error_log  /u01/logfiles/nginx/nginx_error.log  warn;
@@ -1029,16 +1026,17 @@ source /etc/profile
 java -version
 ```
 
-下载 Elasticsearch，并解压至 `/usr/local/webserver/elasticsearch-5.1.1`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
+下载 Elasticsearch，并解压至 `/usr/local/webserver/es`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
 
 ```sh
 useradd elastic
+chown -R elastic:elastic /usr/local/webserver/es
 su elastic
 ```
 
 开发机可以根据实际情况更改 JVM 空间分配，这里设为 512MB：
 ```sh
-sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /usr/local/webserver/elasticsearch-5.1.1/config/jvm.options
+sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /usr/local/webserver/es/config/jvm.options
 ```
 
 Elasticsearch 启动前的必要配置：
@@ -1051,7 +1049,7 @@ sysctl -p
 
 启动 Elasticsearch：
 ```sh
-/usr/local/webserver/elasticsearch-5.1.1/bin/elasticsearch -d
+/usr/local/webserver/es/bin/elasticsearch -d
 ```
 
 ### 5.7. 安装 mongodb
