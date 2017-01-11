@@ -92,7 +92,7 @@ EOF
 ```sh
 sudo -s
 LANG=C
-yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
 ```
 
 ### 3.2. 下载所需软件包
@@ -427,6 +427,7 @@ cd /usr/src/php-7.*/
 --with-mhash \
 --with-mcrypt \
 --with-ldap \
+--with-readline \
 --disable-ipv6
 ```
 
@@ -525,18 +526,6 @@ cd /usr/src/mongodb-1.2.2/
 make && make install
 ```
 
-需要注意的是，类似 `php -a` 和 Laravel 框架的 `php artisan tinker` 的 REPL，需要 readline 模块，安装方式如下：
-
-```sh
-cd /usr/src/libedit-*/
-./configure && make && make install
-
-cd /usr/src/php-7.1*/ext/readline/
-/usr/local/webserver/php7/bin/phpize
-./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
-make && make install
-```
-
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
 
 ```sh
@@ -550,7 +539,6 @@ vi /usr/local/webserver/php7/etc/php.ini
     extension=imagick.so
     extension=redis.so
     extension=mongodb.so
-    extension=readline.so
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
@@ -567,7 +555,7 @@ vi /usr/local/webserver/php7/etc/php.ini
 以上也可以直接用下面两条 sed 命令修改：
 
 ```sh
-sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so\nextension=readline.so' /usr/local/webserver/php7/etc/php.ini
+sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' /usr/local/webserver/php7/etc/php.ini
 sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /usr/local/webserver/php7/etc/php.ini
 ```
 
