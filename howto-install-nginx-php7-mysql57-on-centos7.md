@@ -18,17 +18,17 @@
 
 所需软件包：
 
-    nginx-1.10.2.tar.gz
-    php-7.1.0.tar.gz
+    nginx-1.10.3.tar.gz
+    php-7.1.1.tar.gz
     mysql-boost-5.7.17.tar.gz
-    redis-3.2.3.tar.gz
-    node-v6.9.2.tar.gz
+    redis-3.2.6.tar.gz
+    node-v6.9.5.tar.gz
     Python-3.6.0.tgz 
 
 相关库：
 
     ImageMagick.tar.gz
-    imagick-3.4.3RC1.tgz
+    imagick-3.4.3.tgz
     libiconv-1.14.tar.gz
     libmcrypt-2.5.8.tar.gz
     mcrypt-2.6.8.tar.gz
@@ -92,7 +92,7 @@ EOF
 ```sh
 sudo -s
 LANG=C
-yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel sysstat ntp curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
 ```
 
 ### 3.2. 下载所需软件包
@@ -100,8 +100,8 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 下载：
 ```sh
 cd /usr/src/
-wget http://nginx.org/download/nginx-1.10.2.tar.gz
-wget -O php-7.1.0.tar.gz http://cn2.php.net/get/php-7.1.0.tar.gz/from/this/mirror
+wget http://nginx.org/download/nginx-1.10.3.tar.gz
+wget -O php-7.1.1.tar.gz http://cn2.php.net/get/php-7.1.1.tar.gz/from/this/mirror
 wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.17.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
@@ -109,13 +109,13 @@ wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
-wget https://pecl.php.net/get/imagick-3.4.3RC1.tgz
+wget https://pecl.php.net/get/imagick-3.4.3.tgz
 wget http://download.redis.io/releases/redis-3.2.6.tar.gz
 wget https://pecl.php.net/get/redis-3.1.0.tgz
 wget http://thrysoee.dk/editline/libedit-20160903-3.1.tar.gz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.1.tgz
 wget https://pecl.php.net/get/mongodb-1.2.2.tgz
-wget https://nodejs.org/dist/v6.9.2/node-v6.9.2.tar.gz
+wget https://nodejs.org/dist/v6.9.5/node-v6.9.5.tar.gz
 wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
 ```
 
@@ -129,7 +129,7 @@ cat *.gz *.tgz | tar zxf - -i
 安装 Vim 等工具：
 
 ```sh
-yum -y install man wget unzip zip net-tools nmap iptraf iotop htop vim-enhanced bash-completion
+yum -y install man wget unzip zip net-tools nmap iptraf iotop htop sysstat ntp vim-enhanced bash-completion
 ```
 
 简单配置 Vim：
@@ -956,7 +956,7 @@ FTP 服务器
 
 编译安装：
 ```sh
-cd /usr/src/redis-3.2.6/
+cd /usr/src/redis-3.2.7/
 make && make install
 ```
 
