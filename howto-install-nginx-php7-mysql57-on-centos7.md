@@ -956,7 +956,7 @@ FTP 服务器
 
 编译安装：
 ```sh
-cd /usr/src/redis-3.2.7/
+cd /usr/src/redis-3.2.8/
 make && make install
 ```
 
