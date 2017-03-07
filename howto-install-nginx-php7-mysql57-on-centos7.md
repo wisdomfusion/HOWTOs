@@ -20,7 +20,7 @@
 
     nginx-1.10.3.tar.gz
     php-7.1.2.tar.gz
-    mysql-boost-5.7.17.tar.gz
+    percona-server-5.7.17-11.tar.gz (MySQL)
     redis-3.2.8.tar.gz
     node-v6.10.0.tar.gz
     Python-3.6.0.tgz 
@@ -102,6 +102,7 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 cd /usr/src/
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
+wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
 wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.17.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
