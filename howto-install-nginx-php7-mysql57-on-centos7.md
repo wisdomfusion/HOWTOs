@@ -34,9 +34,9 @@
     mcrypt-2.6.8.tar.gz
     mhash-0.9.9.9.tar.gz
     pcre-8.39.tar.gz
-    redis-3.1.0
+    redis-3.1.1
     libedit-20160903-3.1.tar.gz
-    mongodb-1.2.2
+    mongodb-1.2.5
     
 ## 2. 系统基本设定
 
@@ -111,10 +111,10 @@ wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3.tgz
 wget http://download.redis.io/releases/redis-3.2.8.tar.gz
-wget https://pecl.php.net/get/redis-3.1.0.tgz
+wget https://pecl.php.net/get/redis-3.1.1.tgz
 wget http://thrysoee.dk/editline/libedit-20160903-3.1.tar.gz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.2.tgz
-wget https://pecl.php.net/get/mongodb-1.2.2.tgz
+wget https://pecl.php.net/get/mongodb-1.2.5.tgz
 wget https://nodejs.org/dist/v6.10.0/node-v6.10.0.tar.gz
 wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
 ```
