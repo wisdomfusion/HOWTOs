@@ -103,7 +103,6 @@ cd /usr/src/
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
 wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
-wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-boost-5.7.17.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
@@ -516,12 +515,12 @@ cd /usr/src/imagick-*/
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
 
-cd /usr/src/redis-3.1.0/
+cd /usr/src/redis-3.1.1/
 /usr/local/webserver/php7/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
 
-cd /usr/src/mongodb-1.2.2/
+cd /usr/src/mongodb-1.2.5/
 /usr/local/webserver/php7/bin/phpize
 ./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
 make && make install
@@ -1060,7 +1059,7 @@ sysctl -p
 
 安装：
 ```sh
-mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.1 /usr/local/webserver/mongodb
+mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.2 /usr/local/webserver/mongodb
 
 cat > /etc/mongod.conf <<'EOF'
 # mongod.conf
@@ -1328,7 +1327,8 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 
 修改 php.ini 配置文件：
 
-    disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+    sed -i '/^disable_functions/c\disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source' /usr/local/webserver/php7/etc/php.ini
+    sed -i '/;cgi.fix_pathinfo=1/c\cgi.fix_pathinfo=0' /usr/local/webserver/php7/etc/php.ini
 
 php.ini 官方手册参考 [Description of core php.ini directives][phpini]
 
@@ -1352,9 +1352,8 @@ echo "exclude=kernel*" >> /etc/yum.conf
 
 ```sh
 cd /usr/src/
-wget https://nodejs.org/dist/v4.4.7/node-v4.4.7.tar.gz
-tar zxvf node-v4.4.7.tar.gz
-cd node-v4.4.7/
+wget https://nodejs.org/dist/v6.10.0/node-v6.10.0.tar.gz
+cd node-v6.10.0/
 ./configure
 make && make install
 ```
