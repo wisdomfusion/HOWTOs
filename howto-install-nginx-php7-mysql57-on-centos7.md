@@ -103,18 +103,18 @@ cd /usr/src/
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
 wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
-wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
+wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
-wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.40.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3.tgz
 wget http://download.redis.io/releases/redis-3.2.8.tar.gz
 wget https://pecl.php.net/get/redis-3.1.1.tgz
 wget http://thrysoee.dk/editline/libedit-20160903-3.1.tar.gz
 wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.2.tgz
-wget https://pecl.php.net/get/mongodb-1.2.5.tgz
+wget https://pecl.php.net/get/mongodb-1.2.6.tgz
 wget https://nodejs.org/dist/v6.10.0/node-v6.10.0.tar.gz
 wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
 ```
