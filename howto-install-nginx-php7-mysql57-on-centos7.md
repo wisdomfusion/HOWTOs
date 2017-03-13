@@ -145,13 +145,32 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 
 ### 4.1. 相关库
 
+#### libiconv
+
+编译时会出以下错误：
+
+    In file included from progname.c:26:0:
+    ./stdio.h:1010:1: error: 'gets' undeclared here (not in a function)
+    _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+
+更改如下头文件：
+
+```sh
+cd /usr/src/libiconv-*/
+sed -i '/gets is a security hole/c\#if defined(__GLIBC__) && !defined(__UCLIBC__) && !__GLIBC_PREREQ(2, 16)\n_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");\n#endif' srclib/stdio.h
+```
+
+再编译安装：
+
 ```sh
 cd /usr/src/libiconv-*/
 ./configure --prefix=/usr/local
-make
-sed -i '/gets is a security hole/c\#if defined(__GLIBC__) && !defined(__UCLIBC__) && !__GLIBC_PREREQ(2, 16)\n_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");\n#endif' srclib/stdio.h
 make && make install
+```
 
+#### libcrypt
+
+```sh
 cd /usr/src/libmcrypt-*/
 ./configure && make && make install
 /sbin/ldconfig
@@ -168,10 +187,18 @@ ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
 ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
 ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
 ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
+```
 
+#### mhash
+
+```sh
 cd /usr/src/mhash-*/
 ./configure && make && make install
+```
 
+#### mcrypt
+
+```sh
 cd /usr/src/mcrypt-*/
 /sbin/ldconfig
 ./configure && make && make install
