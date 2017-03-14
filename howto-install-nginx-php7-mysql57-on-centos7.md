@@ -1,4 +1,4 @@
-# How to Install nginx with PHP 7 and MySQL (Percona Server) 5.7 on CentOS 7
+# How to Install nginx with PHP 7 and MySQL 5.7 on CentOS 7
 
 ## 0. 约定
 
@@ -18,25 +18,25 @@
 
 所需软件包：
 
-    nginx-1.10.3.tar.gz
-    php-7.1.2.tar.gz
-    percona-server-5.7.17-11.tar.gz (MySQL)
-    redis-3.2.8.tar.gz
-    node-v6.10.0.tar.gz
-    Python-3.6.0.tgz 
+- nginx-1.10.3.tar.gz
+- php-7.1.2.tar.gz
+- percona-server-5.7.17-11.tar.gz (本文采用 Percona 分支，和原生 MySQL 完全兼容，可直接套用安装方法)
+- redis-3.2.8.tar.gz
+- node-v6.10.0.tar.gz
+- Python-3.6.0.tgz 
 
 相关库：
 
-    ImageMagick.tar.gz
-    imagick-3.4.3.tgz
-    libiconv-1.14.tar.gz
-    libmcrypt-2.5.8.tar.gz
-    mcrypt-2.6.8.tar.gz
-    mhash-0.9.9.9.tar.gz
-    pcre-8.39.tar.gz
-    redis-3.1.1
-    libedit-20160903-3.1.tar.gz
-    mongodb-1.2.5
+- ImageMagick.tar.gz
+- imagick-3.4.3.tgz
+- libiconv-1.14.tar.gz
+- libmcrypt-2.5.8.tar.gz
+- mcrypt-2.6.8.tar.gz
+- mhash-0.9.9.9.tar.gz
+- pcre-8.39.tar.gz
+- redis-3.1.1.tgz
+- libedit-20160903-3.1.tar.gz
+- mongodb-1.2.5.tgz
     
 ## 2. 系统基本设定
 
@@ -297,7 +297,7 @@ query_cache_size = 8M
 query_cache_limit = 2M
 ft_min_word_len = 4
 
-#log_bin = /data/mysql/binlogs/mysql-bin
+#log_bin = /data/log/binlogs/mysql-bin
 binlog_format = mixed
 expire_logs_days = 0
 log_error = /data/mysql/mysql-error.log
@@ -355,8 +355,8 @@ chown mysql:mysql /data/mysql/
 建立 binlog 日志存放目录：
 
 ```sh
-mkdir -p /data/mysql/binlogs
-chown mysql:mysql /data/mysql/binlogs
+mkdir -p /data/log/binlogs
+chown mysql:mysql /data/log/binlogs
 ```
 
 将 MySQL 数据库的动态链接库共享至系统链接库：

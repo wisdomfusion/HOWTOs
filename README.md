@@ -4,8 +4,7 @@
 
 **System Administration**
 
-- [x] [How to Install nginx with PHP 5.6 and MySQL 5.7 on CentOS 6](howto-install-nginx-php56-mysql57-on-centos6.md)
-- [x] [How to Install nginx with PHP 7 and MySQL (Percona Server) 5.7 on CentOS 7](howto-install-nginx-php7-mysql57-on-centos7.md)
+- [x] [How to Install nginx with PHP 7 and MySQL 5.7 on CentOS 7](howto-install-nginx-php7-mysql57-on-centos7.md)
 - [ ] [How to Install nginx with PHP 7 and MySQL 5.7 on Ubuntu 16.04 LTS](howto-install-nginx-php7-mysql57-on-ubuntu1604.md)
 - [ ] [How to Install nginx with PHP 7 and MySQL 5.7 on FreeBSD 11.0](howto-install-nginx-php7-mysql57-on-freebsd11.md)
 - [ ] [How to Mount VMWare Shared Folder in CentOS 7](howto-mount-vmware-shared-folder-in-centos7.md)
