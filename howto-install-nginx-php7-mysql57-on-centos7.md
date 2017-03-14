@@ -1385,25 +1385,10 @@ mv composer.phar /usr/local/bin/composer
 安装 Git 需要 libiconv 支持，上述步骤中已安装过，接下来安装 Git：
 
 ```sh
+yum -y install perl-ExtUtils-MakeMaker
 cd /usr/src/git-*/
 ./configure --prefix=/usr/local --with-iconv=/usr/local/lib
 make && make install
-```
-
-在安装的时候，可能会因为有没有 Perl 的 ExtUtils::MakeMaker 模块，而出错：
-
-    # make
-        SUBDIR perl
-    /usr/bin/perl Makefile.PL PREFIX='/usr/local' INSTALL_BASE='' --localedir='/usr/local/share/locale'
-    Can't locate ExtUtils/MakeMaker.pm in @INC (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at Makefile.PL line 3.
-    BEGIN failed--compilation aborted at Makefile.PL line 3.
-    make[1]: *** [perl.mak] Error 2
-    make: *** [perl/perl.mak] Error 2
-
-yum 安装一下即可：
-
-```sh
-yum -y install perl-ExtUtils-MakeMaker
 ```
 
 ### 7.4. 安装 Ruby/Sass/Gulp.js
