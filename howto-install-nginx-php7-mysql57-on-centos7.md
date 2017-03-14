@@ -5,10 +5,10 @@
 - 暂用系统用户 root 方便安装调试
 - 主机IP地址：192.168.187.10
 - 软件包下载到 `/usr/src/` 目录下
-- 所有软件包安装在 `/usr/local/webserver/` 目录下
-- `/u01/mysql/` 存放数据库
-- `/u01/www/` 存放网站数据
-- `/u01/logfiles/` 存放网站日志
+- 所有软件包安装在 `/opt/` 目录下
+- `/data/mysql/` 存放MySQL数据
+- `/data/www/` 存放网站数据
+- `/data/log/` 存放网站日志
 
 ## 1. 系统要求
 
@@ -458,7 +458,7 @@ cd /usr/src/php-7.*/
 make ZEND_EXTRA_LIBS='-liconv' -j `nproc` && make install
 ```
 
-php.ini 和 php-fpm.conf
+`php.ini` 和 `php-fpm.conf`
 
 ```sh
 cp php.ini-production /opt/php7/lib/php.ini
@@ -466,7 +466,7 @@ cp /opt/php7/etc/php-fpm.conf.default /opt/php7/etc/php-fpm.conf
 cp /opt/php7/etc/php-fpm.d/www.conf.default /opt/php7/etc/php-fpm.d/www.conf
 ```
 
-php-fpm.conf 配置 `vi /opt/php7/etc/php-fpm.conf`：
+`php-fpm.conf` 配置 `vi /opt/php7/etc/php-fpm.conf`：
 
     [global]
     pid = run/php-fpm.pid
@@ -477,7 +477,7 @@ php-fpm.conf 配置 `vi /opt/php7/etc/php-fpm.conf`：
     daemonize = yes
     rlimit_files = 65535
 
-www.conf 配置 `vi /opt/php7/etc/php-fpm.d/www.conf`：
+`www.conf` 配置 `vi /opt/php7/etc/php-fpm.d/www.conf`：
 
     [www]
     user = www
