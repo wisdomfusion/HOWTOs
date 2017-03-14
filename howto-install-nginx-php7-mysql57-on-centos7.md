@@ -484,22 +484,26 @@ cp /opt/php7/etc/php-fpm.d/www.conf.default /opt/php7/etc/php-fpm.d/www.conf
 可以直接使用如下系列命令达到如上修改效果：
 
 ```sh
-sed -i '/^;pid/s/^;//' /opt/php7/etc/php-fpm.conf
-sed -i '/^;error_log/s/^;//' /opt/php7/etc/php-fpm.conf
-sed -i '/^;emergency_restart_threshold/c\emergency_restart_threshold = 60' /opt/php7/etc/php-fpm.conf
-sed -i '/^;emergency_restart_interval/c\emergency_restart_interval = 60' /opt/php7/etc/php-fpm.conf
-sed -i '/^;process/c\process_control_timeout = 5s' /opt/php7/etc/php-fpm.conf
-sed -i '/^;daemonize/s/^;//' /opt/php7/etc/php-fpm.conf
-sed -i '/^;rlimit_files/c\rlimit_files = 65535' /opt/php7/etc/php-fpm.conf
+sed -i \
+-e '/^;pid/s/^;//' \
+-e '/^;error_log/s/^;//' \
+-e '/^;emergency_restart_threshold/c\emergency_restart_threshold = 60' \
+-e '/^;emergency_restart_interval/c\emergency_restart_interval = 60' \
+-e '/^;process/c\process_control_timeout = 5s' \
+-e '/^;daemonize/s/^;//' \
+-e '/^;rlimit_files/c\rlimit_files = 65535' \
+/opt/php7/etc/php-fpm.conf
 
-sed -i '/^pm =/c\pm = static' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^pm.max_children/s/[0-9]\+$/128/' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^pm.start_servers/s/[0-9]\+$/20/' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^pm.min_spare_servers/s/[0-9]\+$/5/' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^pm.max_spare_servers/s/[0-9]\+$/35/' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^;pm.process_idle_timeout/s/^;//' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^;pm.max_requests/c\pm.max_requests = 51200' /opt/php7/etc/php-fpm.d/www.conf
-sed -i '/^;request_terminate_timeout/s/^;//' /opt/php7/etc/php-fpm.d/www.conf
+sed -i \
+-e '/^pm =/c\pm = static' \
+-e '/^pm.max_children/s/[0-9]\+$/128/' \
+-e '/^pm.start_servers/s/[0-9]\+$/20/' \
+-e '/^pm.min_spare_servers/s/[0-9]\+$/5/' \
+-e '/^pm.max_spare_servers/s/[0-9]\+$/35/' \
+-e '/^;pm.process_idle_timeout/s/^;//' \
+-e '/^;pm.max_requests/c\pm.max_requests = 51200' \
+-e '/^;request_terminate_timeout/s/^;//' \
+/opt/php7/etc/php-fpm.d/www.conf
 ```
 
 php-fpm 启动脚本：
@@ -564,8 +568,10 @@ vi /opt/php7/lib/php.ini
 以上也可以直接用下面两条 sed 命令修改：
 
 ```sh
-sed -i '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' /opt/php7/lib/php.ini
-sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /opt/php7/lib/php.ini
+sed -i \
+-e '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' \
+-e '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' \
+/opt/php7/lib/php.ini
 ```
 
 重新启动 php-fpm 即可生效。
@@ -1335,8 +1341,12 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 
 修改 php.ini 配置文件：
 
-    sed -i '/^disable_functions/c\disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source' /opt/php7/lib/php.ini
-    sed -i '/;cgi.fix_pathinfo=1/c\cgi.fix_pathinfo=0' /opt/php7/lib/php.ini
+```sh
+sed -i \
+-e '/^disable_functions/c\disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source' \
+-e '/;cgi.fix_pathinfo=1/c\cgi.fix_pathinfo=0' \
+/opt/php7/lib/php.ini
+```
 
 php.ini 官方手册参考 [Description of core php.ini directives][phpini]
 
