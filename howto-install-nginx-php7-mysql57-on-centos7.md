@@ -148,21 +148,6 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 
 #### libiconv
 
-编译时会出以下错误：
-
-    In file included from progname.c:26:0:
-    ./stdio.h:1010:1: error: 'gets' undeclared here (not in a function)
-    _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
-
-更改如下头文件：
-
-```sh
-cd /usr/src/libiconv-*/
-sed -i '/gets is a security hole/c\#if defined(__GLIBC__) && !defined(__UCLIBC__) && !__GLIBC_PREREQ(2, 16)\n_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");\n#endif' srclib/stdio.h
-```
-
-再编译安装：
-
 ```sh
 cd /usr/src/libiconv-*/
 ./configure && make && make install
@@ -236,6 +221,7 @@ cmake \
 如果主要用于移动端数据存储，可以默认 utf8mb4 编码，可存储 emoji 表情符号：
 
 ```sh
+cd /usr/src/percona-server-5.7.*/
 cmake \
 -DCMAKE_INSTALL_PREFIX=/opt/mysql \
 -DMYSQL_DATADIR=/data/mysql \
@@ -259,7 +245,7 @@ cmake \
 make -j `nproc` && make install
 ```
 
-MySQL 启动脚本：
+启动脚本：
 
 ```sh
 cp /opt/mysql/support-files/mysql.server /etc/init.d/mysqld
@@ -358,18 +344,22 @@ write_buffer = 4M
 EOF
 ```
 
-初始化数据库，请保持 `/u01/mysql/` 目录为空：
+初始化数据库（请保持 `/u01/mysql/` 目录为空）：
 
 ```sh
 mkdir -p /data/mysql
 chown mysql:mysql /data/mysql/
 /opt/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/data/mysql
+```
 
+建立 binlog 日志存放目录：
+
+```sh
 mkdir -p /data/mysql/binlogs
 chown mysql:mysql /data/mysql/binlogs
 ```
 
-将MySQL数据库的动态链接库共享至系统链接库：
+将 MySQL 数据库的动态链接库共享至系统链接库：
 
 ```sh
 echo "/opt/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
