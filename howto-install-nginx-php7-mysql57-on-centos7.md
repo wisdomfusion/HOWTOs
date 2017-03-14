@@ -1,4 +1,4 @@
-# How to Install nginx with PHP 7 and MySQL 5.7 on CentOS 7
+# How to Install nginx with PHP 7 and MySQL (Percona Server) 5.7 on CentOS 7
 
 ## 0. 约定
 
@@ -102,6 +102,7 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 cd /usr/src/
 wget http://nginx.org/download/nginx-1.10.3.tar.gz
 wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
+wget https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
@@ -164,8 +165,14 @@ sed -i '/gets is a security hole/c\#if defined(__GLIBC__) && !defined(__UCLIBC__
 
 ```sh
 cd /usr/src/libiconv-*/
-./configure --prefix=/usr/local
-make && make install
+./configure && make && make install
+```
+
+#### mhash
+
+```sh
+cd /usr/src/mhash-*/
+./configure && make && make install
 ```
 
 #### libcrypt
@@ -177,33 +184,15 @@ cd /usr/src/libmcrypt-*/
 cd libltdl/
 ./configure --enable-ltdl-install
 make && make install
-
-ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
-ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
-ln -s /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
-ln -s /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
-ln -s /usr/local/lib/libmhash.a /usr/lib/libmhash.a
-ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
-ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
-ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
-ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
-```
-
-#### mhash
-
-```sh
-cd /usr/src/mhash-*/
-./configure && make && make install
+echo "/usr/local/lib" >> /etc/ld.so.conf
+/sbin/ldconfig
 ```
 
 #### mcrypt
 
 ```sh
 cd /usr/src/mcrypt-*/
-/sbin/ldconfig
 ./configure && make && make install
-echo "/usr/local/lib" >> /etc/ld.so.conf
-/sbin/ldconfig
 ```
 
 ### 4.2. 安装 MySQL 5.7
@@ -215,13 +204,20 @@ echo "/usr/local/lib" >> /etc/ld.so.conf
 /usr/sbin/useradd -g mysql -s /sbin/nologin mysql
 ```
 
-解压前配置软件包
+解压 boost 库
 
 ```sh
-cd /usr/src/mysql-5.7.*/
+cd /usr/src/
+tar zxf boost_1_59_0.tar.gz -C /usr/local/
+```
+
+安装 MySQL
+
+```
+cd /usr/src/percona-server-5.7.*/
 cmake \
--DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
--DMYSQL_DATADIR=/u01/mysql \
+-DCMAKE_INSTALL_PREFIX=/opt/mysql \
+-DMYSQL_DATADIR=/data/mysql \
 -DEXTRA_CHARSETS=all \
 -DDEFAULT_CHARSET=utf8 \
 -DDEFAULT_COLLATION=utf8_general_ci \
@@ -233,7 +229,7 @@ cmake \
 -DWITH_PARTITION_STORAGE_ENGINE=1 \
 -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
 -DWITH_MEMORY_STORAGE_ENGINE=1 \
--DWITH_BOOST=boost/boost_1_59_0 \
+-DWITH_BOOST=/usr/local/boost_1_59_0 \
 -DENABLE_DOWNLOADS=1
 ```
 
@@ -241,8 +237,8 @@ cmake \
 
 ```sh
 cmake \
--DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
--DMYSQL_DATADIR=/u01/mysql \
+-DCMAKE_INSTALL_PREFIX=/opt/mysql \
+-DMYSQL_DATADIR=/data/mysql \
 -DEXTRA_CHARSETS=all \
 -DDEFAULT_CHARSET=utf8mb4 \
 -DDEFAULT_COLLATION=utf8mb4_general_ci \
@@ -254,7 +250,7 @@ cmake \
 -DWITH_PARTITION_STORAGE_ENGINE=1 \
 -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
 -DWITH_MEMORY_STORAGE_ENGINE=1 \
--DWITH_BOOST=boost/boost_1_59_0 \
+-DWITH_BOOST=/usr/local/boost_1_59_0 \
 -DENABLE_DOWNLOADS=1
 ```
 
@@ -266,7 +262,7 @@ make -j `nproc` && make install
 MySQL 启动脚本：
 
 ```sh
-cp /usr/local/webserver/mysql/support-files/mysql.server /etc/init.d/mysqld
+cp /opt/mysql/support-files/mysql.server /etc/init.d/mysqld
 chmod +x /etc/init.d/mysqld
 chkconfig --add mysqld
 chkconfig mysqld on
@@ -284,9 +280,9 @@ socket = /tmp/mysql.sock
 [mysqld]
 port = 3306
 socket = /tmp/mysql.sock
-basedir = /usr/local/webserver/mysql
-datadir = /u01/mysql
-pid-file = /u01/mysql/mysql.pid
+basedir = /opt/mysql
+datadir = /data/mysql
+pid-file = /data/mysql/mysql.pid
 user = mysql
 bind-address = 0.0.0.0
 server-id = 1
@@ -315,13 +311,13 @@ query_cache_size = 8M
 query_cache_limit = 2M
 ft_min_word_len = 4
 
-log_bin = /u01/mysql/binlogs/mysql-bin
+#log_bin = /data/mysql/binlogs/mysql-bin
 binlog_format = mixed
 expire_logs_days = 0
-log_error = /u01/mysql/mysql-error.log
+log_error = /data/mysql/mysql-error.log
 slow_query_log = 1
 long_query_time = 1
-slow_query_log_file = /u01/mysql/mysql-slow.log
+slow_query_log_file = /data/mysql/mysql-slow.log
 performance_schema = 0
 explicit_defaults_for_timestamp
 #lower_case_table_names = 1
@@ -365,19 +361,18 @@ EOF
 初始化数据库，请保持 `/u01/mysql/` 目录为空：
 
 ```sh
-mkdir -p /u01/mysql
-chown mysql:mysql /u01/mysql/
+mkdir -p /data/mysql
+chown mysql:mysql /data/mysql/
+/opt/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/data/mysql
 
-/usr/local/webserver/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/usr/local/webserver/mysql --datadir=/u01/mysql
-
-mkdir -p /u01/mysql/binlogs
-chow mysql:mysql /u01/mysql/binlogs
+mkdir -p /data/mysql/binlogs
+chown mysql:mysql /data/mysql/binlogs
 ```
 
 将MySQL数据库的动态链接库共享至系统链接库：
 
 ```sh
-echo "/usr/local/webserver/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
+echo "/opt/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
 /sbin/ldconfig
 /sbin/ldconfig -v | grep mysql
 ```
@@ -392,8 +387,8 @@ echo "/usr/local/webserver/mysql/lib/" > /etc/ld.so.conf.d/mysql.conf
 
 ```sh
 DBROOTPWD=123456
-/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$DBROOTPWD\" with grant option;"
-/usr/local/webserver/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$DBROOTPWD\" with grant option;"
+/opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$DBROOTPWD\" with grant option;"
+/opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$DBROOTPWD\" with grant option;"
 ```
 
 关闭 MySQL：
@@ -409,17 +404,16 @@ DBROOTPWD=123456
 ```sh
 /usr/sbin/groupadd www
 /usr/sbin/useradd -g www -s /sbin/nologin www
-mkdir -p /u01/www
-chmod +w /u01/www
-chown -R www:www /u01/www
+mkdir -p /data/www
+chmod +w /data/www
+chown -R www:www /data/www
 ```
 
 安装 PHP：
 
 ```sh
 cd /usr/src/php-7.*/
-./configure --prefix=/usr/local/webserver/php7 \
---with-config-file-path=/usr/local/webserver/php7/etc \
+./configure --prefix=/opt/php7 \
 --with-libdir=lib64 \
 --enable-fpm \
 --with-fpm-user=www \
@@ -458,8 +452,6 @@ cd /usr/src/php-7.*/
 --disable-ipv6
 ```
 
-**注意：**PHP 默认配置文件存放在 `php7/lib/` 下，为什么不放在 `php7/etc/` 下？为什么不放在 `php7/etc/` 下？为什么？好，我把它改到 `php7/etc/` 下，所以上面编译选项中我添加了这一项 `--with-config-file-path=/usr/local/webserver/php7/etc`。如果你觉得默认就很爽，那你大可以把这项去掉，能很欢快地找到 php.ini 并使之生效即可，如果发现配置不生效，请用 `php --ini` 命令 check 一下。
-
 编译安装：
 
 ```sh
@@ -469,12 +461,12 @@ make ZEND_EXTRA_LIBS='-liconv' -j `nproc` && make install
 php.ini 和 php-fpm.conf
 
 ```sh
-cp php.ini-production /usr/local/webserver/php7/etc/php.ini
-cp /usr/local/webserver/php7/etc/php-fpm.conf.default /usr/local/webserver/php7/etc/php-fpm.conf
-cp /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default /usr/local/webserver/php7/etc/php-fpm.d/www.conf
+cp php.ini-production /opt/php7/lib/php.ini
+cp /opt/php7/etc/php-fpm.conf.default /opt/php7/etc/php-fpm.conf
+cp /opt/php7/etc/php-fpm.d/www.conf.default /opt/php7/etc/php-fpm.d/www.conf
 ```
 
-php-fpm.conf 配置 `vi /usr/local/webserver/php7/etc/php-fpm.conf`：
+php-fpm.conf 配置 `vi /opt/php7/etc/php-fpm.conf`：
 
     [global]
     pid = run/php-fpm.pid
@@ -485,7 +477,7 @@ php-fpm.conf 配置 `vi /usr/local/webserver/php7/etc/php-fpm.conf`：
     daemonize = yes
     rlimit_files = 65535
 
-www.conf 配置 `vi /usr/local/webserver/php7/etc/php-fpm.d/www.conf`：
+www.conf 配置 `vi /opt/php7/etc/php-fpm.d/www.conf`：
 
     [www]
     user = www
@@ -502,22 +494,22 @@ www.conf 配置 `vi /usr/local/webserver/php7/etc/php-fpm.d/www.conf`：
 可以直接使用如下系列命令达到如上修改效果：
 
 ```sh
-sed -i '/^;pid/s/^;//' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;error_log/s/^;//' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;emergency_restart_threshold/c\emergency_restart_threshold = 60' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;emergency_restart_interval/c\emergency_restart_interval = 60' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;process/c\process_control_timeout = 5s' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;daemonize/s/^;//' /usr/local/webserver/php7/etc/php-fpm.conf
-sed -i '/^;rlimit_files/c\rlimit_files = 65535' /usr/local/webserver/php7/etc/php-fpm.conf
+sed -i '/^;pid/s/^;//' /opt/php7/etc/php-fpm.conf
+sed -i '/^;error_log/s/^;//' /opt/php7/etc/php-fpm.conf
+sed -i '/^;emergency_restart_threshold/c\emergency_restart_threshold = 60' /opt/php7/etc/php-fpm.conf
+sed -i '/^;emergency_restart_interval/c\emergency_restart_interval = 60' /opt/php7/etc/php-fpm.conf
+sed -i '/^;process/c\process_control_timeout = 5s' /opt/php7/etc/php-fpm.conf
+sed -i '/^;daemonize/s/^;//' /opt/php7/etc/php-fpm.conf
+sed -i '/^;rlimit_files/c\rlimit_files = 65535' /opt/php7/etc/php-fpm.conf
 
-sed -i '/^pm =/c\pm = static' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^pm.max_children/s/[0-9]\+$/256/' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^pm.start_servers/s/[0-9]\+$/20/' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^pm.min_spare_servers/s/[0-9]\+$/5/' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^pm.max_spare_servers/s/[0-9]\+$/35/' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^;pm.process_idle_timeout/s/^;//' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^;pm.max_requests/c\pm.max_requests = 51200' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
-sed -i '/^;request_terminate_timeout/s/^;//' /usr/local/webserver/php7/etc/php-fpm.d/www.conf.default
+sed -i '/^pm =/c\pm = static' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^pm.max_children/s/[0-9]\+$/128/' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^pm.start_servers/s/[0-9]\+$/20/' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^pm.min_spare_servers/s/[0-9]\+$/5/' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^pm.max_spare_servers/s/[0-9]\+$/35/' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^;pm.process_idle_timeout/s/^;//' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^;pm.max_requests/c\pm.max_requests = 51200' /opt/php7/etc/php-fpm.d/www.conf
+sed -i '/^;request_terminate_timeout/s/^;//' /opt/php7/etc/php-fpm.d/www.conf
 ```
 
 php-fpm 启动脚本：
@@ -538,31 +530,31 @@ cd /usr/src/ImageMagick-*/
 
 cd /usr/src/imagick-*/
 /sbin/ldconfig
-/usr/local/webserver/php7/bin/phpize
-./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
+/opt/php7/bin/phpize
+./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
 
 cd /usr/src/redis-3.1.1/
-/usr/local/webserver/php7/bin/phpize
-./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
+/opt/php7/bin/phpize
+./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
 
-cd /usr/src/mongodb-1.2.5/
-/usr/local/webserver/php7/bin/phpize
-./configure --with-php-config=/usr/local/webserver/php7/bin/php-config
+cd /usr/src/mongodb-1.2.6/
+/opt/php7/bin/phpize
+./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
 ```
 
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
 
 ```sh
-vi /usr/local/webserver/php7/etc/php.ini
+vi /opt/php7/lib/php.ini
 ```
 
 配置项：
 
     ; extension_dir = "ext"
-    extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20151012/"
+    extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20151012/"
     extension=imagick.so
     extension=redis.so
     extension=mongodb.so
@@ -582,8 +574,8 @@ vi /usr/local/webserver/php7/etc/php.ini
 以上也可以直接用下面两条 sed 命令修改：
 
 ```sh
-sed -i '/; extension_dir = "ext"/a\extension_dir = "/usr/local/webserver/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' /usr/local/webserver/php7/etc/php.ini
-sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /usr/local/webserver/php7/etc/php.ini
+sed -i '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' /opt/php7/lib/php.ini
+sed -i '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' /opt/php7/lib/php.ini
 ```
 
 重新启动 php-fpm 即可生效。
@@ -601,9 +593,8 @@ cd /usr/src/pcre-*/
 
 ```sh
 cd /usr/src/nginx-*/
-/sbin/ldconfig
 ./configure \
---prefix=/usr/local/webserver/nginx \
+--prefix=/opt/nginx \
 --user=www \
 --group=www \
 --with-http_v2_module \
@@ -630,9 +621,9 @@ cat > /etc/init.d/nginx <<\EOF
 # description:  NGINX is an HTTP(S) server, HTTP(S) reverse \
 #               proxy and IMAP/POP3 proxy server
 # processname: nginx
-# nginx:       /usr/local/webserver/nginx/sbin/nginx
-# config:      /usr/local/webserver/nginx/conf/nginx.conf
-# pidfile:     /usr/local/webserver/nginx/logs/nginx.pid
+# nginx:       /opt/nginx/sbin/nginx
+# config:      /opt/nginx/conf/nginx.conf
+# pidfile:     /opt/nginx/logs/nginx.pid
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -643,10 +634,10 @@ cat > /etc/init.d/nginx <<\EOF
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
-nginx="/usr/local/webserver/nginx/sbin/nginx"
+nginx="/opt/nginx/sbin/nginx"
 prog=$(basename $nginx)
 
-NGINX_CONF_FILE="/usr/local/webserver/nginx/conf/nginx.conf"
+NGINX_CONF_FILE="/opt/nginx/conf/nginx.conf"
 
 lockfile=/var/lock/subsys/nginx
 
@@ -759,18 +750,18 @@ chkconfig nginx on
 相关配置：
 
 ```sh
-mkdir -p /u01/logfiles/nginx
-chmod +w /u01/logfiles/nginx
-chown -R www:www /u01/logfiles/nginx
+mkdir -p /data/log/nginx
+chmod +w /data/log/nginx
+chown -R www:www /data/log/nginx
 
-cp /usr/local/webserver/nginx/conf/nginx.conf{,.original}
-cat > /usr/local/webserver/nginx/conf/nginx.conf <<\EOF
+cp /opt/nginx/conf/nginx.conf{,.original}
+cat > /opt/nginx/conf/nginx.conf <<\EOF
 user  www www;
 
 #worker_processes 8;
 worker_rlimit_nofile 65535;
 
-error_log  /u01/logfiles/nginx/nginx_error.log  warn;
+error_log  /data/log/nginx/nginx_error.log  warn;
 
 events
 {
@@ -823,7 +814,7 @@ http
     listen 80;
     server_name example.com;
     index index.php index.html;
-    root /u01/www/;
+    root /data/www/;
 
     #limit_conn  connlimit 15;
     #limit_rate  256k;
@@ -846,7 +837,7 @@ http
       access_log   off;
     }
 
-    access_log  /u01/logfiles/nginx/access.log  access;
+    access_log  /data/log/nginx/access.log  access;
   }
 
 }
@@ -855,24 +846,24 @@ EOF
 
 nginx 日志轮询：
 
-- nginx 日志存放位置：`/u01/logfiles/nginx`
-- 日志轮询脚本：`/usr/local/webserver/nginx/cut_nginx_log.sh`
-- nginx pid 文件位置：`/usr/local/webserver/nginx/logs/nginx.pid`
+- nginx 日志存放位置：`/data/log/nginx`
+- 日志轮询脚本：`/opt/nginx/cut_nginx_log.sh`
+- nginx pid 文件位置：`/opt/nginx/logs/nginx.pid`
 
 ```sh
-cat > /usr/local/webserver/nginx/cut_nginx_log.sh <<\EOF
+cat > /opt/nginx/cut_nginx_log.sh <<\EOF
 #!/bin/bash
 # cut_nginx_log.sh
 # This script run at 00:00
 
 # The Nginx logs path
-log_path="/u01/logfiles/nginx"
+log_path="/data/log/nginx"
 new_log_path=${log_path}/$(date -d 'yesterday' '+%Y%m%d')
 
 mkdir -p ${new_log_path}
 mv ${log_path}/*.log ${new_log_path}
 
-kill -USR1 `cat /usr/local/webserver/nginx/logs/nginx.pid`
+kill -USR1 `cat /opt/nginx/logs/nginx.pid`
 EOF
 ```
 
@@ -880,7 +871,7 @@ crontab 中添加定时任务，00:00 执行日志轮询：
 
 ```sh
 crontab -e
-0 0 * * * /bin/bash /usr/local/webserver/nginx/cut_nginx_log.sh
+0 0 * * * /bin/bash /opt/nginx/cut_nginx_log.sh
 ```
 
 ## 5. 其他服务安装
@@ -947,7 +938,7 @@ vi /etc/rsyncd.conf
     gid = root
 
     max connections = 10
-    log file = /srvapp/logfiles/rsyncd.log
+    log file = /data/log/rsyncd.log
     timeout = 300
 
     [test]
@@ -990,27 +981,27 @@ make && make install
 建立 redis data 目录：
 
 ```sh
-mkdir -p /u01/redis/
+mkdir -p /data/redis/
 ```
 
 安装启动脚本（注意其中的 conf 文件、日志文件、数据目录等的位置）：
 ```
-# ./install_server.sh
+# ./utils/install_server.sh 
 Welcome to the redis service installer
 This script will help you easily set up a running redis server
 
-Please select the redis port for this instance: [6379]
+Please select the redis port for this instance: [6379] 
 Selecting default: 6379
-Please select the redis config file name [/etc/redis/6379.conf]
+Please select the redis config file name [/etc/redis/6379.conf] 
 Selected default - /etc/redis/6379.conf
-Please select the redis log file name [/var/log/redis_6379.log] /u01/logfiles/redis.log
-Please select the data directory for this instance [/var/lib/redis/6379] /u01/redis
-Please select the redis executable path [/usr/local/bin/redis-server]
+Please select the redis log file name [/var/log/redis_6379.log] /data/log/redis.log
+Please select the data directory for this instance [/var/lib/redis/6379] /data/redis
+Please select the redis executable path [/usr/local/bin/redis-server] 
 Selected config:
 Port           : 6379
 Config file    : /etc/redis/6379.conf
-Log file       : /u01/logfiles/redis.log
-Data dir       : /u01/redis
+Log file       : /data/log/redis.log
+Data dir       : /data/redis
 Executable     : /usr/local/bin/redis-server
 Cli Executable : /usr/local/bin/redis-cli
 Is this ok? Then press ENTER to go on or Ctrl-C to abort.
@@ -1056,17 +1047,17 @@ source /etc/profile
 java -version
 ```
 
-下载 Elasticsearch，并解压至 `/usr/local/webserver/es`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
+下载 Elasticsearch，并解压至 `/opt/es`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
 
 ```sh
 useradd elastic
-chown -R elastic:elastic /usr/local/webserver/es
+chown -R elastic:elastic /opt/es
 su elastic
 ```
 
 开发机可以根据实际情况更改 JVM 空间分配，这里设为 512MB：
 ```sh
-sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /usr/local/webserver/es/config/jvm.options
+sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /opt/es/config/jvm.options
 ```
 
 Elasticsearch 启动前的必要配置：
@@ -1079,23 +1070,23 @@ sysctl -p
 
 启动 Elasticsearch：
 ```sh
-/usr/local/webserver/es/bin/elasticsearch -d
+/opt/es/bin/elasticsearch -d
 ```
 
 ### 5.7. 安装 mongodb
 
 安装：
 ```sh
-mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.2 /usr/local/webserver/mongodb
+mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.2 /opt/mongodb
 
 cat > /etc/mongod.conf <<'EOF'
 # mongod.conf
-dbpath=/u01/mongodb
+dbpath=/data/mongodb
 
 port = 27017
 
 #where to log
-logpath=/u01/logfiles/mongodb.log
+logpath=/data/log/mongodb.log
 logappend = true
 
 #rest = true
@@ -1178,7 +1169,7 @@ nohttpinterface = true
 #source = slave.example.com
 EOF
 
-mkdir -p /u01/mongodb/
+mkdir -p /data/mongodb/
 ```
 
 禁用大内存页面：
@@ -1200,18 +1191,18 @@ EOF
 
 mongodb 相关命令：
 ```sh
-export PATH=$PATH:/usr/local/webserver/mongodb/bin
-echo 'export PATH=$PATH:/usr/local/webserver/mongodb/bin' >> ~/.bashrc
+export PATH=$PATH:/opt/mongodb/bin
+echo 'export PATH=$PATH:/opt/mongodb/bin' >> ~/.bashrc
 ```
 
 随机启动 mongod：
 ```sh
-echo '/usr/local/webserver/mongodb/bin/mongod --config /etc/mongod.conf' >> /etc/rc.local
+echo '/opt/mongodb/bin/mongod --config /etc/mongod.conf' >> /etc/rc.local
 ```
 
 运行：
 ```sh
-/usr/local/webserver/mongodb/bin/mongod --config /etc/mongod.conf
+/opt/mongodb/bin/mongod --config /etc/mongod.conf
 ```
 
 关闭：
@@ -1354,8 +1345,8 @@ echo "/usr/local/firewall/iptables.rule" >> /etc/rc.local
 
 修改 php.ini 配置文件：
 
-    sed -i '/^disable_functions/c\disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source' /usr/local/webserver/php7/etc/php.ini
-    sed -i '/;cgi.fix_pathinfo=1/c\cgi.fix_pathinfo=0' /usr/local/webserver/php7/etc/php.ini
+    sed -i '/^disable_functions/c\disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source' /opt/php7/lib/php.ini
+    sed -i '/;cgi.fix_pathinfo=1/c\cgi.fix_pathinfo=0' /opt/php7/lib/php.ini
 
 php.ini 官方手册参考 [Description of core php.ini directives][phpini]
 
@@ -1453,8 +1444,8 @@ pip3.6 --version
 ```sh
 cat >> ~/.bashrc <<'EOF'
 
-export PATH=$PATH:/usr/local/webserver/php7/bin
-export PATH=$PATH:/usr/local/webserver/mysql/bin
-export PATH=$PATH:/usr/local/webserver/redis/src
+export PATH=$PATH:/opt/php7/bin
+export PATH=$PATH:/opt/mysql/bin
+export PATH=$PATH:/opt/redis/src
 EOF
 ```
