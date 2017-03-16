@@ -1,4 +1,4 @@
-# How to Install nginx with PHP 7 and MySQL 5.7 on CentOS 7
+# How to Install nginx with PHP 7 and MySQL 5.7 from Source on CentOS 7
 
 ## 0. 约定
 
@@ -196,7 +196,7 @@ cd /usr/src/
 tar zxf boost_1_59_0.tar.gz -C /usr/local/
 ```
 
-安装 MySQL
+**安装 MySQL I**（默认 utf8 字符集）：
 
 ```
 cd /usr/src/percona-server-5.7.*/
@@ -218,7 +218,7 @@ cmake \
 -DENABLE_DOWNLOADS=1
 ```
 
-如果主要用于移动端数据存储，可以默认 utf8mb4 编码，可存储 emoji 表情符号：
+**安装 MySQL II**（默认 utf8mb4 字符集，可存储 emoji 表情符号）：
 
 ```sh
 cd /usr/src/percona-server-5.7.*/
@@ -1043,7 +1043,7 @@ source /etc/profile
 java -version
 ```
 
-下载 Elasticsearch，并解压至 `/opt/es`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动之：
+下载 Elasticsearch，并解压至 `/opt/es`，新建`elastic`用户，用来启动 Elasticsearch，官方不建议直接使用 `root` 用户启动：
 
 ```sh
 useradd elastic
@@ -1056,16 +1056,27 @@ su elastic
 sed -i 's/-Xms2g/-Xms512m/;s/-Xmx2g/-Xmx512m/' /opt/es/config/jvm.options
 ```
 
-Elasticsearch 启动前的必要配置：
+更改数据及日志存放路径：
 
 ```sh
+sed -i -e '/^#path.data/c\path.data: \/data\/es' -e '/^#path.logs/c\path.logs: \/data\/log\/es' /opt/es/config/elasticsearch.yml
+```
+
+Elasticsearch 启动前的必要配置，切换至 `root` 用户：
+
+```sh
+su -
+mkdir -p /data/es /data/log/es
+chown elastic:elastic /data/es /data/log/es
+
 ulimit -n 65536
 echo "vm.max_map_count=262144" >> /etc/sysctl.conf
 sysctl -p
 ```
 
-启动 Elasticsearch：
+启动 Elasticsearch 时，事先切换至 `elastic` 用户：
 ```sh
+su elastic
 /opt/es/bin/elasticsearch -d
 ```
 
