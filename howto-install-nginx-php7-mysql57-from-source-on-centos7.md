@@ -34,7 +34,7 @@
 - mcrypt-2.6.8.tar.gz
 - mhash-0.9.9.9.tar.gz
 - pcre-8.39.tar.gz
-- redis-3.1.1.tgz
+- redis-3.1.3.tgz
 - libedit-20160903-3.1.tar.gz
 - mongodb-1.2.9.tgz
     
@@ -528,12 +528,12 @@ cd /usr/src/imagick-*/
 ./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
 
-cd /usr/src/redis-3.1.1/
+cd /usr/src/redis-3.1.3/
 /opt/php7/bin/phpize
 ./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
 
-cd /usr/src/mongodb-1.2.6/
+cd /usr/src/mongodb-1.2.9/
 /opt/php7/bin/phpize
 ./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
@@ -970,7 +970,7 @@ FTP 服务器
 
 编译安装：
 ```sh
-cd /usr/src/redis-3.2.8/
+cd /usr/src/redis-4.0.1/
 make && make install
 ```
 
@@ -1024,12 +1024,12 @@ cd /usr/src/node-*/
 
 ### 5.6. 安装 Elasticsearch
 
-Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u112-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_112`，配置 JDK 环境：
+Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u141-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_141`，配置 JDK 环境：
 
 ```sh
 cat >> /etc/profile <<'EOF'
 
-export JAVA_HOME=/usr/local/jdk1.8.0_112
+export JAVA_HOME=/usr/local/jdk1.8.0_141
 export JRE_HOME=${JAVA_HOME}/jre
 export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 export PATH=${JAVA_HOME}/bin:${PATH}
@@ -1381,8 +1381,8 @@ echo "exclude=kernel*" >> /etc/yum.conf
 
 ```sh
 cd /usr/src/
-wget https://nodejs.org/dist/v6.10.0/node-v6.10.0.tar.gz
-cd node-v6.10.0/
+wget https://nodejs.org/dist/v6.11.1/node-v6.11.1.tar.gz
+cd node-v6.11.1/
 ./configure
 make && make install
 ```
@@ -1422,10 +1422,10 @@ gem install sass
 cnpm install -g gulp
 ```
 
-### 7.5. 安装 Python 3.6.0/pip
+### 7.5. 安装 Python 3.6.2/pip
 
 ```sh
-cd /usr/src/Python-3.6.0/
+cd /usr/src/Python-3.6.2/
 ./configure --prefix=/usr/local && make && make altinstall
 python3.6 --version
 easy_install-3.6 pip
