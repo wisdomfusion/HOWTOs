@@ -99,15 +99,157 @@ yum -y install nginx
 
 ```sh
 rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-yum -y install php71w-common php71w-cli php71w-fpm php71w-gd php71w-mbstring php71w-mcrypt php71w-mysqlnd php71w-opcache php71w-pdo php71w-xml
+yum -y install php71w-common php71w-cli php71w-fpm php71w-gd php71w-mbstring php71w-mcrypt php71w-mysqlnd php71w-opcache php71w-pecl-mongodb php71w-pecl-redis php71w-pecl-xdebug php71w-pdo php71w-xml ImageMagick php71w-pecl-imagick
 ```
 
-yum -y install redis
-
-## 安装 MySQL（Percona 分支
+## 安装 MySQL（Percona 分支）
 
 ```sh
 yum install http://www.percona.com/downloads/percona-release/redhat/0.1-4/percona-release-0.1-4.noarch.rpm
 yum install Percona-Server-server-57
 ```
+
+## 安装 Redis
+
+```sh
+yum -y install redis
+```
+
+## 安装 MongoDB
+
+```sh
+mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.2 /opt/mongodb
+
+cat > /etc/mongod.conf <<'EOF'
+# mongod.conf
+dbpath=/data/mongodb
+
+port = 27017
+
+#where to log
+logpath=/data/log/mongodb.log
+logappend = true
+
+#rest = true
+
+verbose = true
+## for log , more verbose
+##vvvvv = true
+#
+##profile = 2
+##slowms = 10
+
+# fork and run in background
+fork = true
+
+# Disables write-ahead journaling
+# nojournal = true
+
+# Enables periodic logging of CPU utilization and I/O wait
+#cpu = true
+
+# Turn on/off security.  Off is currently the default
+#noauth = true
+#auth = true
+
+# Verbose logging output.
+#verbose = true
+
+# Inspect all client data for validity on receipt (useful for
+# developing drivers)
+#objcheck = true
+
+# Enable db quota management
+#quota = true
+
+# Set oplogging level where n is
+#   0=off (default)
+#   1=W
+#   2=R
+#   3=both
+#   7=W+some reads
+#oplog = 0
+
+# Ignore query hints
+#nohints = true
+
+# Disable the HTTP interface (Defaults to localhost:27018).
+nohttpinterface = true
+
+# Turns off server-side scripting.  This will result in greatly limited
+# functionality
+#noscripting = true
+
+# Turns off table scans.  Any query that would do a table scan fails.
+#notablescan = true
+
+# Disable data file preallocation.
+#noprealloc = true
+
+# Specify .ns file size for new databases.
+# nssize = <size>
+
+# Accout token for Mongo monitoring server.
+#mms-token = <token>
+
+# Server name for Mongo monitoring server.
+#mms-name = <server-name>
+
+# Ping interval for Mongo monitoring server.
+#mms-interval = <seconds>
+
+# Replication Options
+
+# in replicated mongo databases, specify here whether this is a slave or master
+#slave = true
+#source = master.example.com
+# Slave only: specify a single database to replicate
+#only = master.example.com
+# or
+#master = true
+#source = slave.example.com
+EOF
+
+mkdir -p /data/mongodb/
+```
+
+禁用大内存页面：
+```sh
+echo never > /sys/kernel/mm/transparent_hugepage/enabled
+echo never > /sys/kernel/mm/transparent_hugepage/defrag
+
+cat >> /etc/rc.local <<'EOF'
+
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+   echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+   echo never > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+
+EOF
+```
+
+mongodb 相关命令：
+```sh
+export PATH=$PATH:/opt/mongodb/bin
+echo 'export PATH=$PATH:/opt/mongodb/bin' >> ~/.bashrc
+```
+
+随机启动 mongod：
+```sh
+echo '/opt/mongodb/bin/mongod --config /etc/mongod.conf' >> /etc/rc.local
+```
+
+运行：
+```sh
+/opt/mongodb/bin/mongod --config /etc/mongod.conf
+```
+
+关闭：
+```sh
+pkill mongod
+```
+
+
 

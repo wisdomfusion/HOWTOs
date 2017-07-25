@@ -18,12 +18,12 @@
 
 所需软件包：
 
-- nginx-1.10.3.tar.gz
-- php-7.1.2.tar.gz
-- percona-server-5.7.17-11.tar.gz (本文采用 Percona 分支，和原生 MySQL 完全兼容，可直接套用安装方法)
-- redis-3.2.8.tar.gz
-- node-v6.10.0.tar.gz
-- Python-3.6.0.tgz 
+- nginx-1.12.1.tar.gz
+- php-7.1.7.tar.gz
+- percona-server-5.7.18-15.tar.gz (本文采用 Percona 分支，和原生 MySQL 完全兼容，可直接套用安装方法)
+- redis-4.0.1.tar.gz
+- node-v6.11.1.tar.gz
+- Python-3.6.2.tgz 
 
 相关库：
 
@@ -36,7 +36,7 @@
 - pcre-8.39.tar.gz
 - redis-3.1.1.tgz
 - libedit-20160903-3.1.tar.gz
-- mongodb-1.2.5.tgz
+- mongodb-1.2.9.tgz
     
 ## 2. 系统基本设定
 
@@ -100,7 +100,7 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 下载：
 ```sh
 cd /usr/src/
-wget http://nginx.org/download/nginx-1.10.3.tar.gz
+wget http://nginx.org/download/nginx-1.12.1.tar.gz
 wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
 wget https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
@@ -108,16 +108,16 @@ wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
 wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
 wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
-wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.40.tar.gz
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3.tgz
-wget http://download.redis.io/releases/redis-3.2.8.tar.gz
-wget https://pecl.php.net/get/redis-3.1.1.tgz
+wget http://download.redis.io/releases/redis-4.0.1.tar.gz
+wget http://pecl.php.net/get/redis-3.1.3.tgz
 wget http://thrysoee.dk/editline/libedit-20160903-3.1.tar.gz
-wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.2.tgz
-wget https://pecl.php.net/get/mongodb-1.2.6.tgz
-wget https://nodejs.org/dist/v6.10.0/node-v6.10.0.tar.gz
-wget http://mirrors.sohu.com/python/3.6.0/Python-3.6.0.tgz
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.6.tgz
+wget http://pecl.php.net/get/mongodb-1.2.9.tgz
+wget https://nodejs.org/dist/v6.11.1/node-v6.11.1.tar.gz
+wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz
 ```
 
 全部解压：
