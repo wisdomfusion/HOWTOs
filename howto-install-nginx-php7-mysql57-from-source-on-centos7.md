@@ -1084,7 +1084,7 @@ su elastic
 
 安装：
 ```sh
-mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.2 /opt/mongodb
+mv /usr/src/mongodb-linux-x86_64-rhel70-3.4.6 /opt/mongodb
 
 cat > /etc/mongod.conf <<'EOF'
 # mongod.conf
