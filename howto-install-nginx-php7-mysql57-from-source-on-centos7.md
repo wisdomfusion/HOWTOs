@@ -6,7 +6,7 @@
 - 主机IP地址：192.168.187.10
 - 软件包下载到 `/usr/src/` 目录下
 - 所有软件包安装在 `/opt/` 目录下
-- `/data/mysql/` 存放MySQL数据
+- `/data/mysql/` 存放MySQL数据，类似的还有 `/data/redis` 和 `/data/mongodb` 等
 - `/data/www/` 存放网站数据
 - `/data/log/` 存放网站日志
 
