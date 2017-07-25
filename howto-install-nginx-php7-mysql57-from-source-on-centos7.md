@@ -30,9 +30,6 @@
 - ImageMagick.tar.gz
 - imagick-3.4.3.tgz
 - libiconv-1.14.tar.gz
-- libmcrypt-2.5.8.tar.gz
-- mcrypt-2.6.8.tar.gz
-- mhash-0.9.9.9.tar.gz
 - pcre-8.39.tar.gz
 - redis-3.1.3.tgz
 - libedit-20160903-3.1.tar.gz
@@ -105,9 +102,6 @@ wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
 wget https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
 wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
-wget http://downloads.sourceforge.net/mcrypt/libmcrypt-2.5.8.tar.gz
-wget http://downloads.sourceforge.net/mcrypt/mcrypt-2.6.8.tar.gz
-wget http://downloads.sourceforge.net/mhash/mhash-0.9.9.9.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3.tgz
