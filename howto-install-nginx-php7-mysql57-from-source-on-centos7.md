@@ -19,21 +19,19 @@
 所需软件包：
 
 - nginx-1.12.1.tar.gz
-- php-7.1.7.tar.gz
-- percona-server-5.7.18-15.tar.gz (本文采用 Percona 分支，和原生 MySQL 完全兼容，可直接套用安装方法)
+- php-7.1.9.tar.gz
+- percona-server-5.7.19-17.tar.gz (本文采用 Percona 分支，和原生 MySQL 完全兼容，可直接套用安装方法)
 - redis-4.0.1.tar.gz
-- node-v6.11.1.tar.gz
+- node-v6.11.3.tar.gz
 - Python-3.6.2.tgz 
 
 相关库：
 
-- ImageMagick.tar.gz
-- imagick-3.4.3.tgz
-- libiconv-1.14.tar.gz
-- pcre-8.39.tar.gz
-- redis-3.1.3.tgz
-- libedit-20160903-3.1.tar.gz
-- mongodb-1.2.9.tgz
+- [ImageMagick.tar.gz](https://www.imagemagick.org/download/ImageMagick.tar.gz)
+- [imagick-3.4.3.tgz](http://pecl.php.net/get/imagick-3.4.3.tgz)
+- [libiconv-1.15.tar.gz](https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz)
+- [pcre-8.41.tar.gz](ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz)
+- [libedit-20170329-3.1.tar.gz](http://thrysoee.dk/editline/libedit-20170329-3.1.tar.gz)
     
 ## 2. 系统基本设定
 
@@ -98,19 +96,16 @@ yum -y install gcc gcc-c++ autoconf automake cmake zlib zlib-devel compat-libstd
 ```sh
 cd /usr/src/
 wget http://nginx.org/download/nginx-1.12.1.tar.gz
-wget -O php-7.1.2.tar.gz http://cn2.php.net/distributions/php-7.1.2.tar.gz
+wget -O php-7.1.9.tar.gz http://cn2.php.net/distributions/php-7.1.9.tar.gz
 wget https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz
-wget https://www.percona.com/downloads/Percona-Server-5.7/Percona-Server-5.7.17-11/source/tarball/percona-server-5.7.17-11.tar.gz
+wget https://www.percona.com/downloads/Percona-Server-LATEST/Percona-Server-5.7.19-17/source/tarball/percona-server-5.7.19-17.tar.gz
 wget http://ftp.gnu.org/gnu/libiconv/libiconv-1.15.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz
 wget http://www.imagemagick.org/download/ImageMagick.tar.gz
 wget https://pecl.php.net/get/imagick-3.4.3.tgz
 wget http://download.redis.io/releases/redis-4.0.1.tar.gz
-wget http://pecl.php.net/get/redis-3.1.3.tgz
-wget http://thrysoee.dk/editline/libedit-20160903-3.1.tar.gz
-wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-3.4.6.tgz
-wget http://pecl.php.net/get/mongodb-1.2.9.tgz
-wget https://nodejs.org/dist/v6.11.1/node-v6.11.1.tar.gz
+wget http://thrysoee.dk/editline/libedit-20170329-3.1.tar.gz
+wget https://nodejs.org/dist/v6.11.3/node-v6.11.3.tar.gz
 wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz
 ```
 
@@ -190,7 +185,7 @@ cd /usr/src/
 tar zxf boost_1_59_0.tar.gz -C /usr/local/
 ```
 
-**安装 MySQL I**（默认 utf8 字符集）：
+**安装 MySQL**（默认 utf8 字符集）：
 
 ```
 cd /usr/src/percona-server-5.7.*/
@@ -521,16 +516,6 @@ cd /usr/src/imagick-*/
 /opt/php7/bin/phpize
 ./configure --with-php-config=/opt/php7/bin/php-config
 make && make install
-
-cd /usr/src/redis-3.1.3/
-/opt/php7/bin/phpize
-./configure --with-php-config=/opt/php7/bin/php-config
-make && make install
-
-cd /usr/src/mongodb-1.2.9/
-/opt/php7/bin/phpize
-./configure --with-php-config=/opt/php7/bin/php-config
-make && make install
 ```
 
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
@@ -544,8 +529,6 @@ vi /opt/php7/lib/php.ini
     ; extension_dir = "ext"
     extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20151012/"
     extension=imagick.so
-    extension=redis.so
-    extension=mongodb.so
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
@@ -1023,7 +1006,7 @@ Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 
 ```sh
 cat >> /etc/profile <<'EOF'
 
-export JAVA_HOME=/usr/local/jdk1.8.0_141
+export JAVA_HOME=/usr/local/jdk1.8.0_144
 export JRE_HOME=${JAVA_HOME}/jre
 export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 export PATH=${JAVA_HOME}/bin:${PATH}
@@ -1375,7 +1358,7 @@ echo "exclude=kernel*" >> /etc/yum.conf
 
 ```sh
 cd /usr/src/
-wget https://nodejs.org/dist/v6.11.1/node-v6.11.1.tar.gz
+wget https://nodejs.org/dist/v6.11.3/node-v6.11.3.tar.gz
 cd node-v6.11.1/
 ./configure
 make && make install
