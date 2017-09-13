@@ -87,7 +87,7 @@ EOF
 ```sh
 sudo -s
 LANG=C
-yum -y install gcc gcc-c++ autoconf automake cmake bison zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel libmcrypt libmcrypt-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+yum -y install gcc gcc-c++ autoconf automake cmake bison zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
 ```
 
 ### 3.2. 下载所需软件包
@@ -133,43 +133,8 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 
 ## 4. 安装
 
-### 4.1. 相关库
 
-#### libiconv
-
-```sh
-cd /usr/src/libiconv-*/
-./configure && make && make install
-```
-
-#### mhash
-
-```sh
-cd /usr/src/mhash-*/
-./configure && make && make install
-```
-
-#### libcrypt
-
-```sh
-cd /usr/src/libmcrypt-*/
-./configure && make && make install
-/sbin/ldconfig
-cd libltdl/
-./configure --enable-ltdl-install
-make && make install
-echo "/usr/local/lib" >> /etc/ld.so.conf
-/sbin/ldconfig
-```
-
-#### mcrypt
-
-```sh
-cd /usr/src/mcrypt-*/
-./configure && make && make install
-```
-
-### 4.2. 安装 MySQL 5.7
+### 4.1. 安装 MySQL 5.7
 
 正式安装前先建立 `mysql:mysql` 用户：
 
@@ -185,7 +150,9 @@ cd /usr/src/
 tar zxf boost_1_59_0.tar.gz -C /usr/local/
 ```
 
-**安装 MySQL**（默认 utf8 字符集）：
+以上步骤已安装开发工具供软件编译用，但 MySQL 编译同时需要安装 `cmake` 及 `bison`，继续以下步骤前请确保已安装这两个开发软件包。
+
+**安装 MySQL I**（默认 utf8 字符集）：
 
 ```
 cd /usr/src/percona-server-5.7.*/
@@ -376,6 +343,70 @@ DBROOTPWD=123456
 /etc/init.d/mysqld stop
 ```
 
+### 4.2. 开始安装 PHP 前的准备
+
+添加或启用 PHP 的特性和扩展需要事先安装相关的库：
+
+#### libiconv
+
+```sh
+cd /usr/src/libiconv-*/
+./configure --prefix=/usr/local
+make && make install
+```
+
+#### mhash
+
+```sh
+cd /usr/src/mhash-*/
+./configure && make && make install
+```
+
+#### libcrypt
+
+```sh
+cd /usr/src/libmcrypt-*/
+./configure && make && make install
+/sbin/ldconfig
+cd libltdl/
+./configure --enable-ltdl-install
+make && make install
+echo "/usr/local/lib" >> /etc/ld.so.conf
+/sbin/ldconfig
+```
+
+还没完，如果有事先系统中存在旧版本的 libmcrypy，在后续安装 mcrypt 的时候，如提示如下错误：
+
+```
+*** 'libmcrypt-config --version' returned 2.4.0, but LIBMCRYPT (2.5.8)
+*** was found! If libmcrypt-config was correct, then it is best
+*** to remove the old version of LIBMCRYPT. You may also be able to fix the error
+*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing
+*** /etc/ld.so.conf. Make sure you have run ldconfig if that is
+*** required on your system.
+*** If libmcrypt-config was wrong, set the environment variable LIBMCRYPT_CONFIG
+*** to point to the correct copy of libmcrypt-config, and remove the file config.cache
+*** before re-running configure
+configure: error: *** libmcrypt was not found
+```
+
+版本不匹配，找的不是我们新安装的 libmcrypt，系统中存在旧版本 libmcrypt，执行如下几条 `ln` 命令修正之：
+
+```sh
+ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+ln -s /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
+ln -s /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
+ln -s /usr/local/bin/libmcrypt-config /usr/bin/libmcrypt-config
+```
+
+#### mcrypt
+
+```sh
+cd /usr/src/mcrypt-*/
+./configure && make && make install
+```
+
 ### 4.3. 安装 PHP7
 
 先建立 www:www 用户：
@@ -401,33 +432,45 @@ cd /usr/src/php-7.*/
 --with-mysqli=mysqlnd \
 --enable-pdo \
 --with-pdo-mysql=mysqlnd \
---enable-opcache \
---enable-pcntl \
---enable-mbstring \
---enable-soap \
---enable-zip \
---enable-calendar \
---enable-bcmath \
---enable-exif \
---enable-ftp \
---enable-intl \
---enable-xml \
---enable-sockets \
---with-xmlrpc \
---with-openssl \
---with-zlib \
 --enable-mbregex \
---with-curl \
---with-gd \
---with-zlib-dir=/usr/lib \
---with-png-dir=/usr/lib \
---with-jpeg-dir=/usr/lib \
---with-freetype-dir=/usr/include/freetype2/ \
---with-gettext \
+--with-zlib-dir \
+--with-png-dir \
+--with-jpeg-dir \
+--with-freetype-dir \
 --with-mhash \
 --with-mcrypt \
---with-ldap \
 --with-readline \
+--enable-bcmath \
+--with-bz2 \
+--enable-calendar \
+--with-curl \
+--enable-exif \
+--enable-ftp \
+--with-gd \
+--enable-gd-jis-conv \
+--enable-gd-native-ttf \
+--with-gettext \
+--with-gmp \
+--with-iconv \
+--enable-intl \
+--with-ldap \
+--enable-mbstring \
+--enable-session \
+--enable-shmop \
+--enable-soap \
+--enable-sockets \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
+--enable-opcache \
+--with-openssl \
+--enable-pcntl \
+--with-zlib \
+--enable-zip \
+--with-xmlrpc \
+--enable-xml \
+--disable-debug \
+--disable-phpdbg \
 --disable-ipv6
 ```
 
