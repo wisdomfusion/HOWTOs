@@ -31,6 +31,7 @@
 - [imagick-3.4.3.tgz](http://pecl.php.net/get/imagick-3.4.3.tgz)
 - [libiconv-1.15.tar.gz](https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz)
 - [pcre-8.41.tar.gz](ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz)
+- [zlib](http://zlib.net/zlib-1.2.11.tar.gz)
 - [libedit-20170329-3.1.tar.gz](http://thrysoee.dk/editline/libedit-20170329-3.1.tar.gz)
     
 ## 2. 系统基本设定
@@ -572,6 +573,25 @@ cd /usr/src/xdebug-*/
 make && make install
 ```
 
+修改 php.ini，添加 Xdebug 配置：
+
+```
+[Xdebug]
+zend_extension="/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"
+xdebug.remote_enable=1
+xdebug.remote_port=9000
+xdebug.profiler_enable=1
+xdebug.profiler_output_dir="/tmp/xdebug"
+```
+
+事先建好 Xdebug 输出目录：
+
+```
+mkdir -p /tmp/xdebug
+chown www:www /tmp/xdebug
+chmod 777 /tmp/xdebug
+```
+
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
 
 ```sh
@@ -583,7 +603,6 @@ vi /opt/php7/lib/php.ini
     ; extension_dir = "ext"
     extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"
     extension = "imagick.so"
-    zend_extension = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
@@ -601,7 +620,7 @@ vi /opt/php7/lib/php.ini
 
 ```sh
 sed -i \
--e '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension = "imagick.so"\nzend_extension = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"' \
+-e '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension = "imagick.so"' \
 -e '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' \
 /opt/php7/lib/php.ini
 ```
