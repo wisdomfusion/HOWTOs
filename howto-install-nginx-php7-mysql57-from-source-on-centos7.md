@@ -87,7 +87,7 @@ EOF
 ```sh
 sudo -s
 LANG=C
-yum -y install gcc gcc-c++ autoconf automake cmake bison zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libXpm libXpm-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
+yum -y install gcc gcc-c++ autoconf automake cmake bison zlib zlib-devel compat-libstdc++-33 glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libtiff-devel gd gd-devel libxml2 libxml2-devel libxslt libxslt-devel libXpm libXpm-devel readline-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers pam-devel libicu libicu-devel
 ```
 
 ### 3.2. 下载所需软件包
@@ -582,8 +582,8 @@ vi /opt/php7/lib/php.ini
 
     ; extension_dir = "ext"
     extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"
-    extension=imagick.so
-    extension=xdebug.so
+    extension = "imagick.so"
+    zend_extension = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
@@ -601,7 +601,7 @@ vi /opt/php7/lib/php.ini
 
 ```sh
 sed -i \
--e '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension=imagick.so\nextension=redis.so\nextension=mongodb.so' \
+-e '/; extension_dir = "ext"/a\extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"\nextension = "imagick.so"\nzend_extension = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"' \
 -e '/\[opcache\]/a\\nzend_extension=opcache.so\nopcache.enable=1\nopcache.memory_consumption=256\nopcache.interned_strings_buffer=8\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\nopcache.fast_shutdown=1\n' \
 /opt/php7/lib/php.ini
 ```
@@ -617,6 +617,11 @@ cd /usr/src/pcre-*/
 ./configure && make && make install
 ```
 
+如需安装 Perl 语言支持，需要安装如下软件包，同时在 nginx 编译选项中添加 `--with-http_perl_module`：
+```
+yum install perl-ExtUtils-Embed
+```
+
 配置并安装 nginx：
 
 ```sh
@@ -625,16 +630,33 @@ cd /usr/src/nginx-*/
 --prefix=/opt/nginx \
 --user=www \
 --group=www \
+--with-threads \
 --with-http_v2_module \
---with-http_sub_module \
 --with-http_ssl_module \
+--with-http_realip_module \
+--with-http_stub_status_module \
+--with-http_xslt_module=dynamic \
+--with-http_sub_module \
+--with-http_dav_module \
+--with-http_flv_module \
+--with-http_mp4_module \
 --with-http_gunzip_module \
 --with-http_gzip_static_module \
---with-http_realip_module \
---with-http_flv_module \
---with-http_stub_status_module \
---with-http_addition_module
+--with-http_auth_request_module \
+--with-http_random_index_module \
+--with-http_secure_link_module \
+--with-http_degradation_module \
+--with-http_slice_module \
+--with-http_image_filter_module=dynamic \
+--with-http_addition_module \
+--with-pcre=../pcre-8.41 \
+--with-pcre-jit \
+--with-zlib=../zlib-1.2.11 \
+--with-http_perl_module
 make && make install
+
+cp man/nginx.8 /usr/share/man/man8
+gzip /usr/share/man/man8/nginx.8
 ```
 
 启动脚本：
@@ -1056,7 +1078,7 @@ cd /usr/src/node-*/
 
 ### 5.6. 安装 Elasticsearch
 
-Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u141-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_141`，配置 JDK 环境：
+Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u144-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_144`，配置 JDK 环境：
 
 ```sh
 cat >> /etc/profile <<'EOF'
@@ -1474,6 +1496,5 @@ cat >> ~/.bashrc <<'EOF'
 
 export PATH=$PATH:/opt/php7/bin
 export PATH=$PATH:/opt/mysql/bin
-export PATH=$PATH:/opt/redis/src
 EOF
 ```
