@@ -549,6 +549,8 @@ chkconfig php-fpm on
 
 PHP 模块安装：
 
+ImageMagick
+
 ```sh
 cd /usr/src/ImageMagick-*/
 ./configure && make && make install
@@ -561,6 +563,15 @@ cd /usr/src/imagick-*/
 make && make install
 ```
 
+Xdebug（生产环境不要安装这个扩展）
+
+```
+cd /usr/src/xdebug-*/
+/opt/php7/bin/phpize
+./configure --enable-xdebug --with-php-config=/opt/php7/bin/php-config
+make && make install
+```
+
 编译安装好模块，还要在 `php.ini` 里添加这些模块，使之生效：
 
 ```sh
@@ -570,8 +581,9 @@ vi /opt/php7/lib/php.ini
 配置项：
 
     ; extension_dir = "ext"
-    extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20151012/"
+    extension_dir = "/opt/php7/lib/php/extensions/no-debug-non-zts-20160303/"
     extension=imagick.so
+    extension=xdebug.so
 
 再次注意 `php.ini` 的位置，这个真的很重要！
 
