@@ -31,7 +31,7 @@
 - [imagick-3.4.3.tgz](http://pecl.php.net/get/imagick-3.4.3.tgz)
 - [libiconv-1.15.tar.gz](https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz)
 - [pcre-8.41.tar.gz](ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.41.tar.gz)
-- [zlib](http://zlib.net/zlib-1.2.11.tar.gz)
+- [zlib-1.2.11.tar.gz](http://zlib.net/zlib-1.2.11.tar.gz)
 - [libedit-20170329-3.1.tar.gz](http://thrysoee.dk/editline/libedit-20170329-3.1.tar.gz)
     
 ## 2. 系统基本设定
@@ -42,14 +42,15 @@
 
 ```sh
 cat /etc/sysconfig/network-scripts/ifcfg-eth0
-DEVICE=eth0
-TYPE=Ethernet
-ONBOOT=yes
-BOOTPROTO=static
-IPADDR=192.168.1.11
-NETMASK=255.255.255.0
-GATEWAY=192.168.1.1
 ```
+
+    DEVICE=eth0
+    TYPE=Ethernet
+    ONBOOT=yes
+    BOOTPROTO=static
+    IPADDR=192.168.1.11
+    NETMASK=255.255.255.0
+    GATEWAY=192.168.1.1
 
 DNS 服务器：
 
@@ -79,6 +80,13 @@ cat >> /etc/security/limits.conf <<EOF
 * soft nofile 65536
 * hard nofile 65536
 EOF
+```
+
+### 2.5. 时区
+
+```sh
+mv /etc/localtime{,.bak}
+ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 ```
 
 ## 3. 安装前的准备
