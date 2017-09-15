@@ -1096,14 +1096,7 @@ chkconfig redis_6379 on
 /etc/init.d/redis_6379 start
 ```
 
-### 5.5. node.js
-
-```sh
-cd /usr/src/node-*/
-./configure && make && make install
-```
-
-### 5.6. 安装 Elasticsearch
+### 5.5. 安装 Elasticsearch
 
 Elasticsearch 是 JVM 平台的开源搜索引擎，安装它之前要先安装 Java 环境，下载 `jdk-8u144-linux-x64.tar.gz`，解压至 `/usr/local/jdk1.8.0_144`，配置 JDK 环境：
 
@@ -1161,7 +1154,7 @@ su elastic
 /opt/es/bin/elasticsearch -d
 ```
 
-### 5.7. 安装 mongodb
+### 5.6. 安装 mongodb
 
 安装：
 ```sh
