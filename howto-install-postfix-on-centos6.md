@@ -847,7 +847,7 @@ mysql> flush privileges;
 
 启动虚拟域以后，需要注释掉 myhostname，mydestination，mydomain，myorigin 几个指令；当然，你也可以把 mydestination 的值改成自己需要的。
 
-**需要注意的是 MySQL 5.7 改动比较大，**而 extmail/extman 又太老，最新一版好像是 2009 年更新的吧，如果用 MySQL 5.7 的话需要调整一下：
+**需要注意的是 MySQL 5.7 改动比较大**，而 extmail/extman 又太老，最新一版好像是 2009 年更新的吧，如果用 MySQL 5.7 的话需要调整一下：
 
 ```sql
 cat > extmail.sql <<\EOF
@@ -1105,14 +1105,13 @@ yum -y install rrdtool rrdtool-perl
 
 **注意！！！**
 
-立即删除这个系统环境探针 CGI 脚本，[官方][extmail]称 [WooYun] 上有爆该文件存在可执行任意脚本的漏洞：
+立即删除这个系统环境探针 CGI 脚本，[官方][extmail]称该文件存在可执行任意脚本的漏洞：
 
 ```sh
 rm /var/www/extsuite/extmail/cgi/env.cgi
 ```
 
 [extmail]: http://www.extmail.org/
-[WooYun]: http://www.wooyun.org/
 
 ### 3.7. maildrop
 
