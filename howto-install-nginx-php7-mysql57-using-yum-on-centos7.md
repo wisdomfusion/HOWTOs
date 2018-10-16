@@ -67,11 +67,17 @@ setenforce 0
 sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
+重启后，查看 SELinux 状态：
+```sh
+# sestatus
+SELinux status:                 disabled
+```
+
 ## 进程打开文件数
 
 ```sh
 ulimit -n 65535
-sed -i 's/^#DefaultLimitNOFILE=.*$/DefaultLimitNOFILE=65535/' /etc/systemd/system.conf
+sed -i '/DefaultLimitNOFILE/c\DefaultLimitNOFILE=65535' /etc/systemd/system.conf
 ```
 
 ## systemd 日志永久保存
