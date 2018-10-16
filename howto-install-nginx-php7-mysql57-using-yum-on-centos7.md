@@ -128,18 +128,66 @@ yum -y install php71w-cli php71w-fpm php71w-mysqlnd php71w-pdo php71w-opcache ph
 
 ## Web Server Integration
 
+Create `www` user and group:
 ```sh
 /usr/sbin/groupadd www
 /usr/sbin/useradd -g www -s /sbin/nologin www
+```
 
+Create necessary dirs:
+```sh
+mkdir -p /data/logs/{php,nginx}
+mkdir -p /data/www
+chown www:www /data/www
+```
+
+nginx global configs, especially user, log format, and log location:
+```sh
+mv /etc/nginx/nginx.conf{,_bak}
+cat > /etc/nginx/nginx.conf <<'EOF'
+user www www;
+worker_processes  4;
+
+error_log  /data/logs/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] $host "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" $upstream_addr $request_time $upstream_response_time';
+
+    access_log  /data/logs/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+```
+
+nginx server config:
+```sh
+mv /etc/nginx/conf.d/default.conf{,_bak}
 cat > /etc/nginx/conf.d/default.conf <<'EOF'
 server {
     listen       80;
     server_name  localhost;
     index        index.html index.php;
-    root         /web/www/;
+    root         /data/www;
 
-    access_log  /web/logs/nginx/access.log  main;
+    access_log  /data/logs/nginx/access.log  main;
 
     location ~ \.php$ {
         fastcgi_pass   127.0.0.1:9000;
@@ -151,13 +199,60 @@ server {
 EOF
 ```
 
+Change php-fpm process user:
+```sh
+sed -i -e '/^user = apache/c\user = www' -e '/^group = apache/c\group = www' /etc/php-fpm.d/www.conf
+```
+
+Enable and start nginx and php-fpm service:
+```sh
+systemctl enable nginx.service
+systemctl start nginx.service
+systemctl enable php-fpm.service
+systemctl start php-fpm.service
+```
+
+Disable opcache for development environment:
+```sh
+sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/opcache.ini
+systemctl reload php-fpm.service
+```
+
+Test static web page and PHP application
+
+```sh
+cat > /data/www/test.html <<'EOF'
+<h1>It works.</h1>
+EOF
+
+cat > /data/www/phpinfo.php <<'EOF'
+<?php phpinfo();
+EOF
+
+chown www:www /data/www/*
+```
+
 
 ## Install Percona Server for MySQL 5.7
 
 ```sh
 cd /opt
 wget https://www.percona.com/downloads/Percona-Server-LATEST/Percona-Server-5.7.23-23/binary/tarball/Percona-Server-5.7.23-23-Linux.x86_64.ssl101.tar.gz
-tar zxvf Percona-Server-5.7.23-23-Linux.x86_64.ssl101.tar.gz -C /opt/mysql
+tar zxvf Percona-Server-5.7.23-23-Linux.x86_64.ssl101.tar.gz
+mv Perlcona-Server*/ mysql
+```
+
+```sh
+/usr/sbin/groupadd mysql
+/usr/sbin/useradd -g mysql -s /sbin/nologin mysql
+```
+
+```sh
+mkdir -p /data/mysql/data
+touch /data/mysql/mysql-error.log
+chown -R mysql:mysql /data/mysql
+mkdir -p /data/logs/binlogs
+chown mysql:mysql /data/logs/binlogs
 ```
 
 my.cnf
@@ -166,7 +261,7 @@ my.cnf
 cat > /opt/mysql/my.cnf <<'EOF'
 !include .my.cnf
 
-# only certain clients support default-character-set
+#only certain clients support default-character-set
 [mysql]
 prompt = 'mysql \u@[\h:\p \d] > '
 default-character-set = utf8mb4
@@ -182,20 +277,20 @@ default-character-set = utf8mb4
 default-character-set = utf8mb4
 
 [mysqld_safe]
-log-error = /web/mysql/mysql-error.log
+log-error = /data/mysql/mysql-error.log
 
 [mysqld]
 ssl=0
 server-id = 1
 
-# chain specific settings
+#chain specific settings
 port = 3306
 socket = /tmp/mysql.sock
 basedir = /opt/mysql
-datadir = /web/mysql/data
-pid-file = /web/mysql/data/mysql.pid
+datadir = /data/mysql/data
+pid-file = /data/mysql/mysql.pid
 
-# common InnoDB/XtraDB settings
+#common InnoDB/XtraDB settings
 #innodb_buffer_pool_instances=4(default=8)
 innodb_buffer_pool_size = 32768M  # x 1.2 + 2GB for OS = 16.4GB node w/o MyISAM
 innodb_log_file_size = 256M  # suitable for most environments
@@ -204,10 +299,10 @@ innodb_flush_method = O_DIRECT
 innodb_file_per_table = 1
 default-storage-engine = innodb
 
-# enable gtid mode
+#enable gtid mode
 
-# Percona Server enhancements
-#  http://www.percona.com/doc/percona-server
+#Percona Server enhancements
+#http://www.percona.com/doc/percona-server
 innodb_empty_free_list_algorithm = backoff
 innodb_buffer_pool_dump_pct=30          #5.7 new
 innodb_buffer_pool_load_at_startup = 1  #5.7 new
@@ -218,7 +313,7 @@ log_slow_verbosity = full
 userstat = ON  # 5.5.10-20.1 introduced
 kill_idle_transaction = 5
 
-# common business settings
+#common business settings
 back_log = 500
 max_connections = 3000  # should be easy job in a big server
 max_connect_errors = 100000
@@ -234,7 +329,7 @@ open_files_limit = 65535
 gtid_mode = ON
 enforce-gtid-consistency = ON
 
-# common mysqld setting
+#common mysqld setting
 skip-symbolic-links
 read_only = 0
 default_password_lifetime=0
@@ -267,7 +362,7 @@ sync_relay_log_info            = 1
 
 #replication
 replicate-same-server-id = 0
-log_bin = /web/logs/binlogs/mysql-bin
+log_bin = /data/logs/binlogs/mysql-bin
 binlog-ignore-db = mysql
 binlog-ignore-db = test
 binlog-ignore-db = information_schema
@@ -285,23 +380,28 @@ slave_parallel_type = LOGICAL_CLOCK
 EOF
 ```
 
-setup MySQL
-
+MySQL startup script:
 ```sh
-cp -a /opt/mysql/support-files/mysql.server /web/mysql/mysql
-sed -i 's/^\(basedir=\).*$/\1\/opt\/mysql/' /web/mysql/mysql
-sed -i 's/^\(datadir=\).*$/\1\/web\/mysql\/data/' /web/mysql/mysql
+cp -a /opt/mysql/support-files/mysql.server /opt/mysql/mysql
+sed -i 's/^\(basedir=\).*$/\1\/opt\/mysql/' /opt/mysql/mysql
+sed -i 's/^\(datadir=\).*$/\1\/data\/mysql\/data/' /opt/mysql/mysql
+```
 
-/opt/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/web/mysql/data
+Initialize data:
+```sh
+/opt/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/data/mysql/data
+```
 
-/web/mysql/mysql start
+Change MySQL root user password:
+```sh
+/opt/mysql/mysql start
 
-DBROOTPWD=123456
+DBROOTPWD=a123456
 /opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$DBROOTPWD\" with grant option;"
 /opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$DBROOTPWD\" with grant option;"
 ```
 
-add MySQL commands to PATH
+Add MySQL commands to system PATH:
 
 ```sh
 export PATH=$PATH:/opt/mysql/bin
