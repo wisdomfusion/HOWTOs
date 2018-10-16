@@ -26,11 +26,38 @@ IPV6_PEERDNS=yes
 IPV6_PEERROUTES=yes
 IPV6_PRIVACY=no
 
-IPADDR=192.168.187.10
-GATEWAY=192.168.187.2
+IPADDR=192.168.10.10
+GATEWAY=192.168.10.2
 NETMASK=255.255.255.0
 DNS1=8.8.8.8
 DNS2=114.114.114.114
+```
+
+## 主机名
+
+```sh
+hostnamectl set-hostname centos.example.com
+```
+
+## 时区
+
+```sh
+timedatectl list-timezones
+timedatectl set-timezone Asia/Shanghai
+```
+
+或
+
+```sh
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+```
+
+## 时间同步
+
+```sh
+yum install -y ntp
+systemctl enable ntpd
+systemctl start ntpd
 ```
 
 ## 禁用 SELinux
@@ -40,22 +67,18 @@ setenforce 0
 sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
-## 禁用 IPv6
-
-```sh
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
-```
-
 ## 进程打开文件数
 
 ```sh
-cat >> /etc/security/limits.conf <<EOF
-* soft nproc 65536
-* hard nproc 65536
-* soft nofile 65536
-* hard nofile 65536
-EOF
+ulimit -n 65535
+sed -i 's/^#DefaultLimitNOFILE=.*$/DefaultLimitNOFILE=65535/' /etc/systemd/system.conf
+```
+
+## systemd 日志永久保存
+
+```sh
+mkdir -p /var/log/journal
+systemctl restart systemd-journald.service
 ```
 
 ## 安装 Vim 等工具
@@ -250,6 +273,3 @@ echo '/opt/mongodb/bin/mongod --config /etc/mongod.conf' >> /etc/rc.local
 ```sh
 pkill mongod
 ```
-
-
-
