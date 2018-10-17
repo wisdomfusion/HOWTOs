@@ -254,7 +254,7 @@ my.cnf
 
 ```sh
 cp -a /etc/my.cnf{,_bak}
-cat > /opt/mysql/my.cnf <<'EOF'
+cat > /etc/my.cnf <<'EOF'
 [mysql]
 prompt = 'mysql \u@[\h:\p \d] > '
 default-character-set = utf8mb4
@@ -420,7 +420,7 @@ yum install -y git
 
 ```sh
 curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
-yum -y install nodejs
+yum install -y nodejs
 ```
 
 ### phpMyAdmin
