@@ -252,8 +252,8 @@ mv Perlcona-Server*/ mysql
 mkdir -p /data/mysql/data
 touch /data/mysql/mysql-error.log
 chown -R mysql:mysql /data/mysql
-mkdir -p /data/logs/binlogs
-chown mysql:mysql /data/logs/binlogs
+mkdir -p /data/binlogs
+chown mysql:mysql /data/binlogs
 ```
 
 my.cnf
@@ -352,6 +352,14 @@ max_slowlog_size=2097152 #percona 5.7 new
 long_query_time = 1  # in seconds, determine slow query
 general_log_file = query.log  # log is deprecated as of 5.1.29
 slow_query_log_file = slow-query.log  # log_slow_queries and log_queries_not_using_index are deprecated as of 5.1.29
+
+EOF
+```
+
+Enable binlog if necessary:
+```sh
+cat >> /opt/mysql/my.cnf <<'EOF'
+#binlog
 log-bin = mysql-bin.log
 sync_binlog = 1  # BBU-backed RAID or flash
 relay-log = relay-bin.log  # auto purge by default, see relay-log-purge
@@ -363,7 +371,7 @@ sync_relay_log_info            = 1
 
 #replication
 replicate-same-server-id = 0
-log_bin = /data/logs/binlogs/mysql-bin
+log_bin = /data/binlogs/mysql-bin
 binlog-ignore-db = mysql
 binlog-ignore-db = test
 binlog-ignore-db = information_schema
