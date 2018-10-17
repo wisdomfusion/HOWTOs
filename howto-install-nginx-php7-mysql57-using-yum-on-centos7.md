@@ -236,19 +236,15 @@ chown www:www /data/www/*
 
 ## Install Percona Server for MySQL 5.7
 
-```sh
-cd /opt
-wget https://www.percona.com/downloads/Percona-Server-LATEST/Percona-Server-5.7.23-23/binary/tarball/Percona-Server-5.7.23-23-Linux.x86_64.ssl101.tar.gz
-tar zxvf Percona-Server-5.7.23-23-Linux.x86_64.ssl101.tar.gz
-mv Perlcona-Server*/ mysql
-```
+## From a Repository
 
 ```sh
-/usr/sbin/groupadd mysql
-/usr/sbin/useradd -g mysql -s /sbin/nologin mysql
-```
+yum install https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
+cp -a /etc/yum.repos.d/percona-release.repo{,_bak}
+sed -i 's!http://repo.percona.com/release/!https://mirrors.tuna.tsinghua.edu.cn/percona/release/!g' /etc/yum.repos.d/percona-release.repo
+yum makecache
+yum install -y Percona-Server-server-57
 
-```sh
 mkdir -p /data/mysql/data
 touch /data/mysql/mysql-error.log
 chown -R mysql:mysql /data/mysql
@@ -259,10 +255,8 @@ chown mysql:mysql /data/binlogs
 my.cnf
 
 ```sh
+cp -a /etc/my.cnf{,_bak}
 cat > /opt/mysql/my.cnf <<'EOF'
-!include .my.cnf
-
-#only certain clients support default-character-set
 [mysql]
 prompt = 'mysql \u@[\h:\p \d] > '
 default-character-set = utf8mb4
@@ -278,18 +272,17 @@ default-character-set = utf8mb4
 default-character-set = utf8mb4
 
 [mysqld_safe]
-log-error = /data/mysql/mysql-error.log
+log-error=/var/log/mariadb/mariadb.log
+pid-file=/var/run/mariadb/mariadb.pid
 
 [mysqld]
 ssl=0
 server-id = 1
 
-#chain specific settings
-port = 3306
-socket = /tmp/mysql.sock
-basedir = /opt/mysql
-datadir = /data/mysql/data
-pid-file = /data/mysql/mysql.pid
+datadir=/data/mysql
+pid-file=/data/mysql/mysqld.pid
+log-error=/data/mysql/mysqld.log
+socket=/var/lib/mysql/mysql.sock
 
 #common InnoDB/XtraDB settings
 #innodb_buffer_pool_instances=4(default=8)
@@ -299,8 +292,6 @@ innodb_flush_log_at_trx_commit = 2
 innodb_flush_method = O_DIRECT
 innodb_file_per_table = 1
 default-storage-engine = innodb
-
-#enable gtid mode
 
 #Percona Server enhancements
 #http://www.percona.com/doc/percona-server
@@ -352,13 +343,13 @@ max_slowlog_size=2097152 #percona 5.7 new
 long_query_time = 1  # in seconds, determine slow query
 general_log_file = query.log  # log is deprecated as of 5.1.29
 slow_query_log_file = slow-query.log  # log_slow_queries and log_queries_not_using_index are deprecated as of 5.1.29
-
 EOF
 ```
 
 Enable binlog if necessary:
 ```sh
 cat >> /opt/mysql/my.cnf <<'EOF'
+
 #binlog
 log-bin = mysql-bin.log
 sync_binlog = 1  # BBU-backed RAID or flash
@@ -385,36 +376,23 @@ relay_log_info_repository=TABLE
 slave_parallel_workers=0
 slave_preserve_commit_order=1
 slave_parallel_type = LOGICAL_CLOCK
-
 EOF
 ```
 
-MySQL startup script:
+Start MySQL:
 ```sh
-cp -a /opt/mysql/support-files/mysql.server /opt/mysql/mysql
-sed -i 's/^\(basedir=\).*$/\1\/opt\/mysql/' /opt/mysql/mysql
-sed -i 's/^\(datadir=\).*$/\1\/data\/mysql\/data/' /opt/mysql/mysql
+systemctl enable mysqld.service
+systemctl start mysqld.service
 ```
 
-Initialize data:
+Find Percona MySQL Default root password:
 ```sh
-/opt/mysql/bin/mysqld --initialize-insecure --user=mysql --basedir=/opt/mysql --datadir=/data/mysql/data
+grep "generated" /data/mysql/mysqld.log
 ```
 
-Change MySQL root user password:
+Secure MySQL installation run:
 ```sh
-/opt/mysql/mysql start
-
-DBROOTPWD=a123456
-/opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'127.0.0.1' identified by \"$DBROOTPWD\" with grant option;"
-/opt/mysql/bin/mysql -e "grant all privileges on *.* to root@'localhost' identified by \"$DBROOTPWD\" with grant option;"
-```
-
-Add MySQL commands to system PATH:
-
-```sh
-export PATH=$PATH:/opt/mysql/bin
-echo 'export PATH=$PATH:/opt/mysql/bin' >> ~/.bashrc
+/usr/bin/mysql_secure_installation
 ```
 
 ## Install Redis
