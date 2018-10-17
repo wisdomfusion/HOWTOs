@@ -236,8 +236,6 @@ chown www:www /data/www/*
 
 ## Install Percona Server for MySQL 5.7
 
-## From a Repository
-
 ```sh
 yum install https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
 cp -a /etc/yum.repos.d/percona-release.repo{,_bak}
