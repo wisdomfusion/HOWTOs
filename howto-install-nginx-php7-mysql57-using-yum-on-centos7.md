@@ -61,6 +61,15 @@ setenforce 0
 sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
+## disable firewalld
+
+```sh
+systemctl disable firewalld.service
+systemctl stop firewalld.service
+```
+
+BTW, make sure you config iptables before deploy production servers.
+
 ## open file limit
 
 ```sh
@@ -193,9 +202,13 @@ server {
 EOF
 ```
 
-Change php-fpm process user:
+Config PHP and php-fpm:
 ```sh
 sed -i -e '/^user = apache/c\user = www' -e '/^group = apache/c\group = www' /etc/php-fpm.d/www.conf
+sed -i '/^php_admin_value\[error_log\]/s!/var/log/.*$!/data/logs/php/php-fpm-www-error.log!' /etc/php-fpm.d/www.conf
+sed -i '/session.save_path/s!/var/lib/php/session!/tmp!' /etc/php-fpm.d/www.conf
+
+sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/opcache.ini
 ```
 
 Enable and start nginx and php-fpm service:
@@ -204,15 +217,6 @@ systemctl enable nginx.service
 systemctl start nginx.service
 systemctl enable php-fpm.service
 systemctl start php-fpm.service
-```
-
-Config PHP and php-fpm:
-```sh
-sed -i '/^php_admin_value\[error_log\]/s!/var/log/.*$!/data/logs/php/php-fpm-www-error.log!' /etc/php-fpm.d/www.conf
-sed -i '/session.save_path/s!/var/lib/php/session!/tmp!' /etc/php-fpm.d/www.conf
-
-sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/opcache.ini
-systemctl reload php-fpm.service
 ```
 
 Test HTML and PHP pages:
@@ -409,14 +413,8 @@ echo 'export PATH=$PATH:/opt/mysql/bin' >> ~/.bashrc
 
 ```sh
 yum install -y redis
+systemctl enable redis.service
 systemctl start redis.service
-```
-
-Confirm Redis installed successfully:
-
-```sh
-# redis-cli ping
-PONG
 ```
 
 ## Other service or software
