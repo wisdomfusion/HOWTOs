@@ -61,12 +61,6 @@ setenforce 0
 sed -i 's/^SELINUX=.*$/SELINUX=disabled/' /etc/selinux/config
 ```
 
-reboot and confirm the status:
-```sh
-# sestatus
-SELinux status:                 disabled
-```
-
 ## open file limit
 
 ```sh
@@ -212,13 +206,16 @@ systemctl enable php-fpm.service
 systemctl start php-fpm.service
 ```
 
-Disable opcache for development environment:
+Config PHP and php-fpm:
 ```sh
+sed -i '/^php_admin_value\[error_log\]/s!/var/log/.*$!/data/logs/php/php-fpm-www-error.log!' /etc/php-fpm.d/www.conf
+sed -i '/session.save_path/s!/var/lib/php/session!/tmp!' /etc/php-fpm.d/www.conf
+
 sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/opcache.ini
 systemctl reload php-fpm.service
 ```
 
-Test static web page and PHP application
+Test HTML and PHP pages:
 
 ```sh
 cat > /data/www/test.html <<'EOF'
@@ -443,3 +440,17 @@ yum install -y git
 curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 yum -y install nodejs
 ```
+
+### phpMyAdmin
+
+```sh
+cd /data/www
+wget https://files.phpmyadmin.net/phpMyAdmin/4.8.3/phpMyAdmin-4.8.3-all-languages.tar.gz
+tar zxvf phpMyAdmin-4.8.3-all-languages.tar.gz
+mv phpMyAdmin-*/ phpmyadmin/
+
+chown -R www:www phpmyadmin/
+cp -a phpmyadmin/config.sample.inc.php phpmyadmin/config.inc.php
+```
+
+Change `blowfish_secret`, `auth_type`, `host`, and other configs.
