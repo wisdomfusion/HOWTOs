@@ -103,6 +103,7 @@ echo "set fileformats=unix,dos" >> ~/.vimrc
 
 ```sh
 yum -y install epel-release
+yum makecache
 ```
 
 ## Install nginx
@@ -121,12 +122,14 @@ yum -y install nginx
 
 ## Install PHP 7
 
-use webtatic binary
-https://webtatic.com/
+Install PHP from remi repository: https://rpms.remirepo.net/
 
 ```sh
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-yum -y install php71w-cli php71w-fpm php71w-mysqlnd php71w-pdo php71w-opcache php71w-mbstring php71w-mcrypt php71w-gd php71w-pecl-imagick php71w-pecl-redis php71w-pecl-memcached php71w-pecl-mongodb php71w-xml php71w-xmlrpc php71w-process php71w-bcmath
+rpm -Uvh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum install yum-utils
+yum-config-manager --enable remi-php71
+yum install -y php php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
+yum install -y php-fpm
 ```
 
 ## Web Server Integration
@@ -144,7 +147,7 @@ mkdir -p /data/www
 chown www:www /data/www
 ```
 
-nginx global configs, especially user, log format, and log location:
+nginx global config, especially user, log format, and log location:
 ```sh
 mv /etc/nginx/nginx.conf{,_bak}
 cat > /etc/nginx/nginx.conf <<'EOF'
@@ -208,7 +211,7 @@ sed -i -e '/^user = apache/c\user = www' -e '/^group = apache/c\group = www' /et
 sed -i '/^php_admin_value\[error_log\]/s!/var/log/.*$!/data/logs/php/php-fpm-www-error.log!' /etc/php-fpm.d/www.conf
 sed -i '/session.save_path/s!/var/lib/php/session!/tmp!' /etc/php-fpm.d/www.conf
 
-sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/opcache.ini
+sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/10-opcache.ini
 ```
 
 Enable and start nginx and php-fpm service:
@@ -237,12 +240,15 @@ chown www:www /data/www/*
 ## Install Percona Server for MySQL 5.7
 
 ```sh
-yum install https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
+rpm -Uvh https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
 cp -a /etc/yum.repos.d/percona-release.repo{,_bak}
 sed -i 's!http://repo.percona.com/release/!https://mirrors.tuna.tsinghua.edu.cn/percona/release/!g' /etc/yum.repos.d/percona-release.repo
 yum makecache
 yum install -y Percona-Server-server-57
+```
 
+Create necessary dirs:
+```sh
 mkdir -p /data/mysql/data
 touch /data/mysql/mysql-error.log
 chown -R mysql:mysql /data/mysql
@@ -256,7 +262,6 @@ my.cnf
 cp -a /etc/my.cnf{,_bak}
 cat > /etc/my.cnf <<'EOF'
 [mysql]
-prompt = 'mysql \u@[\h:\p \d] > '
 default-character-set = utf8mb4
 [mysqladmin]
 default-character-set = utf8mb4
@@ -278,8 +283,8 @@ ssl=0
 server-id = 1
 
 datadir=/data/mysql
-pid-file=/data/mysql/mysqld.pid
 log-error=/data/mysql/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
 socket=/var/lib/mysql/mysql.sock
 
 #common InnoDB/XtraDB settings
@@ -385,7 +390,7 @@ systemctl start mysqld.service
 
 Find Percona MySQL Default root password:
 ```sh
-grep "generated" /data/mysql/mysqld.log
+grep "temporary password" /data/mysql/mysqld.log
 ```
 
 Secure MySQL installation run:
