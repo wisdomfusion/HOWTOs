@@ -126,10 +126,9 @@ Install PHP from remi repository: https://rpms.remirepo.net/
 
 ```sh
 rpm -Uvh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-yum install yum-utils
+yum install -y yum-utils
 yum-config-manager --enable remi-php71
-yum install -y php php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
-yum install -y php-fpm
+yum install -y php-fpm php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
 ```
 
 ## Web Server Integration
@@ -212,6 +211,8 @@ sed -i '/^php_admin_value\[error_log\]/s!/var/log/.*$!/data/logs/php/php-fpm-www
 sed -i '/session.save_path/s!/var/lib/php/session!/tmp!' /etc/php-fpm.d/www.conf
 
 sed -i '/^opcache.enable=1/c\opcache.enable=0' /etc/php.d/10-opcache.ini
+
+sed -i '/^;cgi.fix_pathinfo=/c\cgi.fix_pathinfo=0' /etc/php.ini
 ```
 
 Enable and start nginx and php-fpm service:
