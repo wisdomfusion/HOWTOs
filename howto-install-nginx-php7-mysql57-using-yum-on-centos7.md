@@ -129,7 +129,7 @@ Install PHP from remi repository: https://rpms.remirepo.net/
 rpm -ivUh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum -y install yum-utils
 yum-config-manager --enable remi-php71
-yum -y install php-fpm php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
+yum -y install php-fpm php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
 ```
 
 ## Web Server Integration
