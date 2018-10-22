@@ -49,7 +49,7 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 ## ntpd
 
 ```sh
-yum install -y ntp
+yum -y install ntp
 systemctl enable ntpd.service
 systemctl start ntpd.service
 ```
@@ -74,7 +74,7 @@ BTW, make sure you config iptables before deploy production servers.
 
 ```sh
 ulimit -n 65535
-sed -i '/DefaultLimitNOFILE/c\DefaultLimitNOFILE=65535' /etc/systemd/system.conf
+sed -i '/DefaultLimitNOFILE=/c\DefaultLimitNOFILE=65535' /etc/systemd/system.conf
 ```
 
 ## keep systemd logs
@@ -87,13 +87,13 @@ systemctl restart systemd-journald.service
 ## Vim and other tools
 
 ```sh
-yum install -y git man wget unzip zip net-tools nmap iptraf iotop htop sysstat bash-completion lrzsz
+yum -y install git man wget unzip zip net-tools nmap iptraf iotop htop sysstat bash-completion lrzsz
 ```
 
 **simple Vim configs**
 
 ```sh
-yum install -y vim-enhanced
+yum -y install vim-enhanced
 alias vi='vim'
 echo "alias vi='vim'" >> ~/.bashrc
 echo "set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936" >> ~/.vimrc
@@ -126,10 +126,10 @@ yum -y install nginx
 Install PHP from remi repository: https://rpms.remirepo.net/
 
 ```sh
-rpm -Uvh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
-yum install -y yum-utils
+rpm -ivUh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum -y install yum-utils
 yum-config-manager --enable remi-php71
-yum install -y php-fpm php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
+yum -y install php-fpm php-bcmath php-cli php-ctype php-gd php-json php-mbstring php-mcrypt php-mysqlnd php-opcache php-openssl php-nette-tokenizer php-pdo php-mbstring php-xml php-xmlrpc php-pecl-imagick php-pecl-zip
 ```
 
 ## Web Server Integration
@@ -242,11 +242,11 @@ chown www:www /data/www/*
 ## Install Percona Server for MySQL 5.7
 
 ```sh
-rpm -Uvh https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
+rpm -ivUh https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
 cp -a /etc/yum.repos.d/percona-release.repo{,_bak}
 sed -i 's!http://repo.percona.com/release/!https://mirrors.tuna.tsinghua.edu.cn/percona/release/!g' /etc/yum.repos.d/percona-release.repo
 yum makecache
-yum install -y Percona-Server-server-57
+yum -y install Percona-Server-server-57
 ```
 
 Create necessary dirs:
@@ -405,7 +405,7 @@ Secure MySQL installation run:
 ## Install Redis
 
 ```sh
-yum install -y redis
+yum -y install redis
 systemctl enable redis.service
 systemctl start redis.service
 ```
@@ -423,7 +423,7 @@ mv composer.phar /usr/local/bin/composer
 
 ```sh
 curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
-yum install -y nodejs
+yum -y install nodejs
 ```
 
 ### phpMyAdmin
@@ -439,3 +439,24 @@ cp -a phpmyadmin/config.sample.inc.php phpmyadmin/config.inc.php
 ```
 
 Change `blowfish_secret`, `auth_type`, `host`, and other configs.
+
+### Python 3.6
+
+```sh
+yum -y update
+yum -y install yum-utils
+yum -y groupinstall development
+rpm -ivUh https://centos7.iuscommunity.org/ius-release.rpm
+yum -y install python36u python36u-pip python36u-devel
+
+```
+
+### Perl 5.28.0
+
+```sh
+\curl -L https://install.perlbrew.pl | bash
+source ~/perl5/perlbrew/etc/bashrc
+echo -e '\nsource ~/perl5/perlbrew/etc/bashrc' >> ~/.bashrc
+perlbrew install 5.28.0
+perlbrew switch 5.28.0
+```
