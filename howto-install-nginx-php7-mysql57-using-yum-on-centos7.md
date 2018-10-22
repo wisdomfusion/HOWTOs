@@ -87,12 +87,13 @@ systemctl restart systemd-journald.service
 ## Vim and other tools
 
 ```sh
-yum -y install man wget unzip zip net-tools nmap iptraf iotop htop sysstat ntp vim-enhanced bash-completion lrzsz
+yum install -y git man wget unzip zip net-tools nmap iptraf iotop htop sysstat bash-completion lrzsz
 ```
 
 **simple Vim configs**
 
 ```sh
+yum install -y vim-enhanced
 alias vi='vim'
 echo "alias vi='vim'" >> ~/.bashrc
 echo "set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936" >> ~/.vimrc
@@ -325,6 +326,8 @@ open_files_limit = 65535
 gtid_mode = ON
 enforce-gtid-consistency = ON
 
+explicit_defaults_for_timestamp = ON
+
 #common mysqld setting
 skip-symbolic-links
 read_only = 0
@@ -416,19 +419,11 @@ curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 ```
 
-### Git
-
-```sh
-yum install -y git
-```
-
 ### node.js
 
 ```sh
 curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 yum install -y nodejs
-curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
-yum install -y yarn
 ```
 
 ### phpMyAdmin
