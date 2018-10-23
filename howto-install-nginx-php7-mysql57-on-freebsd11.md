@@ -79,28 +79,55 @@ netstat -an -p tcp
 ## Install ELK Stack
 
 
+## Install Samba Server to Sharing Files with Windows Client
 
-## Sharing Folders on VMware Workstation 15 Pro Between Windows 10 Host and FreeBSD 11.2 Guest
+Install Samba server:
 
 ```sh
-pkg install --yes open-vm-tools-nox11
-
-sysrc vmware_guest_vmblock_enable=yes
-sysrc vmware_guest_vmhgfs_enable=yes
-sysrc vmware_guest_vmmemctl_enable=yes
-sysrc vmware_guest_vmxnet_enable=yes
-sysrc vmware_guestd_enable=yes
-
-mkdir /data/shared
-vmhgfs-fuse .host:/shared /data/shared -o uid=`id -u www`,gid=`id -g www`,umask=0022,subtype=vmhgfs,allow_other
+pkg install --yes samba48
 ```
 
-Description of the four kernel modules:
+Create data dir:
 
-- vmemctl is driver for memory ballooning
-- vmxnet is paravirtualized network driver
-- vmhgfs is the driver that allows the shared files feature of VMware Workstation and other products that use it.
-- vmblock is block filesystem driver to provide drag-and-drop functionality from the remote console.
-- VMware Guest Daemon (guestd) is the daemon for controlling communication between the guest and the host including time synchronization.
+```sh
+mkdir -p /data/www
+chown www:www /data/www
+```
 
-vmmemctl.ko kernel driver is not available for FreeBSD 11.x in the VMware Tools distributed by VMware.
+Samba server side conif:
+
+```sh
+cat /usr/local/etc/smb4.conf
+[global]
+workgroup = WORKGROUP
+server string = Samba Server Version %v
+netbios name = freebsd_shared
+wins support = Yes
+security = user
+hosts allow = 192.168.10.
+passdb backend = tdbsam
+
+[www]
+path = /data/www
+valid users = www
+writable  = yes
+browsable = yes
+read only = no
+guest ok = no
+public = no
+create mask = 0644
+directory mask = 0755
+```
+
+Enable and start Samba server:
+
+```sh
+sysrc samba_server_enable=yes
+service samba_server start
+```
+
+Use `pdbedit` map system user to Samba user:
+
+```sh
+pdbedit -a -u www
+```
