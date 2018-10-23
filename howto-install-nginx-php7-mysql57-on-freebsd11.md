@@ -94,7 +94,7 @@ mkdir -p /data/www
 chown www:www /data/www
 ```
 
-Samba server side conif:
+Samba server config:
 
 ```sh
 cat /usr/local/etc/smb4.conf
@@ -119,7 +119,7 @@ create mask = 0644
 directory mask = 0755
 ```
 
-Enable and start Samba server:
+Enable and start Samba service:
 
 ```sh
 sysrc samba_server_enable=yes
