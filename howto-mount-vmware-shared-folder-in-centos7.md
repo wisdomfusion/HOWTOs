@@ -1,16 +1,30 @@
-# How to Mount VMWare Shared Folder in CentOS 7
+# How to Mount VMware Shared Folder in CentOS 7
 
-## Install VMWare tools
+## Add Shared Folder in VMware Preferences
 
+`shared`
 
+## Install VMWare Tools
 
+```sh
+yum install -y open-vm-tools
+```
 
-## Mount shared folder
+If you use CentOS with X11, install `open-vm-tools-desktop` too:
 
+```sh
+yum install -y open-vm-tools open-vm-tools-desktop
+```
 
+## Mount Shared Folder in CentOS Guest OS
 
-## Change ownership of VMWare shared folder
+```sh
+mkdir -p /data/shared
+/usr/bin/vmhgfs-fuse .host:/shared /data/shared -o uid=$(id -u www),gid=$(id -g www),umask=0022,subtype=vmhgfs-fuse,allow_other
+```
 
+## Umount If Necessary:
 
-
-
+```sh
+umount /data/shared
+```

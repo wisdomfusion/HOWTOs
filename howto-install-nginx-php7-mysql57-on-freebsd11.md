@@ -67,7 +67,16 @@ Verifying network sockets status:
 netstat -an -p tcp
 ```
 
+## Install Node.js
+
+
 ## Install Redis
+
+
+## Install MongoDB
+
+
+## Install ELK Stack
 
 
 
