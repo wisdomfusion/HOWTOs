@@ -90,6 +90,19 @@ service mongod start
 #TODO
 ```
 
+## Install JDK
+
+```sh
+pkg install -y openjdk8 openjdk8-jre
+mount -t fdescfs fdesc /dev/fd
+mount -t procfs proc /proc
+```
+
+Append to `/etc/fstab`:
+
+    fdesc	/dev/fd		fdescfs		rw	0	0
+    proc	/proc		procfs		rw	0	0
+
 ## Install Samba Server to Sharing Files with Windows Client
 
 Install Samba server:
@@ -105,30 +118,27 @@ mkdir -p /data/www
 chown www:www /data/www
 ```
 
-Samba server config:
+Samba server config `/usr/local/etc/smb4.conf`:
 
-```sh
-cat /usr/local/etc/smb4.conf
-[global]
-workgroup = WORKGROUP
-server string = Samba Server Version %v
-netbios name = freebsd_shared
-wins support = Yes
-security = user
-hosts allow = 192.168.10.
-passdb backend = tdbsam
+    [global]
+    workgroup = WORKGROUP
+    server string = Samba Server Version %v
+    netbios name = freebsd_shared
+    wins support = Yes
+    security = user
+    hosts allow = 192.168.10.
+    passdb backend = tdbsam
 
-[www]
-path = /data/www
-valid users = www
-writable  = yes
-browsable = yes
-read only = no
-guest ok = no
-public = no
-create mask = 0644
-directory mask = 0755
-```
+    [www]
+    path = /data/www
+    valid users = www
+    writable  = yes
+    browsable = yes
+    read only = no
+    guest ok = no
+    public = no
+    create mask = 0644
+    directory mask = 0755
 
 Enable and start Samba service:
 
