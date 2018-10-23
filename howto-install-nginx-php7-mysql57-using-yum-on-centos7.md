@@ -107,6 +107,13 @@ yum -y install epel-release
 yum makecache
 ```
 
+## Compile from source code
+
+If you need tools for compiling installation, install `Development Tools` group:
+```sh
+yum -y groupinstall "Development Tools"
+```
+
 ## Install nginx
 
 ```sh
@@ -445,18 +452,6 @@ Change `blowfish_secret`, `auth_type`, `host`, and other configs.
 ```sh
 yum -y update
 yum -y install yum-utils
-yum -y groupinstall development
 rpm -ivUh https://centos7.iuscommunity.org/ius-release.rpm
 yum -y install python36u python36u-pip python36u-devel
-
-```
-
-### Perl 5.28.0
-
-```sh
-\curl -L https://install.perlbrew.pl | bash
-source ~/perl5/perlbrew/etc/bashrc
-echo -e '\nsource ~/perl5/perlbrew/etc/bashrc' >> ~/.bashrc
-perlbrew install 5.28.0
-perlbrew switch 5.28.0
 ```
