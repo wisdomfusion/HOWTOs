@@ -429,7 +429,7 @@ mv composer.phar /usr/local/bin/composer
 ### node.js
 
 ```sh
-curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+curl --silent --location https://rpm.nodesource.com/setup_10.x | bash -
 yum -y install nodejs
 ```
 
