@@ -249,7 +249,7 @@ chown www:www /data/www/*
 ## Install Percona Server for MySQL 5.7
 
 ```sh
-rpm -ivUh https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-0.1-7.noarch.rpm
+rpm -ivUh https://mirrors.tuna.tsinghua.edu.cn/percona/release/percona-release-latest.noarch.rpm
 cp -a /etc/yum.repos.d/percona-release.repo{,_bak}
 sed -i 's!http://repo.percona.com/release/!https://mirrors.tuna.tsinghua.edu.cn/percona/release/!g' /etc/yum.repos.d/percona-release.repo
 yum makecache
@@ -437,8 +437,8 @@ yum -y install nodejs
 
 ```sh
 cd /data/www
-wget https://files.phpmyadmin.net/phpMyAdmin/4.8.3/phpMyAdmin-4.8.3-all-languages.tar.gz
-tar zxvf phpMyAdmin-4.8.3-all-languages.tar.gz
+wget https://files.phpmyadmin.net/phpMyAdmin/4.8.5/phpMyAdmin-4.8.5-all-languages.tar.gz
+tar zxvf phpMyAdmin-*.tar.gz
 mv phpMyAdmin-*/ phpmyadmin/
 
 chown -R www:www phpmyadmin/
