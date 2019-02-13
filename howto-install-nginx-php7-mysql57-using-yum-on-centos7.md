@@ -258,8 +258,7 @@ yum -y install Percona-Server-server-57
 
 Create necessary dirs:
 ```sh
-mkdir -p /data/mysql/data
-touch /data/mysql/mysql-error.log
+mkdir -p /data/mysql
 chown -R mysql:mysql /data/mysql
 mkdir -p /data/binlogs
 chown mysql:mysql /data/binlogs
@@ -291,7 +290,7 @@ pid-file=/var/run/mariadb/mariadb.pid
 ssl=0
 server-id = 1
 
-datadir=/data/mysql
+datadir=/data/mysql/data
 log-error=/data/mysql/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 socket=/var/lib/mysql/mysql.sock
@@ -362,7 +361,7 @@ EOF
 
 Enable binlog if necessary:
 ```sh
-cat >> /opt/mysql/my.cnf <<'EOF'
+cat >> /etc/my.cnf <<'EOF'
 
 #binlog
 log-bin = mysql-bin.log
@@ -450,8 +449,8 @@ Change `blowfish_secret`, `auth_type`, `host`, and other configs.
 ### Python 3.6
 
 ```sh
+rpm -ivUh https://centos7.iuscommunity.org/ius-release.rpm
 yum -y update
 yum -y install yum-utils
-rpm -ivUh https://centos7.iuscommunity.org/ius-release.rpm
-yum -y install python36u python36u-pip python36u-devel
+yum -y install python36u python36u-libs python36u-devel python36u-pip
 ```
