@@ -267,8 +267,8 @@ chown mysql:mysql /data/binlogs
 my.cnf
 
 ```sh
-cp -a /etc/my.cnf{,_bak}
-cat > /etc/my.cnf <<'EOF'
+cp -a /etc/percona-server.conf.d/mysqld.cnf{,_bak}
+cat > /etc/percona-server.conf.d/mysqld.cnf <<'EOF'
 [mysql]
 default-character-set = utf8mb4
 [mysqladmin]
@@ -283,112 +283,113 @@ default-character-set = utf8mb4
 default-character-set = utf8mb4
 
 [mysqld_safe]
-log-error=/var/log/mariadb/mariadb.log
-pid-file=/var/run/mariadb/mariadb.pid
+log-error = /var/log/mariadb/mariadb.log
+pid-file  = /var/run/mariadb/mariadb.pid
 
 [mysqld]
 ssl=0
 server-id = 1
 
-datadir=/data/mysql/data
-log-error=/data/mysql/mysqld.log
-pid-file=/var/run/mysqld/mysqld.pid
-socket=/var/lib/mysql/mysql.sock
+datadir   = /data/mysql/data
+log-error = /data/mysql/mysqld.log
+pid-file  = /var/run/mysqld/mysqld.pid
+socket    = /var/lib/mysql/mysql.sock
 
 #common InnoDB/XtraDB settings
-#innodb_buffer_pool_instances=4(default=8)
-innodb_buffer_pool_size = 32768M  # x 1.2 + 2GB for OS = 16.4GB node w/o MyISAM
-innodb_log_file_size = 256M  # suitable for most environments
+#innodb_buffer_pool_instances  = 4(default=8)
+innodb_buffer_pool_size        = 32768M  # x 1.2 + 2GB for OS = 16.4GB node w/o MyISAM
+innodb_log_file_size           = 256M    # suitable for most environments
 innodb_flush_log_at_trx_commit = 2
-innodb_flush_method = O_DIRECT
-innodb_file_per_table = 1
-default-storage-engine = innodb
+innodb_flush_method            = O_DIRECT
+innodb_file_per_table          = 1
+default-storage-engine         = innodb
 
 #Percona Server enhancements
 #http://www.percona.com/doc/percona-server
-innodb_empty_free_list_algorithm = backoff
-innodb_buffer_pool_dump_pct=30          #5.7 new
-innodb_buffer_pool_load_at_startup = 1  #5.7 new
-innodb_buffer_pool_dump_at_shutdown = 1 #5.7 new
-relay_log_recovery = 1
-innodb_corrupt_table_action = warn  # 5.5.10-20.1 introduced
-log_slow_verbosity = full
-userstat = ON  # 5.5.10-20.1 introduced
-kill_idle_transaction = 5
+innodb_empty_free_list_algorithm    = backoff
+innodb_buffer_pool_dump_pct         = 30   # 5.7 new
+innodb_buffer_pool_load_at_startup  = 1    # 5.7 new
+innodb_buffer_pool_dump_at_shutdown = 1    # 5.7 new
+relay_log_recovery                  = 1
+innodb_corrupt_table_action         = warn # 5.5.10-20.1 introduced
+log_slow_verbosity                  = full
+userstat                            = ON   # 5.5.10-20.1 introduced
+kill_idle_transaction               = 5
 
 #common business settings
-back_log = 500
-max_connections = 3000  # should be easy job in a big server
-max_connect_errors = 100000
-thread_cache_size = 64
-table_open_cache = 1024
-sort_buffer_size = 2M
-read_buffer_size = 2M
-join_buffer_size = 2M
+back_log             = 500
+max_connections      = 3000  # should be easy job in a big server
+max_connect_errors   = 100000
+thread_cache_size    = 64
+table_open_cache     = 1024
+sort_buffer_size     = 2M
+read_buffer_size     = 2M
+join_buffer_size     = 2M
 read_rnd_buffer_size = 4M
-open_files_limit = 65535
+open_files_limit     = 65535
 
 #GTID
-gtid_mode = ON
+gtid_mode                = ON
 enforce-gtid-consistency = ON
 
 explicit_defaults_for_timestamp = ON
 
 #common mysqld setting
 skip-symbolic-links
-read_only = 0
-default_password_lifetime=0
-max_allowed_packet = 16M  # same to master
-user = mysql
-skip-external-locking  # a.k.a skip-locking
+read_only                 = 0
+default_password_lifetime = 0
+max_allowed_packet        = 16M   # same to master
+user                      = mysql
+
+skip-external-locking             # a.k.a skip-locking
 skip-name-resolve
-skip-slave-start = 1
-character-set-server = utf8mb4  # default-character-set is deprecated in 5.0
-collation-server = utf8mb4_general_ci
-tmpdir = /dev/shm
-log_output = FILE
-general_log = OFF
-slow_query_log = 1  # ON is not recognized in 5.1.46
-binlog_format=ROW
-slave_skip_errors = 1062
-max_slowlog_size=5
-max_slowlog_size=2097152 #percona 5.7 new
-long_query_time = 1  # in seconds, determine slow query
-general_log_file = query.log  # log is deprecated as of 5.1.29
-slow_query_log_file = slow-query.log  # log_slow_queries and log_queries_not_using_index are deprecated as of 5.1.29
+skip-slave-start     = 1
+character-set-server = utf8mb4    # default-character-set is deprecated in 5.0
+collation-server     = utf8mb4_general_ci
+tmpdir               = /dev/shm
+log_output           = FILE
+general_log          = OFF
+slow_query_log       = 1          # ON is not recognized in 5.1.46
+binlog_format        = ROW
+slave_skip_errors    = 1062
+max_slowlog_size     = 5
+max_slowlog_size     = 2097152    # percona 5.7 new
+long_query_time      = 1          # in seconds, determine slow query
+general_log_file     = query.log  # log is deprecated as of 5.1.29
+slow_query_log_file  = slow-query.log  # log_slow_queries and log_queries_not_using_index are deprecated as of 5.1.29
 EOF
 ```
 
 Enable binlog if necessary:
 ```sh
-cat >> /etc/my.cnf <<'EOF'
+cat >> /etc/percona-server.cnf <<'EOF'
 
 #binlog
-log-bin = mysql-bin.log
-sync_binlog = 1  # BBU-backed RAID or flash
-relay-log = relay-bin.log  # auto purge by default, see relay-log-purge
-relay-log-purge = 0  # MHA node
+log-bin             = mysql-bin.log
+sync_binlog         = 1  # BBU-backed RAID or flash
+relay-log           = relay-bin.log  # auto purge by default, see relay-log-purge
+relay-log-purge     = 0  # MHA node
 log-slave-updates
-sync_master_info               = 1
-sync_relay_log                 = 1
-sync_relay_log_info            = 1
+sync_master_info    = 1
+sync_relay_log      = 1
+sync_relay_log_info = 1
 
 #replication
-replicate-same-server-id = 0
-log_bin = /data/binlogs/mysql-bin
-binlog-ignore-db = mysql
-binlog-ignore-db = test
-binlog-ignore-db = information_schema
-binlog-ignore-db = performance_schema
-replicate-ignore-db = mysql
-replicate-ignore-db = test
-replicate-ignore-db = information_schema
-replicate-ignore-db = performance_schema
-master_info_repository=TABLE
-relay_log_info_repository=TABLE
-slave_parallel_workers=0
-slave_preserve_commit_order=1
-slave_parallel_type = LOGICAL_CLOCK
+replicate-same-server-id    = 0
+log_bin                     = /data/binlogs/mysql-bin
+binlog-ignore-db            = mysql
+binlog-ignore-db            = test
+binlog-ignore-db            = information_schema
+binlog-ignore-db            = performance_schema
+replicate-ignore-db         = mysql
+replicate-ignore-db         = test
+replicate-ignore-db         = information_schema
+replicate-ignore-db         = performance_schema
+master_info_repository      = TABLE
+relay_log_info_repository   = TABLE
+slave_parallel_workers      = 0
+slave_preserve_commit_order = 1
+slave_parallel_type         = LOGICAL_CLOCK
 EOF
 ```
 
