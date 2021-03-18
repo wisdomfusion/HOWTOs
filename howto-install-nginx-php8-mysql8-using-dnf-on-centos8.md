@@ -327,7 +327,7 @@ EOF
 
 Enable binlog if necessary:
 ```sh
-cat >> /etc/percona-server.cnf <<'EOF'
+cat >> /etc/my.cnf.d/mysql-server.cnf <<'EOF'
 
 #binlog
 log-bin             = mysql-bin.log
