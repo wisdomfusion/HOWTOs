@@ -608,34 +608,33 @@ http
 EOF
 ```
 
-nginx 日志轮询：
-
-- nginx 日志存放位置：`/data/log/nginx`
-- 日志轮询脚本：`/opt/nginx/cut_nginx_log.sh`
-- nginx pid 文件位置：`/opt/nginx/logs/nginx.pid`
-
+nginx systemd 单元文件：
 ```sh
-cat > /opt/nginx/cut_nginx_log.sh <<\EOF
-#!/bin/bash
-# cut_nginx_log.sh
-# This script run at 00:00
+cat > /etc/systemd/system/nginx.service\EOF
+[Unit]
+Description=nginx - high performance web server
+Documentation=https://nginx.org/en/docs/
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
 
-# The Nginx logs path
-log_path="/data/log/nginx"
-new_log_path=${log_path}/$(date -d 'yesterday' '+%Y%m%d')
+[Service]
+Type=forking
+PIDFile=/opt/nginx/logs/nginx.pid
+ExecStartPre=/opt/nginx/sbin/nginx -t -c /opt/nginx/conf/nginx.conf
+ExecStart=/opt/nginx/sbin/nginx -c /opt/nginx/conf/nginx.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
 
-mkdir -p ${new_log_path}
-mv ${log_path}/*.log ${new_log_path}
-
-kill -USR1 `cat /opt/nginx/logs/nginx.pid`
+[Install]
+WantedBy=multi-user.target
 EOF
 ```
 
-crontab 中添加定时任务，00:00 执行日志轮询：
-
+nginx 服务启停：
 ```sh
-crontab -e
-0 0 * * * /bin/bash /opt/nginx/cut_nginx_log.sh
+systemctl enable nginx.service
+systemctl start nginx.service
+systemctl stop nginx.service
 ```
 
 ## 其他
