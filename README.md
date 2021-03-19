@@ -4,6 +4,8 @@
 
 **System Administration**
 
+- [x] [How to Install Nginx with PHP 8 and MySQL 8 from Source on CentOS 8](howto-install-nginx-php8-mysql8-from-source-on-centos8.md)
+- [x] [How to Install Nginx with PHP 8 and MySQL 8 Using Yum on CentOS 8](howto-install-nginx-php8-mysql8-using-dnf-on-centos8.md)
 - [x] [How to Install Nginx with PHP 7 and MySQL 5.7 from Source on CentOS 7](howto-install-nginx-php7-mysql57-from-source-on-centos7.md)
 - [x] [How to Install Nginx with PHP 7 and MySQL 5.7 Using Yum on CentOS 7](howto-install-nginx-php7-mysql57-using-yum-on-centos7.md)
 - [ ] [How to Install nginx with PHP 7 and MySQL 5.7 on Ubuntu 18.04 LTS](howto-install-nginx-php7-mysql57-on-ubuntu18.04.md)

@@ -1,4 +1,4 @@
-# How to Install nginx with PHP 8 and MySQL 8 Using dnf on CentOS 8
+# LEMP: How to Install nginx with PHP 8 and MySQL 8 Using dnf on CentOS 8
 
 ## Enable network
 
@@ -43,6 +43,7 @@ timedatectl set-timezone Asia/Shanghai
 ## chronyd
 
 ```sh
+dnf -y install chrony
 systemctl enable chronyd.service
 systemctl start chronyd.service
 ```
@@ -276,7 +277,7 @@ my.cnf
 cp -a /etc/my.cnf.d/mysql-server.cnf{,_bak}
 cat > /etc/my.cnf.d/mysql-server.cnf <<'EOF'
 [mysqld]
-ssl=0
+ssl       = 0
 server-id = 1
 
 datadir   = /data/mysql/data
@@ -284,14 +285,14 @@ log-error = /data/mysql/mysqld.log
 pid-file  = /var/run/mysqld/mysqld.pid
 socket    = /var/lib/mysql/mysql.sock
 
-#common mysqld setting
+# common mysqld setting
 read_only                 = 0
 default_password_lifetime = 0
 max_allowed_packet        = 16M   # same to master
 user                      = mysql
 
-#common InnoDB/XtraDB settings
-#innodb_buffer_pool_instances  = 4(default=8)
+# common InnoDB/XtraDB settings
+# innodb_buffer_pool_instances  = 4      # default=8
 innodb_buffer_pool_size        = 32768M  # x 1.2 + 2GB for OS = 16.4GB node w/o MyISAM
 innodb_log_file_size           = 256M
 innodb_flush_log_at_trx_commit = 2
@@ -299,7 +300,7 @@ innodb_flush_method            = O_DIRECT
 innodb_file_per_table          = 1
 default-storage-engine         = innodb
 
-#common business settings
+# common business settings
 back_log             = 500
 max_connections      = 3000
 max_connect_errors   = 100000
@@ -311,7 +312,7 @@ join_buffer_size     = 2M
 read_rnd_buffer_size = 4M
 open_files_limit     = 65535
 
-#GTID
+# GTID
 gtid_mode                = ON
 enforce-gtid-consistency = ON
 
@@ -406,4 +407,4 @@ chown -R www:www phpmyadmin/
 cp -a phpmyadmin/config.sample.inc.php phpmyadmin/config.inc.php
 ```
 
-Change `blowfish_secret`, `auth_type`, `host`, and other configs.
+Change `blowfish_secret`, `auth_type`, `host`, and other configrations.
