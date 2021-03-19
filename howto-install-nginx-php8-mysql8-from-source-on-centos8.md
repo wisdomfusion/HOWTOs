@@ -1,6 +1,6 @@
 # LEMP: How to Install nginx with PHP 8 and MySQL 8 from Source on CentOS 8
 
-## 0. 约定
+## 约定
 
 - 暂用系统用户 root 方便安装调试
 - 主机IP地址：192.168.111.106
