@@ -2,7 +2,7 @@
 
 "How to" documents on special subjects.
 
-**System Administration**
+**SRE**
 
 - [x] [How to Install Nginx with PHP 8 and MySQL 8 from Source on CentOS 8](howto-install-nginx-php8-mysql8-from-source-on-centos8.md)
 - [x] [How to Install Nginx with PHP 8 and MySQL 8 Using Yum on CentOS 8](howto-install-nginx-php8-mysql8-using-dnf-on-centos8.md)
@@ -19,6 +19,6 @@
 - [x] [How to Install Multiple Versions of Perl on Mac OS X](howto-install-multiple-versions-of-perl-on-macosx.md)
 - [x] [How to Install Perl Modules Using App::cpanminus (cpanm)](howto-install-perl-moudles-using-cpanminus.md)
 
-**OS X**
+**macOS**
 
 - [x] [How to Install httpd 2.2 with PHP 5.6 and MySQL 5.7 on Mac OS X](howto-install-httpd22-php56-mysql57-on-macosx.md)

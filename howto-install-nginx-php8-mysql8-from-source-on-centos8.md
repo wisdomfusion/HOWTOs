@@ -121,7 +121,7 @@ cd /usr/src/
 cat *.gz *.tgz | tar zxf - -i
 ```
 
-## 安装
+## 安装服务
 
 ### 安装 MySQL 8
 
@@ -269,7 +269,7 @@ MySQL 启停：
 /etc/init.d/mysqld stop
 ```
 
-### 开始 PHP 8
+### 安装 PHP
 
 #### 安装准备工作
 
