@@ -1,4 +1,4 @@
-# LEMP: How to Install nginx with PHP 8 and MySQL 8 from Source on CentOS 8
+# How to Install nginx with PHP 8 and MySQL 8 (LEMP stack) from Source on CentOS 8
 
 ## 约定
 

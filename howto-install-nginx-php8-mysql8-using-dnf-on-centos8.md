@@ -1,4 +1,4 @@
-# LEMP: How to Install nginx with PHP 8 and MySQL 8 Using dnf on CentOS 8
+# How to Install nginx with PHP 8 and MySQL 8 (LEMP stack) Using dnf on CentOS 8
 
 ## Enable network
 
