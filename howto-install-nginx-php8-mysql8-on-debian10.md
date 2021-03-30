@@ -73,7 +73,7 @@
 
 ## 服务安装配置
 
-### SSH 服务
+### 安装 SSH 服务
 
 安装 sshd：
 
@@ -102,7 +102,7 @@
     22/tcp                     ALLOW       Anywhere
     22/tcp (v6)                ALLOW       Anywhere (v6)
 
-## 安装 nginx Web 服务器
+### 安装 nginx Web 服务器
 
 安装 nginx：
 
@@ -122,11 +122,11 @@
     22/tcp (v6)                ALLOW       Anywhere (v6)
     Nginx HTTP (v6)            ALLOW       Anywhere (v6)
 
-## 安装 MySQL 8.0
+### 安装 MySQL 8.0
 
 Debian 10 把 MySQL 的分支版本 MariaDB 添加到默认的 APT 源中，原生 MySQL 反而没有包含在内，所以，安装之前我们需要做些额外的工作。
 
-### 添加 MySQL 官方 APT 源
+#### 添加 MySQL 官方 APT 源
 
 首先，我们访问 [MySQL APT Repository](https://dev.mysql.com/downloads/repo/apt/)，获取当前最新的 MySQL APT deb 包的 URL（如 `https://repo.mysql.com//mysql-apt-config_0.8.16-1_all.deb`），此 deb 包实际上是 APT 源配置工具，运行如下命令，按提示设置 MySQL 8.0 安装源。
 
@@ -139,7 +139,7 @@ Debian 10 把 MySQL 的分支版本 MariaDB 添加到默认的 APT 源中，原�
 
     $ sudo apt update
 
-### 安装 mysql-server
+#### 安装 mysql-server
 
 运行如下命令安装 mysql-server
 
@@ -168,9 +168,9 @@ Debian 10 把 MySQL 的分支版本 MariaDB 添加到默认的 APT 源中，原�
 
     $ mysql_secure_installation
 
-## 安装 PHP 8
+### 安装 PHP 8
 
-### 添加 PHP 8 安装源
+#### 添加 PHP 8 安装源
 
 Debian GNU/Linux 默认只有 PHP7 的安装源，类似 MySQL 8.0，也要安装一个靠谱的 APT 源，这里选用 [sury APT 源](https://packages.sury.org/)。
 
@@ -179,7 +179,7 @@ Debian GNU/Linux 默认只有 PHP7 的安装源，类似 MySQL 8.0，也要安�
     $ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
     $ wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
 
-### 安装 PHP 8.0
+#### 安装 PHP 8.0
 
     $ sudo apt update
     $ sudo apt install -y php8.0
@@ -198,7 +198,7 @@ Debian GNU/Linux 默认只有 PHP7 的安装源，类似 MySQL 8.0，也要安�
     $ curl -sS https://getcomposer.org/installer | sudo  php -- --install-dir=/usr/local/bin --filename=composer
     $ sudo chmod +x /usr/local/bin/composer
 
-### 构建 Laravel 演示项目，并添加必要的站点配置
+#### 构建 Laravel 演示项目，并添加必要的站点配置
 
 前往 `/var/www` 构建 Laravel 演示项目，该还示项目的项目假定为 `debian.wf.com`：
 
