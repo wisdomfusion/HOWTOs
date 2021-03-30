@@ -81,7 +81,12 @@
 
 ### 安装 ufw 防火墙工具
 
+安装 ufw：
+
     $ sudo apt install ufw
+
+必要的配置：
+
     $ sudo ufw default deny incoming
     $ sudo ufw default allow outgoing
     $ sudo ufw allow ssh
@@ -119,7 +124,7 @@
 
 ## 安装 MySQL 8.0
 
-Debian 10 把 MySQL 的分支版本 MariaDB 添加到默认的 APT 源中，原生 MySQL 反而没有包含在内，所以，安装之前我需要作些额外的工作。
+Debian 10 把 MySQL 的分支版本 MariaDB 添加到默认的 APT 源中，原生 MySQL 反而没有包含在内，所以，安装之前我们需要做些额外的工作。
 
 ### 添加 MySQL 官方 APT 源
 
