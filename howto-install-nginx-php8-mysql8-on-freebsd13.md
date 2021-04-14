@@ -89,7 +89,41 @@ service mongod start
 
 ```sh
 pkg install -y openjdk11 openjdk11-jre
+```
 
+    ...
+    
+    This OpenJDK implementation requires fdescfs(5) mounted on /dev/fd and
+    procfs(5) mounted on /proc.
+
+    If you have not done it yet, please do the following:
+
+            mount -t fdescfs fdesc /dev/fd
+            mount -t procfs proc /proc
+
+    To make it permanent, you need the following lines in /etc/fstab:
+
+            fdesc   /dev/fd         fdescfs         rw      0       0
+            proc    /proc           procfs          rw      0       0
+    =====
+    Message from openjdk11-jre-11.0.10+9.1_1:
+
+    --
+    This OpenJDK implementation requires fdescfs(5) mounted on /dev/fd and
+    procfs(5) mounted on /proc.
+
+    If you have not done it yet, please do the following:
+
+            mount -t fdescfs fdesc /dev/fd
+            mount -t procfs proc /proc
+
+    To make it permanent, you need the following lines in /etc/fstab:
+
+            fdesc   /dev/fd         fdescfs         rw      0       0
+            proc    /proc           procfs          rw      0       0
+
+
+```sh
 mount -t fdescfs fdesc /dev/fd
 mount -t procfs proc /proc
 ```
