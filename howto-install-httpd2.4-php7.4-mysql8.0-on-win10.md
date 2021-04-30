@@ -62,6 +62,7 @@ Apache HTTP Server Project 官网不提供 httpd 的二进制包下载，这里�
 
     "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqld.exe" --defaults-file="C:\ProgramData\MySQL\MySQL Server 8.0\my.ini" MySQL80
 
+查看 `collation` 配置：
 
     mysql> show variables like '%collation%';
     +-------------------------------+--------------------+
@@ -74,6 +75,7 @@ Apache HTTP Server Project 官网不提供 httpd 的二进制包下载，这里�
     +-------------------------------+--------------------+
     4 rows in set, 1 warning (0.00 sec)
 
+查看 `character set` 配置：
 
     mysql> show variables like 'character_set%';
     +--------------------------+---------------------------------------------------------+
@@ -92,7 +94,7 @@ Apache HTTP Server Project 官网不提供 httpd 的二进制包下载，这里�
 
 ## 配置 httpd vhosts 以添加 phpMyAdmin 访问入口
 
-假定用 pma.wf.com 这个域名指向本地的 phpMyAdmin 程序。我们从 phpMyAdmin 官网下载最新版的程序，解压到 `D:\localserver\phpmyadmin` 目录。新版本的 phpMyAdmin 需要 `composer` 命令安装依赖包，所以我们先安装 `composer`。
+假定用 pma.wf.com 这个域名指向本地的 phpMyAdmin 程序。我们从 [phpMyAdmin 官网](https://www.phpmyadmin.net/)下载最新版的程序，解压到 `D:\localserver\phpmyadmin` 目录。新版本的 phpMyAdmin 需要 `composer` 命令安装依赖包，所以我们先安装 `composer`。
 
 ### 配置 PHP
 
