@@ -15,6 +15,10 @@
 - [x] [How To Use Systemctl to Manage Systemd Services in CentOS 7](howto-use-systemctl-to-manage-systemd-services-in-centos7.md)
 - [x] [How to Install postfix on CentOS 6](howto-install-postfix-on-centos6.md)
 
+## WAMP
+
+- [x] [How to Install httpd 2.4 with PHP 7.4 and MySQL 8.0 on Windows 10](howto-install-httpd2.4-php7.4-mysql8.0-on-win10.md)
+
 ## Perl
 
 - [x] [How to Install Multiple Versions of Perl on Mac OS X](howto-install-multiple-versions-of-perl-on-macosx.md)
