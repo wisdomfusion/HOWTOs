@@ -66,7 +66,7 @@ Create a copy of Tomcat with JRE 7:
 ```sh
 cp -a /opt/apache-tomcat-8.5.70 /opt/apache-tomcat-8.5.70_jre7
 
-useradd -m -d /opt/tomcat -U tomcat -s /sbin/nologin
+useradd -m -d /opt/tomcat -s /sbin/nologin -U tomcat
 chown -R tomcat:tomcat /opt/apache-tomcat-8*
 ```
 
