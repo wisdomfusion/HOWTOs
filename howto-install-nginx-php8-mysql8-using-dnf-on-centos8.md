@@ -48,6 +48,13 @@ systemctl enable chronyd.service
 systemctl start chronyd.service
 ```
 
+## disable IPv6
+
+```sh
+
+```
+
+
 ## disable SELinux
 
 ```sh
@@ -82,6 +89,8 @@ dnf -y install git man wget unzip zip net-tools nmap iptraf iotop sysstat bash-c
 ```sh
 dnf -y install vim-enhanced
 alias vi='vim'
+
+echo >> ~/.bashrc
 echo "alias vi='vim'" >> ~/.bashrc
 echo "set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936" >> ~/.vimrc
 echo "set fileformats=unix,dos" >> ~/.vimrc

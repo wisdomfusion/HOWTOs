@@ -22,16 +22,6 @@ export JAVA_HOME=/opt/jdk1.8.0_301
 export JRE_HOME=${JAVA_HOME}/jre
 export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 export PATH=${JAVA_HOME}/bin:$PATH
-
-alias java=${JAVA_HOME}/bin/java
-
-export JAVA7_HOME=/opt/jdk1.7.0_80
-export JRE7_HOME=${JAVA7_HOME}/jre
-export CLASSPATH=.:${JAVA7_HOME}/lib:${JRE7_HOME}/lib
-export PATH=${JAVA7_HOME}/bin:$PATH
-
-alias java7=${JAVA7_HOME}/bin/java
-
 EOF
 
 source ~/.bashrc
@@ -44,10 +34,6 @@ Verify `java` command for JDK 1.8 and `java7` command for JDK 1.7:
 java version "1.8.0_301"
 Java(TM) SE Runtime Environment (build 1.8.0_301-b09)
 Java HotSpot(TM) 64-Bit Server VM (build 25.301-b09, mixed mode)
-[root@localhost ~]# java7 -version
-java version "1.7.0_80"
-Java(TM) SE Runtime Environment (build 1.7.0_80-b15)
-Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)
 ```
 
 ## Install Apache Tomcat 8 (Compatiable with JDK 1.7+)
@@ -66,7 +52,7 @@ Create a copy of Tomcat with JRE 7:
 ```sh
 cp -a /opt/apache-tomcat-8.5.70 /opt/apache-tomcat-8.5.70_jre7
 
-useradd -m -d /opt/tomcat -s /sbin/nologin -U tomcat
+useradd -m -s /sbin/nologin -U tomcat
 chown -R tomcat:tomcat /opt/apache-tomcat-8*
 ```
 
