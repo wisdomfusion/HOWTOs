@@ -59,9 +59,9 @@ chown -R tomcat:tomcat /opt/apache-tomcat-8*
 Config systemd service:
 
 ```sh
-cat > /etc/systemd/system/tomcat.service <<'EOF'
+cat > /etc/systemd/system/tomcat_jre8.service <<'EOF'
 [Unit]
-Description=Tomcat 8.5
+Description=Tomcat 8.5 with JRE 8
 After=network.target
 
 [Service]
@@ -76,8 +76,8 @@ Environment=CATALINA_HOME=/opt/apache-tomcat-8.5.73_jre8
 Environment=CATALINA_PID=/opt/apache-tomcat-8.5.73_jre8/temp/tomcat.pid
 Environment=CATALINA_OPTS=-Xms1g -Xmx1g -server
 
-ExecStart=/opt/apache-tomcat-8.5.73/bin/catalina.sh start
-ExecStop=/opt/apache-tomcat-8.5.73/bin/catalina.sh stop
+ExecStart=/opt/apache-tomcat-8.5.73_jre8/bin/catalina.sh start
+ExecStop=/opt/apache-tomcat-8.5.73_jre8/bin/catalina.sh stop
 
 [Install]
 WantedBy=multi-user.target
@@ -114,8 +114,8 @@ Enable and start up tomcat servers:
 
 ```sh
 systemctl daemon-reload
-systemctl enable tomcat.service
-systemctl start tomcat.service
+systemctl enable tomcat_jre8.service
+systemctl start tomcat_jre8.service
 systemctl enable tomcat_jre7.service
 systemctl start tomcat_jre7.service
 ```

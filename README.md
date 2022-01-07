@@ -6,7 +6,7 @@
 
 - [x] [How to Install Docker and Docker Compose on Ubuntu 20.04](howto-install-docker-and-docker-compose-on-ubuntu20.04.md)
 - [x] [How to Install nginx with PHP 8 and MySQL 8 on Debian 10](howto-install-nginx-php8-mysql8-on-debian10.md)
-- [x] [How to Install nginx with PHP 7 and MySQL 8 on Debian 9.9](howto-install-nginx-phpp7-mysql8-on-debian9.md)
+- [x] [How to Install nginx with PHP 7 and MySQL 8 on Debian 9.9](howto-install-nginx-php7-mysql8-on-debian9.md)
 - [x] [How to Install nginx with PHP 8 and MySQL 8 from Source on CentOS 8](howto-install-nginx-php8-mysql8-from-source-on-centos8.md)
 - [x] [How to Install nginx with PHP 8 and MySQL 8 Using dnf on CentOS 8](howto-install-nginx-php8-mysql8-using-dnf-on-centos8.md)
 - [x] [How to Install nginx with PHP 8 and MySQL 8 on FreeBSD 13](howto-install-nginx-php8-mysql8-on-freebsd13.md)
