@@ -222,12 +222,12 @@ Debian GNU/Linux 默认只有 PHP7 的安装源，类似 MySQL 8.0，也要安�
 
         location ~ \.php$ {
             include snippets/fastcgi-php.conf;
-            fastcgi_pass unix:/run/php/php8.0-fpm.sock;
+            fastcgi_pass unix:/run/php/php7.2-fpm.sock;
         }
     }
 
 重点 PHP-FPM 和 nginx 服务使配置生效：
 
-    sudo systemctl restart php8.0-fpm.service
+    sudo systemctl restart php7.2-fpm.service
     sudo systemctl restart nginx.service
 
